@@ -42,7 +42,7 @@
 typedef HANDLE ScmInternalThread;
 #define SCM_INTERNAL_THREAD_INIT(thr)   ((thr) = INVALID_HANDLE_VALUE)
 #define SCM_INTERNAL_THREAD_INITIALIZED_P(thr) \
-    ((thr) != INVALID_HANDLE_VALUE)
+	((thr) != INVALID_HANDLE_VALUE)
 #define SCM_INTERNAL_THREAD_GETCURRENT()  GetCurrentThread()
 #define SCM_INTERNAL_THREAD_SETSPECIFIC(key, val) TlsSetValue(key, val)
 #define SCM_INTERNAL_THREAD_EXIT()        Scm__WinThreadExit()
@@ -51,23 +51,23 @@ SCM_EXTERN void Scm__WinThreadExit(void);
 
 /* to mimic pthread_cleanup things */
 typedef struct ScmWinCleanupRec {
-    void (*cleanup)(void *data);
-    void *data;
-    struct ScmWinCleanupRec *prev;
+	void (*cleanup)(void *data);
+	void *data;
+	struct ScmWinCleanupRec *prev;
 } ScmWinCleanup;
 
 #define SCM_INTERNAL_THREAD_CLEANUP_PUSH(fn_, data_) \
-    do { ScmWinCleanup cup__;                     \
-         ScmVM *vm__ = Scm_VM();                  \
-         cup__.cleanup = (fn_);                   \
-         cup__.data = (data_);                    \
-         cup__.prev = vm__->winCleanup;           \
-         vm__->winCleanup = &cup__
+	do { ScmWinCleanup cup__;                     \
+	     ScmVM *vm__ = Scm_VM();                  \
+	     cup__.cleanup = (fn_);                   \
+	     cup__.data = (data_);                    \
+	     cup__.prev = vm__->winCleanup;           \
+	     vm__->winCleanup = &cup__
 
 #define SCM_INTERNAL_THREAD_CLEANUP_POP() \
-        vm__->winCleanup = cup__.prev;    \
-        cup__.cleanup(cup__.data);        \
-    } while (0)
+	vm__->winCleanup = cup__.prev;    \
+	cup__.cleanup(cup__.data);        \
+	} while (0)
 
 #define SCM_INTERNAL_THREAD_PROC_RETTYPE   DWORD WINAPI
 #define SCM_INTERNAL_THREAD_PROC_RETVAL    0
@@ -89,11 +89,11 @@ SCM_EXTERN void Scm__MutexCleanup(void *); /* in core.c */
 /* TODO: We need to implement the safe cancel mechanism
    and then handle this safe lock stuff.  For now, just a placeholder. */
 #define SCM_INTERNAL_MUTEX_SAFE_LOCK_BEGIN(mutex) \
-    SCM_INTERNAL_MUTEX_LOCK(mutex);               \
-    SCM_INTERNAL_THREAD_CLEANUP_PUSH(Scm__MutexCleanup, &mutex)
+	SCM_INTERNAL_MUTEX_LOCK(mutex);               \
+	SCM_INTERNAL_THREAD_CLEANUP_PUSH(Scm__MutexCleanup, &mutex)
 
 #define SCM_INTERNAL_MUTEX_SAFE_LOCK_END() \
-    SCM_INTERNAL_THREAD_CLEANUP_POP()
+	SCM_INTERNAL_THREAD_CLEANUP_POP()
 
 /* Condition variable
 
@@ -102,25 +102,25 @@ SCM_EXTERN void Scm__MutexCleanup(void *); /* in core.c */
    it.  Instead we emulate posix condition variable semantics.
    We follow the SignalObjectAndWait solution shown in
    <http://www1.cse.wustl.edu/~schmidt/win32-cv-1.html>
-*/
+ */
 typedef struct ScmInternalCondRec {
-   int numWaiters;                  /* # of waiting threads */
-   CRITICAL_SECTION numWaitersLock; /* protect numWaiters */
-   HANDLE mutex;                    /* protect cond operations */
-   HANDLE sem;                      /* to queue waiting threads */
-   HANDLE done;                     /* an auto-reset event for a waiter
-                                       threads to tell CV that it's
-                                       finished examining the condition. */
-   int broadcast;                   /* flag to indicate whether we're
-                                       bloadcasting or just signalling. */
+	int numWaiters;             /* # of waiting threads */
+	CRITICAL_SECTION numWaitersLock; /* protect numWaiters */
+	HANDLE mutex;               /* protect cond operations */
+	HANDLE sem;                 /* to queue waiting threads */
+	HANDLE done;                /* an auto-reset event for a waiter
+	                               threads to tell CV that it's
+	                               finished examining the condition. */
+	int broadcast;              /* flag to indicate whether we're
+	                               bloadcasting or just signalling. */
 } ScmInternalCond;
 #define SCM_INTERNAL_COND_INIT(cond)        Scm__InternalCondInit(&(cond))
 #define SCM_INTERNAL_COND_SIGNAL(cond)      Scm__InternalCondSignal(&(cond))
 #define SCM_INTERNAL_COND_BROADCAST(cond)   Scm__InternalCondBroadcast(&(cond))
 #define SCM_INTERNAL_COND_WAIT(cond, mutex) \
-    Scm__InternalCondWait(&(cond), &(mutex), NULL)
+	Scm__InternalCondWait(&(cond), &(mutex), NULL)
 #define SCM_INTERNAL_COND_TIMEDWAIT(cond, mutex, ptimespec) \
-    Scm__InternalCondWait(&(cond), &(mutex), (ptimespec))
+	Scm__InternalCondWait(&(cond), &(mutex), (ptimespec))
 #define SCM_INTERNAL_COND_DESTROY(cond)     Scm__InternalCondDestroy(&(cond))
 #define SCM_INTERNAL_COND_INITIALIZER       {0}
 #define SCM_INTERNAL_COND_TIMEDOUT          1
@@ -157,10 +157,10 @@ typedef HANDLE ScmInternalFastlock;
 #define SCM_INTERNAL_SYNC()                 MemoryBarrier()
 #else
 #define SCM_INTERNAL_SYNC()                     \
-    do {                                        \
-        long dummy = 0;                         \
-        InterlockedExchange(&dummy, 1);         \
-    } while (0)
+	do {                                        \
+		long dummy = 0;                         \
+		InterlockedExchange(&dummy, 1);         \
+	} while (0)
 #endif
 
 #endif /* GAUCHE_WTHREAD_H */

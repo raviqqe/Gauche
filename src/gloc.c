@@ -41,81 +41,81 @@
 static void gloc_print(ScmObj obj, ScmPort *port,
                        ScmWriteContext *ctx SCM_UNUSED)
 {
-    ScmGloc *g = SCM_GLOC(obj);
-    Scm_Printf(port, "#<gloc %S#%S%s>", g->module->name,
-               g->name,
-               (Scm_GlocConstP(g)
-                ? " const"
-                : (Scm_GlocInlinableP(g)
-                   ? " inlinable"
-                   : (SCM_GLOC_PHANTOM_BINDING_P(g)
-                      ? " phantom"
-                      : ""))));
+	ScmGloc *g = SCM_GLOC(obj);
+	Scm_Printf(port, "#<gloc %S#%S%s>", g->module->name,
+	           g->name,
+	           (Scm_GlocConstP(g)
+	            ? " const"
+	            : (Scm_GlocInlinableP(g)
+	               ? " inlinable"
+	               : (SCM_GLOC_PHANTOM_BINDING_P(g)
+	                  ? " phantom"
+	                  : ""))));
 }
 
 SCM_DEFINE_BUILTIN_CLASS_SIMPLE(Scm_GlocClass, gloc_print);
 
 ScmObj Scm_MakeGloc(ScmSymbol *sym, ScmModule *module)
 {
-    ScmGloc *g = SCM_NEW(ScmGloc);
-    SCM_SET_CLASS(g, &Scm_GlocClass);
-    g->name = sym;
-    g->module = module;
-    g->value = SCM_UNBOUND;
-    g->hidden = FALSE;
-    g->getter = NULL;
-    g->setter = NULL;
-    return SCM_OBJ(g);
+	ScmGloc *g = SCM_NEW(ScmGloc);
+	SCM_SET_CLASS(g, &Scm_GlocClass);
+	g->name = sym;
+	g->module = module;
+	g->value = SCM_UNBOUND;
+	g->hidden = FALSE;
+	g->getter = NULL;
+	g->setter = NULL;
+	return SCM_OBJ(g);
 }
 
 /* special setters for const and inlinable bindings. */
 ScmObj Scm_GlocConstSetter(ScmGloc *gloc, ScmObj val SCM_UNUSED)
 {
-    Scm_Error("cannot change constant value of %S#%S",
-              gloc->module->name, gloc->name);
-    return SCM_UNDEFINED;       /* dummy */
+	Scm_Error("cannot change constant value of %S#%S",
+	          gloc->module->name, gloc->name);
+	return SCM_UNDEFINED;   /* dummy */
 }
 
 ScmObj Scm_GlocInlinableSetter(ScmGloc *gloc, ScmObj val)
 {
-    Scm_Warn("altering binding of inlinable procedure: %S#%S",
-             gloc->module->name, gloc->name);
-    return val;
+	Scm_Warn("altering binding of inlinable procedure: %S#%S",
+	         gloc->module->name, gloc->name);
+	return val;
 }
 
 int Scm_GlocConstP(ScmGloc *gloc)
 {
-    return ((gloc)->setter == Scm_GlocConstSetter);
+	return ((gloc)->setter == Scm_GlocConstSetter);
 }
 
 int Scm_GlocInlinableP(ScmGloc *gloc)
 {
-    return ((gloc)->setter == Scm_GlocInlinableSetter);
+	return ((gloc)->setter == Scm_GlocInlinableSetter);
 }
 
 /* Change binding flags.  Do not use casually. */
 void Scm_GlocMark(ScmGloc *gloc, int flags)
 {
-    if (flags & SCM_BINDING_CONST) {
-        gloc->setter = Scm_GlocConstSetter;
-    } else if (flags & SCM_BINDING_INLINABLE) {
-        gloc->setter = Scm_GlocInlinableSetter;
-    } else {
-        gloc->setter = NULL;
-    }
+	if (flags & SCM_BINDING_CONST) {
+		gloc->setter = Scm_GlocConstSetter;
+	} else if (flags & SCM_BINDING_INLINABLE) {
+		gloc->setter = Scm_GlocInlinableSetter;
+	} else {
+		gloc->setter = NULL;
+	}
 }
 
 /* For the backward ABI compatibility */
 ScmObj Scm_GlocMarkConst(ScmGloc *gloc)
 {
-    Scm_GlocMark(gloc, SCM_BINDING_CONST);
-    return SCM_OBJ(gloc);
+	Scm_GlocMark(gloc, SCM_BINDING_CONST);
+	return SCM_OBJ(gloc);
 }
 
 /* For the backward ABI compatibility */
 ScmObj Scm_GlocUnmarkConst(ScmGloc *gloc)
 {
-    Scm_GlocMark(gloc, 0);
-    return SCM_OBJ(gloc);
+	Scm_GlocMark(gloc, 0);
+	return SCM_OBJ(gloc);
 }
 

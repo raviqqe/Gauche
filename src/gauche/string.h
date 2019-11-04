@@ -68,12 +68,12 @@
    it was OK, but for 64bit architecture it became an issue.
    As of 0.9.7, we switch to use ScmSmallInt for length and size, breaking
    the backward compatibility.
-*/
+ */
 typedef struct ScmStringBodyRec {
-    u_long flags;
-    ScmSmallInt length;
-    ScmSmallInt size;
-    const char *start;
+	u_long flags;
+	ScmSmallInt length;
+	ScmSmallInt size;
+	const char *start;
 } ScmStringBody;
 
 #if SIZEOF_LONG == 4
@@ -85,22 +85,22 @@ typedef struct ScmStringBodyRec {
 #endif
 
 struct ScmStringRec {
-    SCM_HEADER;
-    const ScmStringBody *body;  /* may be NULL if we use initial body. */
-    ScmStringBody initialBody;  /* initial body */
+	SCM_HEADER;
+	const ScmStringBody *body; /* may be NULL if we use initial body. */
+	ScmStringBody initialBody; /* initial body */
 };
 
 /* The flag value.  Some of them can be specified at construction time
    (marked 'C').  Some of them are kept in "flags" field of the string body
    (marked 'R). */
 enum ScmStringFlags {
-    SCM_STRING_IMMUTABLE  = (1L<<0),     /* [C,R] The string is immutable. */
-    SCM_STRING_INCOMPLETE = (1L<<1),     /* [C,R] The string is incomplete. */
-    SCM_STRING_TERMINATED = (1L<<2),     /* [R] The string content is
-                                            NUL-terminated.  This flag is used
-                                            internally. */
-    SCM_STRING_COPYING = (1L<<16),       /* [C]   Need to copy the content
-                                            given to the constructor. */
+	SCM_STRING_IMMUTABLE  = (1L<<0), /* [C,R] The string is immutable. */
+	SCM_STRING_INCOMPLETE = (1L<<1), /* [C,R] The string is incomplete. */
+	SCM_STRING_TERMINATED = (1L<<2), /* [R] The string content is
+	                                    NUL-terminated.  This flag is used
+	                                    internally. */
+	SCM_STRING_COPYING = (1L<<16),   /* [C]   Need to copy the content
+	                                    given to the constructor. */
 };
 #define SCM_STRING_FLAG_MASK  (0xffff)
 
@@ -110,7 +110,7 @@ SCM_CLASS_DECL(Scm_StringClass);
 #define SCM_STRINGP(obj)        SCM_XTYPEP(obj, SCM_CLASS_STRING)
 #define SCM_STRING(obj)         ((ScmString*)(obj))
 #define SCM_STRING_BODY(obj) \
-    ((const ScmStringBody*)(SCM_STRING(obj)->body?SCM_STRING(obj)->body:&SCM_STRING(obj)->initialBody))
+	((const ScmStringBody*)(SCM_STRING(obj)->body ? SCM_STRING(obj)->body : &SCM_STRING(obj)->initialBody))
 
 /* Accessor macros for string body */
 #define SCM_STRING_BODY_LENGTH(body)       ((body)->length)
@@ -119,20 +119,20 @@ SCM_CLASS_DECL(Scm_StringClass);
 #define SCM_STRING_BODY_FLAGS(body)        ((body)->flags)
 
 #define SCM_STRING_BODY_HAS_FLAG(body, flag) \
-    (SCM_STRING_BODY_FLAGS(body)&(flag))
+	(SCM_STRING_BODY_FLAGS(body)&(flag))
 #define SCM_STRING_BODY_INCOMPLETE_P(body)   \
-    SCM_STRING_BODY_HAS_FLAG(body, SCM_STRING_INCOMPLETE)
+	SCM_STRING_BODY_HAS_FLAG(body, SCM_STRING_INCOMPLETE)
 #define SCM_STRING_BODY_IMMUTABLE_P(body)    \
-    SCM_STRING_BODY_HAS_FLAG(body, SCM_STRING_IMMUTABLE)
+	SCM_STRING_BODY_HAS_FLAG(body, SCM_STRING_IMMUTABLE)
 #define SCM_STRING_BODY_SINGLE_BYTE_P(body) \
-    (SCM_STRING_BODY_SIZE(body)==SCM_STRING_BODY_LENGTH(body))
+	(SCM_STRING_BODY_SIZE(body)==SCM_STRING_BODY_LENGTH(body))
 
 /* This is MT-safe, for string immutability won't change */
 #define SCM_STRING_IMMUTABLE_P(obj)  \
-    SCM_STRING_BODY_IMMUTABLE_P(SCM_STRING_BODY(obj))
+	SCM_STRING_BODY_IMMUTABLE_P(SCM_STRING_BODY(obj))
 
 #define SCM_STRING_NULL_P(obj) \
-    (SCM_STRING_BODY_SIZE(SCM_STRING_BODY(obj)) == 0)
+	(SCM_STRING_BODY_SIZE(SCM_STRING_BODY(obj)) == 0)
 
 /* Macros for backward compatibility.  Use of these are deprecated,
    since they are not MT-safe.  Use SCM_STRING_BODY_* macros or
@@ -141,9 +141,9 @@ SCM_CLASS_DECL(Scm_StringClass);
 #define SCM_STRING_SIZE(obj)    (SCM_STRING_BODY(obj)->size)
 #define SCM_STRING_START(obj)   (SCM_STRING_BODY(obj)->start)
 #define SCM_STRING_INCOMPLETE_P(obj)  \
-    (SCM_STRING_BODY_INCOMPLETE_P(SCM_STRING_BODY(obj)))
+	(SCM_STRING_BODY_INCOMPLETE_P(SCM_STRING_BODY(obj)))
 #define SCM_STRING_SINGLE_BYTE_P(obj) \
-    (SCM_STRING_SIZE(obj)==SCM_STRING_LENGTH(obj))
+	(SCM_STRING_SIZE(obj)==SCM_STRING_LENGTH(obj))
 
 
 /* OBSOLETED.  Kept for backward compatibility */
@@ -159,18 +159,18 @@ SCM_EXTERN ScmObj  Scm_MakeString(const char *str,
                                   ScmSmallInt size, ScmSmallInt len,
                                   u_long flags);
 SCM_EXTERN ScmObj  Scm_MakeFillString(ScmSmallInt len, ScmChar fill);
-SCM_EXTERN ScmObj  Scm_CopyStringWithFlags(ScmString *str, 
+SCM_EXTERN ScmObj  Scm_CopyStringWithFlags(ScmString *str,
                                            u_long flags, u_long mask);
 
 #define SCM_MAKE_STR(cstr) \
-    Scm_MakeString(cstr, -1, -1, 0)
+	Scm_MakeString(cstr, -1, -1, 0)
 #define SCM_MAKE_STR_COPYING(cstr) \
-    Scm_MakeString(cstr, -1, -1, SCM_STRING_COPYING)
+	Scm_MakeString(cstr, -1, -1, SCM_STRING_COPYING)
 #define SCM_MAKE_STR_IMMUTABLE(cstr) \
-    Scm_MakeString(cstr, -1, -1, SCM_STRING_IMMUTABLE)
+	Scm_MakeString(cstr, -1, -1, SCM_STRING_IMMUTABLE)
 
 #define Scm_CopyString(str) \
-    Scm_CopyStringWithFlags(str, 0, SCM_STRING_IMMUTABLE)
+	Scm_CopyStringWithFlags(str, 0, SCM_STRING_IMMUTABLE)
 
 /*
  * C String extraction
@@ -202,7 +202,7 @@ SCM_EXTERN ScmObj  Scm_ListToString(ScmObj chars);
 
 /* OBSOLETED */
 SCM_EXTERN ScmObj  Scm_StringCompleteToIncomplete(ScmString *);
-SCM_EXTERN ScmObj  Scm_StringIncompleteToComplete(ScmString *, int, ScmChar);
+SCM_EXTERN ScmObj Scm_StringIncompleteToComplete(ScmString *, int, ScmChar);
 
 /*
  * Comparisons
@@ -241,10 +241,10 @@ SCM_EXTERN ScmObj  Scm_StringJoin(ScmObj strs, ScmString *delim, int grammar);
 
 /* grammar spec for StringJoin (see SRFI-13) */
 enum {
-    SCM_STRING_JOIN_INFIX,
-    SCM_STRING_JOIN_STRICT_INFIX,
-    SCM_STRING_JOIN_SUFFIX,
-    SCM_STRING_JOIN_PREFIX
+	SCM_STRING_JOIN_INFIX,
+	SCM_STRING_JOIN_STRICT_INFIX,
+	SCM_STRING_JOIN_SUFFIX,
+	SCM_STRING_JOIN_PREFIX
 };
 
 /*
@@ -264,12 +264,12 @@ SCM_EXTERN ScmObj  Scm_StringScanCharRight(ScmString *s1, ScmChar ch, int retmod
 
 /* "retmode" argument for string scan */
 enum {
-    SCM_STRING_SCAN_INDEX,      /* return index */
-    SCM_STRING_SCAN_BEFORE,     /* return substring of s1 before s2 */
-    SCM_STRING_SCAN_AFTER,      /* return substring of s1 after s2 */
-    SCM_STRING_SCAN_BEFORE2,    /* return substr of s1 before s2 and rest */
-    SCM_STRING_SCAN_AFTER2,     /* return substr of s1 up to s2 and rest */
-    SCM_STRING_SCAN_BOTH        /* return substr of s1 before and after s2 */
+	SCM_STRING_SCAN_INDEX,  /* return index */
+	SCM_STRING_SCAN_BEFORE, /* return substring of s1 before s2 */
+	SCM_STRING_SCAN_AFTER,  /* return substring of s1 after s2 */
+	SCM_STRING_SCAN_BEFORE2, /* return substr of s1 before s2 and rest */
+	SCM_STRING_SCAN_AFTER2, /* return substr of s1 up to s2 and rest */
+	SCM_STRING_SCAN_BOTH    /* return substr of s1 before and after s2 */
 };
 
 /*
@@ -293,11 +293,11 @@ SCM_EXTERN ScmObj  Scm_MaybeSubstring(ScmString *x, ScmObj start, ScmObj end);
    of strings. */
 
 #define SCM_STRING_CONST_INITIALIZER(str, len, siz)             \
-    { { SCM_CLASS_STATIC_TAG(Scm_StringClass) }, NULL,          \
-      { SCM_STRING_IMMUTABLE|SCM_STRING_TERMINATED, (len), (siz), (str) } }
+	{ { SCM_CLASS_STATIC_TAG(Scm_StringClass) }, NULL,          \
+		{ SCM_STRING_IMMUTABLE|SCM_STRING_TERMINATED, (len), (siz), (str) } }
 
 #define SCM_DEFINE_STRING_CONST(name, str, len, siz)            \
-    ScmString name = SCM_STRING_CONST_INITIALIZER(str, len, siz)
+	ScmString name = SCM_STRING_CONST_INITIALIZER(str, len, siz)
 
 /*
  * DStrings
@@ -307,25 +307,25 @@ SCM_EXTERN ScmObj  Scm_MaybeSubstring(ScmString *x, ScmObj start, ScmObj end);
 #define SCM_DSTRING_INIT_CHUNK_SIZE 32
 
 typedef struct ScmDStringChunkRec {
-    ScmSmallInt bytes;          /* actual bytes stored in this chunk.
-                                   Note that this is set when the next
-                                   chunk is allocated, or by Scm_DStringSize.*/
-    char data[SCM_DSTRING_INIT_CHUNK_SIZE]; /* variable length, indeed. */
+	ScmSmallInt bytes;      /* actual bytes stored in this chunk.
+	                           Note that this is set when the next
+	                           chunk is allocated, or by Scm_DStringSize.*/
+	char data[SCM_DSTRING_INIT_CHUNK_SIZE]; /* variable length, indeed. */
 } ScmDStringChunk;
 
 typedef struct ScmDStringChainRec {
-    struct ScmDStringChainRec *next;
-    ScmDStringChunk *chunk;
+	struct ScmDStringChainRec *next;
+	ScmDStringChunk *chunk;
 } ScmDStringChain;
 
 struct ScmDStringRec {
-    ScmDStringChunk init;       /* initial chunk */
-    ScmDStringChain *anchor;    /* chain of extra chunks */
-    ScmDStringChain *tail;      /* current chunk */
-    char *current;              /* current ptr */
-    char *end;                  /* end of current chunk */
-    ScmSmallInt lastChunkSize;  /* size of the last chunk */
-    ScmSmallInt length;         /* # of chars written */
+	ScmDStringChunk init;   /* initial chunk */
+	ScmDStringChain *anchor; /* chain of extra chunks */
+	ScmDStringChain *tail;  /* current chunk */
+	char *current;          /* current ptr */
+	char *end;              /* end of current chunk */
+	ScmSmallInt lastChunkSize; /* size of the last chunk */
+	ScmSmallInt length;     /* # of chars written */
 };
 
 SCM_EXTERN void        Scm_DStringInit(ScmDString *dstr);
@@ -333,8 +333,8 @@ SCM_EXTERN ScmSmallInt Scm_DStringSize(ScmDString *dstr);
 SCM_EXTERN ScmObj      Scm_DStringGet(ScmDString *dstr, u_long flags);
 SCM_EXTERN const char *Scm_DStringGetz(ScmDString *dstr);
 SCM_EXTERN void        Scm_DStringWeld(ScmDString *dstr);
-SCM_EXTERN const char *Scm_DStringPeek(ScmDString *dstr, 
-                                       ScmSmallInt *size, 
+SCM_EXTERN const char *Scm_DStringPeek(ScmDString *dstr,
+                                       ScmSmallInt *size,
                                        ScmSmallInt *len);
 SCM_EXTERN void        Scm_DStringPutz(ScmDString *dstr, const char *str,
                                        ScmSmallInt siz);
@@ -347,23 +347,23 @@ SCM_EXTERN ScmSmallInt Scm_DStringTruncate(ScmDString *dstr,
 #define SCM_DSTRING_SIZE(dstr)    Scm_DStringSize(dstr);
 
 #define SCM_DSTRING_PUTB(dstr, byte)                                     \
-    do {                                                                 \
-        if ((dstr)->current >= (dstr)->end) Scm__DStringRealloc(dstr, 1);\
-        *(dstr)->current++ = (char)(byte);                               \
-        (dstr)->length = -1;    /* may be incomplete */                  \
-    } while (0)
+	do {                                                                 \
+		if ((dstr)->current >= (dstr)->end) Scm__DStringRealloc(dstr, 1); \
+		*(dstr)->current++ = (char)(byte);                               \
+		(dstr)->length = -1; /* may be incomplete */                  \
+	} while (0)
 
 #define SCM_DSTRING_PUTC(dstr, ch)                      \
-    do {                                                \
-        ScmChar ch_DSTR = (ch);                         \
-        ScmDString *d_DSTR = (dstr);                    \
-        ScmSmallInt siz_DSTR = SCM_CHAR_NBYTES(ch_DSTR);\
-        if (d_DSTR->current + siz_DSTR > d_DSTR->end)   \
-            Scm__DStringRealloc(d_DSTR, siz_DSTR);      \
-        SCM_CHAR_PUT(d_DSTR->current, ch_DSTR);         \
-        d_DSTR->current += siz_DSTR;                    \
-        if (d_DSTR->length >= 0) d_DSTR->length++;      \
-    } while (0)
+	do {                                                \
+		ScmChar ch_DSTR = (ch);                         \
+		ScmDString *d_DSTR = (dstr);                    \
+		ScmSmallInt siz_DSTR = SCM_CHAR_NBYTES(ch_DSTR); \
+		if (d_DSTR->current + siz_DSTR > d_DSTR->end)   \
+		Scm__DStringRealloc(d_DSTR, siz_DSTR);      \
+		SCM_CHAR_PUT(d_DSTR->current, ch_DSTR);         \
+		d_DSTR->current += siz_DSTR;                    \
+		if (d_DSTR->length >= 0) d_DSTR->length++;      \
+		} while (0)
 
 SCM_EXTERN void Scm__DStringRealloc(ScmDString *dstr, ScmSmallInt min_incr);
 
@@ -379,12 +379,12 @@ SCM_EXTERN char *Scm_StrdupPartial(const char *src, size_t size);
 
 /* Efficient way to access string from Scheme */
 typedef struct ScmStringPointerRec {
-    SCM_HEADER;
-    ScmSmallInt length;
-    ScmSmallInt size;
-    const char *start;
-    ScmSmallInt index;
-    const char *current;
+	SCM_HEADER;
+	ScmSmallInt length;
+	ScmSmallInt size;
+	const char *start;
+	ScmSmallInt index;
+	const char *current;
 } ScmStringPointer;
 
 SCM_CLASS_DECL(Scm_StringPointerClass);

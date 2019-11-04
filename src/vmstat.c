@@ -44,77 +44,77 @@ static u_long lset_freq[LREF_FREQ_COUNT_MAX][LREF_FREQ_COUNT_MAX];
 
 static ScmWord fetch_insn_counting(ScmVM *vm, ScmWord code)
 {
-    if (vm->base && vm->pc != vm->base->code) {
-        insn2_freq[SCM_VM_INSN_CODE(code)][SCM_VM_INSN_CODE(*vm->pc)]++;
-    }
-    code = *vm->pc++;
-    insn1_freq[SCM_VM_INSN_CODE(code)]++;
-    switch (SCM_VM_INSN_CODE(code)) {
-    case SCM_VM_LREF0: lref_freq[0][0]++; break;
-    case SCM_VM_LREF1: lref_freq[0][1]++; break;
-    case SCM_VM_LREF2: lref_freq[0][2]++; break;
-    case SCM_VM_LREF3: lref_freq[0][3]++; break;
-    case SCM_VM_LREF4: lref_freq[0][4]++; break;
-    case SCM_VM_LREF10: lref_freq[1][0]++; break;
-    case SCM_VM_LREF11: lref_freq[1][1]++; break;
-    case SCM_VM_LREF12: lref_freq[1][2]++; break;
-    case SCM_VM_LREF13: lref_freq[1][3]++; break;
-    case SCM_VM_LREF14: lref_freq[1][4]++; break;
-    case SCM_VM_LREF:
-    {
-        int dep = SCM_VM_INSN_ARG0(code);
-        int off = SCM_VM_INSN_ARG1(code);
-        if (dep >= LREF_FREQ_COUNT_MAX) dep=LREF_FREQ_COUNT_MAX-1;
-        if (off >= LREF_FREQ_COUNT_MAX) off=LREF_FREQ_COUNT_MAX-1;
-        lref_freq[dep][off]++;
-        break;
-    }
-    case SCM_VM_LSET0: lset_freq[0][0]++; break;
-    case SCM_VM_LSET1: lset_freq[0][1]++; break;
-    case SCM_VM_LSET2: lset_freq[0][2]++; break;
-    case SCM_VM_LSET3: lset_freq[0][3]++; break;
-    case SCM_VM_LSET4: lset_freq[0][4]++; break;
-    case SCM_VM_LSET:
-    {
-        int dep = SCM_VM_INSN_ARG0(code);
-        int off = SCM_VM_INSN_ARG1(code);
-        if (dep >= LREF_FREQ_COUNT_MAX) dep=LREF_FREQ_COUNT_MAX-1;
-        if (off >= LREF_FREQ_COUNT_MAX) off=LREF_FREQ_COUNT_MAX-1;
-        lset_freq[dep][off]++;
-        break;
-    }
-    }
-    return code;
+	if (vm->base && vm->pc != vm->base->code) {
+		insn2_freq[SCM_VM_INSN_CODE(code)][SCM_VM_INSN_CODE(*vm->pc)]++;
+	}
+	code = *vm->pc++;
+	insn1_freq[SCM_VM_INSN_CODE(code)]++;
+	switch (SCM_VM_INSN_CODE(code)) {
+	case SCM_VM_LREF0: lref_freq[0][0]++; break;
+	case SCM_VM_LREF1: lref_freq[0][1]++; break;
+	case SCM_VM_LREF2: lref_freq[0][2]++; break;
+	case SCM_VM_LREF3: lref_freq[0][3]++; break;
+	case SCM_VM_LREF4: lref_freq[0][4]++; break;
+	case SCM_VM_LREF10: lref_freq[1][0]++; break;
+	case SCM_VM_LREF11: lref_freq[1][1]++; break;
+	case SCM_VM_LREF12: lref_freq[1][2]++; break;
+	case SCM_VM_LREF13: lref_freq[1][3]++; break;
+	case SCM_VM_LREF14: lref_freq[1][4]++; break;
+	case SCM_VM_LREF:
+	{
+		int dep = SCM_VM_INSN_ARG0(code);
+		int off = SCM_VM_INSN_ARG1(code);
+		if (dep >= LREF_FREQ_COUNT_MAX) dep=LREF_FREQ_COUNT_MAX-1;
+		if (off >= LREF_FREQ_COUNT_MAX) off=LREF_FREQ_COUNT_MAX-1;
+		lref_freq[dep][off]++;
+		break;
+	}
+	case SCM_VM_LSET0: lset_freq[0][0]++; break;
+	case SCM_VM_LSET1: lset_freq[0][1]++; break;
+	case SCM_VM_LSET2: lset_freq[0][2]++; break;
+	case SCM_VM_LSET3: lset_freq[0][3]++; break;
+	case SCM_VM_LSET4: lset_freq[0][4]++; break;
+	case SCM_VM_LSET:
+	{
+		int dep = SCM_VM_INSN_ARG0(code);
+		int off = SCM_VM_INSN_ARG1(code);
+		if (dep >= LREF_FREQ_COUNT_MAX) dep=LREF_FREQ_COUNT_MAX-1;
+		if (off >= LREF_FREQ_COUNT_MAX) off=LREF_FREQ_COUNT_MAX-1;
+		lset_freq[dep][off]++;
+		break;
+	}
+	}
+	return code;
 }
 
 static void dump_insn_frequency(void *data)
 {
-    Scm_Printf(SCM_CUROUT, "(:instruction-frequencies (");
-    for (int i=0; i<SCM_VM_NUM_INSNS; i++) {
-        Scm_Printf(SCM_CUROUT, "(%s %d", Scm_VMInsnName(i), insn1_freq[i]);
-        for (int j=0; j<SCM_VM_NUM_INSNS; j++) {
-            Scm_Printf(SCM_CUROUT, " %d", insn2_freq[i][j]);
-        }
-        Scm_Printf(SCM_CUROUT, ")\n");
-    }
-    Scm_Printf(SCM_CUROUT, ")\n :lref-frequencies (");
-    for (int i=0; i<LREF_FREQ_COUNT_MAX; i++) {
-        Scm_Printf(SCM_CUROUT, "(");
-        for (int j=0; j<LREF_FREQ_COUNT_MAX; j++) {
-            Scm_Printf(SCM_CUROUT, "%d ", lref_freq[i][j]);
-        }
-        Scm_Printf(SCM_CUROUT, ")\n");
-    }
-    Scm_Printf(SCM_CUROUT, ")\n :lset-frequencies (");
-    for (int i=0; i<LREF_FREQ_COUNT_MAX; i++) {
-        Scm_Printf(SCM_CUROUT, "(");
-        for (int j=0; j<LREF_FREQ_COUNT_MAX; j++) {
-            Scm_Printf(SCM_CUROUT, "%d ", lset_freq[i][j]);
-        }
-        Scm_Printf(SCM_CUROUT, ")\n");
-    }
-    Scm_Printf(SCM_CUROUT, ")\n");
-    Scm_Printf(SCM_CUROUT, ")\n");
+	Scm_Printf(SCM_CUROUT, "(:instruction-frequencies (");
+	for (int i=0; i<SCM_VM_NUM_INSNS; i++) {
+		Scm_Printf(SCM_CUROUT, "(%s %d", Scm_VMInsnName(i), insn1_freq[i]);
+		for (int j=0; j<SCM_VM_NUM_INSNS; j++) {
+			Scm_Printf(SCM_CUROUT, " %d", insn2_freq[i][j]);
+		}
+		Scm_Printf(SCM_CUROUT, ")\n");
+	}
+	Scm_Printf(SCM_CUROUT, ")\n :lref-frequencies (");
+	for (int i=0; i<LREF_FREQ_COUNT_MAX; i++) {
+		Scm_Printf(SCM_CUROUT, "(");
+		for (int j=0; j<LREF_FREQ_COUNT_MAX; j++) {
+			Scm_Printf(SCM_CUROUT, "%d ", lref_freq[i][j]);
+		}
+		Scm_Printf(SCM_CUROUT, ")\n");
+	}
+	Scm_Printf(SCM_CUROUT, ")\n :lset-frequencies (");
+	for (int i=0; i<LREF_FREQ_COUNT_MAX; i++) {
+		Scm_Printf(SCM_CUROUT, "(");
+		for (int j=0; j<LREF_FREQ_COUNT_MAX; j++) {
+			Scm_Printf(SCM_CUROUT, "%d ", lset_freq[i][j]);
+		}
+		Scm_Printf(SCM_CUROUT, ")\n");
+	}
+	Scm_Printf(SCM_CUROUT, ")\n");
+	Scm_Printf(SCM_CUROUT, ")\n");
 }
 
 #endif /*COUNT_INSN_FREQUENCY*/

@@ -37,23 +37,23 @@
 #define GAUCHE_SYMBOL_H
 
 struct ScmSymbolRec {
-    SCM_HEADER;
-    ScmString *name;
-    int        flags;
+	SCM_HEADER;
+	ScmString *name;
+	int flags;
 };
 
 SCM_CLASS_DECL(Scm_SymbolClass);
 #define SCM_CLASS_SYMBOL       (&Scm_SymbolClass)
 
 typedef enum {
-    SCM_SYMBOL_FLAG_INTERNED = 1L<<0
+	SCM_SYMBOL_FLAG_INTERNED = 1L<<0
 } ScmSymbolFlags;
 
 #define SCM_SYMBOL(obj)          ((ScmSymbol*)(obj))
 #define SCM_SYMBOLP(obj)         SCM_ISA(obj, SCM_CLASS_SYMBOL)
 #define SCM_SYMBOL_NAME(obj)     (SCM_SYMBOL(obj)->name)
 #define SCM_SYMBOL_INTERNED(obj) \
-    (SCM_SYMBOL(obj)->flags&SCM_SYMBOL_FLAG_INTERNED)
+	(SCM_SYMBOL(obj)->flags&SCM_SYMBOL_FLAG_INTERNED)
 
 /* Compatibility note: The 'flags' slot in ScmSymbol used to be an
  * 'interned', just to keep whether the symbol is interned or not.
@@ -96,9 +96,9 @@ SCM_EXTERN ScmObj Scm_DeleteKeywordX(ScmObj key, ScmObj list);
 SCM_EXTERN ScmObj Scm_KeywordToString(ScmKeyword *k);
 
 #define SCM_MAKE_KEYWORD(cstr) \
-    Scm_MakeKeyword(SCM_STRING(SCM_MAKE_STR_IMMUTABLE(cstr)))
+	Scm_MakeKeyword(SCM_STRING(SCM_MAKE_STR_IMMUTABLE(cstr)))
 #define SCM_GET_KEYWORD(cstr, list, fallback) \
-    Scm_GetKeyword(SCM_MAKE_KEYWORD(cstr), list, fallback)
+	Scm_GetKeyword(SCM_MAKE_KEYWORD(cstr), list, fallback)
 
 #endif /* GAUCHE_SYMBOL_H */
 

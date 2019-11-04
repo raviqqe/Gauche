@@ -45,12 +45,12 @@ extern void Scm_Init_console(ScmModule *mod);
 
 SCM_EXTENSION_ENTRY void Scm_Init_os__windows(void)
 {
-    ScmModule *mod;
+	ScmModule *mod;
 
-    SCM_INIT_EXTENSION(os__windows);
-    mod = SCM_FIND_MODULE("os.windows", SCM_FIND_MODULE_CREATE);
-    Scm_Init_windows(mod);
-    Scm_Init_console(mod);
+	SCM_INIT_EXTENSION(os__windows);
+	mod = SCM_FIND_MODULE("os.windows", SCM_FIND_MODULE_CREATE);
+	Scm_Init_windows(mod);
+	Scm_Init_console(mod);
 }
 
 #else  /*!defined(GAUCHE_WINDOWS)*/

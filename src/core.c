@@ -46,17 +46,17 @@ extern void GC_print_static_roots(void);
 
 static void *oom_handler(size_t bytes)
 {
-    Scm_Panic("out of memory (%lu).  aborting...", bytes);
-    return NULL;                /* dummy */
+	Scm_Panic("out of memory (%lu).  aborting...", bytes);
+	return NULL;            /* dummy */
 }
 
 /*
  * Features list used by cond-expand macro
  */
 static struct {
-    ScmObj alist;               /* list of (feature) or (feature module) */
-    ScmObj dlist;               /* list of disabled features */
-    ScmInternalMutex mutex;
+	ScmObj alist;           /* list of (feature) or (feature module) */
+	ScmObj dlist;           /* list of disabled features */
+	ScmInternalMutex mutex;
 } cond_features = { SCM_NIL, SCM_NIL, SCM_INTERNAL_MUTEX_INITIALIZER };
 
 /*=============================================================
@@ -130,99 +130,99 @@ static int scheme_initialized = FALSE;
  */
 void Scm_Init(const char *signature)
 {
-    if (scheme_initialized) return;
-    
-    /* make sure the main program links the same version of libgauche */
-    if (strcmp(signature, GAUCHE_SIGNATURE) != 0) {
-        Scm_Panic("libgauche ABI version mismatch: libgauche %s, expected %s",
-                  GAUCHE_SIGNATURE, signature);
-    }
+	if (scheme_initialized) return;
 
-    /* Some platforms require this.  It is harmless if GC is
-       already initialized, so we call it here just in case. */
-    GC_init();
+	/* make sure the main program links the same version of libgauche */
+	if (strcmp(signature, GAUCHE_SIGNATURE) != 0) {
+		Scm_Panic("libgauche ABI version mismatch: libgauche %s, expected %s",
+		          GAUCHE_SIGNATURE, signature);
+	}
 
-    /* Set up GC parameters.  We need to call finalizers at the safe
-       point of VM loop, so we disable auto finalizer invocation, and
-       ask GC to call us back when finalizers are queued. */
-    GC_oom_fn = oom_handler;
-    GC_finalize_on_demand = TRUE;
-    GC_finalizer_notifier = finalizable;
+	/* Some platforms require this.  It is harmless if GC is
+	   already initialized, so we call it here just in case. */
+	GC_init();
 
-    (void)SCM_INTERNAL_MUTEX_INIT(cond_features.mutex);
+	/* Set up GC parameters.  We need to call finalizers at the safe
+	   point of VM loop, so we disable auto finalizer invocation, and
+	   ask GC to call us back when finalizers are queued. */
+	GC_oom_fn = oom_handler;
+	GC_finalize_on_demand = TRUE;
+	GC_finalizer_notifier = finalizable;
 
-    /* Initialize components.  The order is important, for some components
-       rely on the other components to be initialized. */
-    Scm__InitParameter();
-    Scm__InitVM();
-    Scm__InitHash();
-    Scm__InitSymbol();
-    Scm__InitModule();
-    Scm__InitNumber();
-    Scm__InitChar();
-    Scm__InitClass();
-    Scm__InitCollection();
-    Scm__InitExceptions();
-    Scm__InitProc();
-    Scm__InitPort();
-    Scm__InitWrite();
-    Scm__InitMacro();
-    Scm__InitLoad();
-    Scm__InitRegexp();
-    Scm__InitRead();
-    Scm__InitSignal();
-    Scm__InitSystem();
-    Scm__InitComparator();
+	(void)SCM_INTERNAL_MUTEX_INIT(cond_features.mutex);
 
-    Scm_Init_libalpha();
-    Scm_Init_libbool();
-    Scm_Init_libchar();
-    Scm_Init_libcode();
-    Scm_Init_libcmp();
-    Scm_Init_libdict();
-    Scm_Init_libeval();
-    Scm_Init_libexc();
-    Scm_Init_libfmt();
-    Scm_Init_libio();
-    Scm_Init_liblazy();
-    Scm_Init_liblist();
-    Scm_Init_libmisc();
-    Scm_Init_libmod();
-    Scm_Init_libnum();
-    Scm_Init_libobj();
-    Scm_Init_libproc();
-    Scm_Init_librx();
-    Scm_Init_libsrfis();
-    Scm_Init_libstr();
-    Scm_Init_libsym();
-    Scm_Init_libsys();
-    Scm_Init_libvec();
-    Scm_Init_libmacbase();
-    Scm_Init_compile();
-    Scm_Init_libmacro();
-    Scm_Init_libomega();
+	/* Initialize components.  The order is important, for some components
+	   rely on the other components to be initialized. */
+	Scm__InitParameter();
+	Scm__InitVM();
+	Scm__InitHash();
+	Scm__InitSymbol();
+	Scm__InitModule();
+	Scm__InitNumber();
+	Scm__InitChar();
+	Scm__InitClass();
+	Scm__InitCollection();
+	Scm__InitExceptions();
+	Scm__InitProc();
+	Scm__InitPort();
+	Scm__InitWrite();
+	Scm__InitMacro();
+	Scm__InitLoad();
+	Scm__InitRegexp();
+	Scm__InitRead();
+	Scm__InitSignal();
+	Scm__InitSystem();
+	Scm__InitComparator();
 
-    Scm__InitCompaux();
+	Scm_Init_libalpha();
+	Scm_Init_libbool();
+	Scm_Init_libchar();
+	Scm_Init_libcode();
+	Scm_Init_libcmp();
+	Scm_Init_libdict();
+	Scm_Init_libeval();
+	Scm_Init_libexc();
+	Scm_Init_libfmt();
+	Scm_Init_libio();
+	Scm_Init_liblazy();
+	Scm_Init_liblist();
+	Scm_Init_libmisc();
+	Scm_Init_libmod();
+	Scm_Init_libnum();
+	Scm_Init_libobj();
+	Scm_Init_libproc();
+	Scm_Init_librx();
+	Scm_Init_libsrfis();
+	Scm_Init_libstr();
+	Scm_Init_libsym();
+	Scm_Init_libsys();
+	Scm_Init_libvec();
+	Scm_Init_libmacbase();
+	Scm_Init_compile();
+	Scm_Init_libmacro();
+	Scm_Init_libomega();
 
-    Scm_SelectModule(Scm_GaucheModule());
-    Scm__InitAutoloads();
+	Scm__InitCompaux();
 
-    Scm_SelectModule(Scm_UserModule());
+	Scm_SelectModule(Scm_GaucheModule());
+	Scm__InitAutoloads();
 
-    /* Final setup of cond-features alist. */
-    init_cond_features();
+	Scm_SelectModule(Scm_UserModule());
+
+	/* Final setup of cond-features alist. */
+	init_cond_features();
 
 #ifdef GAUCHE_USE_PTHREADS
-    /* a trick to make sure the gc thread object is linked */
-    ptr_pthread_create = (int (*)(void))GC_pthread_create;
+	/* a trick to make sure the gc thread object is linked */
+	ptr_pthread_create = (int (*)(void))GC_pthread_create;
 #endif
 
-    scheme_initialized = TRUE;
+	scheme_initialized = TRUE;
 }
 
 int Scm_InitializedP()
 {
-    return scheme_initialized;
+	return scheme_initialized;
 }
 
 /*=============================================================
@@ -231,12 +231,12 @@ int Scm_InitializedP()
 
 void Scm_GC()
 {
-    GC_gcollect();
+	GC_gcollect();
 }
 
 void Scm_PrintStaticRoots()
 {
-    GC_print_static_roots();
+	GC_print_static_roots();
 }
 
 /*
@@ -251,12 +251,12 @@ void Scm_PrintStaticRoots()
 void Scm_RegisterDL(void *data_start, void *data_end,
                     void *bss_start, void *bss_end)
 {
-    if (data_start < data_end) {
-        GC_add_roots(data_start, data_end);
-    }
-    if (bss_start < bss_end) {
-        GC_add_roots(bss_start, bss_end);
-    }
+	if (data_start < data_end) {
+		GC_add_roots(data_start, data_end);
+	}
+	if (bss_start < bss_end) {
+		GC_add_roots(bss_start, bss_end);
+	}
 }
 
 /*
@@ -265,12 +265,12 @@ void Scm_RegisterDL(void *data_start, void *data_end,
  */
 static void gc_sentinel(ScmObj obj, void *data)
 {
-    Scm_Printf(SCM_CURERR, "WARNING: object %s(%p) is inadvertently collected\n", (char *)data, obj);
+	Scm_Printf(SCM_CURERR, "WARNING: object %s(%p) is inadvertently collected\n", (char *)data, obj);
 }
 
 void Scm_GCSentinel(void *obj, const char *name)
 {
-    Scm_RegisterFinalizer(SCM_OBJ(obj), gc_sentinel, (void*)name);
+	Scm_RegisterFinalizer(SCM_OBJ(obj), gc_sentinel, (void*)name);
 }
 
 
@@ -279,34 +279,34 @@ void Scm_GCSentinel(void *obj, const char *name)
  */
 void Scm_RegisterFinalizer(ScmObj z, ScmFinalizerProc finalizer, void *data)
 {
-    GC_finalization_proc ofn; void *ocd;
-    GC_REGISTER_FINALIZER_NO_ORDER(z, (GC_finalization_proc)finalizer,
-                                   data, &ofn, &ocd);
+	GC_finalization_proc ofn; void *ocd;
+	GC_REGISTER_FINALIZER_NO_ORDER(z, (GC_finalization_proc)finalizer,
+	                               data, &ofn, &ocd);
 }
 
 void Scm_UnregisterFinalizer(ScmObj z)
 {
-    GC_finalization_proc ofn; void *ocd;
-    GC_REGISTER_FINALIZER_NO_ORDER(z, (GC_finalization_proc)NULL, NULL,
-                                   &ofn, &ocd);
+	GC_finalization_proc ofn; void *ocd;
+	GC_REGISTER_FINALIZER_NO_ORDER(z, (GC_finalization_proc)NULL, NULL,
+	                               &ofn, &ocd);
 }
 
 /* GC calls this back when finalizers are queued. */
 void finalizable(void)
 {
-    ScmVM *vm = Scm_VM();
-    if (vm != NULL) {
-        vm->finalizerPending = TRUE;
-        vm->attentionRequest = TRUE;
-    }
+	ScmVM *vm = Scm_VM();
+	if (vm != NULL) {
+		vm->finalizerPending = TRUE;
+		vm->attentionRequest = TRUE;
+	}
 }
 
 /* Called from VM loop.  Queue is not empty. */
 ScmObj Scm_VMFinalizerRun(ScmVM *vm)
 {
-    GC_invoke_finalizers();
-    vm->finalizerPending = FALSE;
-    return SCM_UNDEFINED;
+	GC_invoke_finalizers();
+	vm->finalizerPending = FALSE;
+	return SCM_UNDEFINED;
 }
 
 /*=============================================================
@@ -314,26 +314,26 @@ ScmObj Scm_VMFinalizerRun(ScmVM *vm)
  */
 
 struct cleanup_handler_rec {
-    void (*handler)(void *data);
-    void *data;
-    struct cleanup_handler_rec *next;
+	void (*handler)(void *data);
+	void *data;
+	struct cleanup_handler_rec *next;
 };
 
 static struct {
-    int dirty;                  /* Flag to avoid cleaning up more than once. */
-    struct cleanup_handler_rec *handlers;
+	int dirty;              /* Flag to avoid cleaning up more than once. */
+	struct cleanup_handler_rec *handlers;
 } cleanup = { TRUE, NULL };
 
 /* Add cleanup handler.  Returns an opaque handle, which can be
    passed to DeleteCleanupHandler. */
 void *Scm_AddCleanupHandler(void (*h)(void *d), void *d)
 {
-    struct cleanup_handler_rec *r = SCM_NEW(struct cleanup_handler_rec);
-    r->handler = h;
-    r->data = d;
-    r->next = cleanup.handlers;
-    cleanup.handlers = r;
-    return r;
+	struct cleanup_handler_rec *r = SCM_NEW(struct cleanup_handler_rec);
+	r->handler = h;
+	r->data = d;
+	r->next = cleanup.handlers;
+	cleanup.handlers = r;
+	return r;
 }
 
 /* Delete cleanup handler.  HANDLE should be an opaque pointer
@@ -341,24 +341,24 @@ void *Scm_AddCleanupHandler(void (*h)(void *d), void *d)
    other pointer is given. */
 void Scm_DeleteCleanupHandler(void *handle)
 {
-    struct cleanup_handler_rec *x = NULL, *y = cleanup.handlers;
-    while (y) {
-        if (y == handle) {
-            if (x == NULL) {
-                cleanup.handlers = y->next;
-            } else {
-                x->next = y->next;
-            }
-            break;
-        }
-    }
+	struct cleanup_handler_rec *x = NULL, *y = cleanup.handlers;
+	while (y) {
+		if (y == handle) {
+			if (x == NULL) {
+				cleanup.handlers = y->next;
+			} else {
+				x->next = y->next;
+			}
+			break;
+		}
+	}
 }
 
 #if defined(GAUCHE_HAS_THREADS)
 void Scm__MutexCleanup(void *mutex_)
 {
-    ScmInternalMutex *mutex = mutex_;
-    (void)SCM_INTERNAL_MUTEX_UNLOCK(*mutex);
+	ScmInternalMutex *mutex = mutex_;
+	(void)SCM_INTERNAL_MUTEX_UNLOCK(*mutex);
 }
 #endif /* GAUCHE_HAS_THREADS */
 
@@ -367,61 +367,61 @@ void Scm__MutexCleanup(void *mutex_)
    Usually calling Scm_Exit is the easiest way to terminate Gauche
    application safely.  If the application wants to continue operation
    after shutting down the Scheme part, however, it can call Scm_Cleanup().
-*/
+ */
 
 /* To avoid complication in supporting different platforms */
 #define EXIT_CODE(code) ((code)&0xff)
 
 void Scm_Exit(int code)
 {
-    Scm_Cleanup();
-    exit(EXIT_CODE(code));
+	Scm_Cleanup();
+	exit(EXIT_CODE(code));
 }
 
 void Scm_Cleanup(void)
 {
-    if (!cleanup.dirty) return;
-    cleanup.dirty = FALSE;
+	if (!cleanup.dirty) return;
+	cleanup.dirty = FALSE;
 
-    /* Execute pending dynamic handlers.
-       NB: we ignore errors here.  It may not be accurate behavior, though.
-       (A handler may intentionally raise an error to skip the rest of
-       handlers).  We may change to break from SCM_FOR_EACH in case if
-       we detect error in Scm_Apply. */
-    ScmVM *vm = Scm_VM();
-    ScmObj hp;
-    SCM_FOR_EACH(hp, vm->handlers) {
-        vm->handlers = SCM_CDR(hp);
-        Scm_Apply(SCM_CDAR(hp), SCM_NIL, NULL);
-    }
+	/* Execute pending dynamic handlers.
+	   NB: we ignore errors here.  It may not be accurate behavior, though.
+	   (A handler may intentionally raise an error to skip the rest of
+	   handlers).  We may change to break from SCM_FOR_EACH in case if
+	   we detect error in Scm_Apply. */
+	ScmVM *vm = Scm_VM();
+	ScmObj hp;
+	SCM_FOR_EACH(hp, vm->handlers) {
+		vm->handlers = SCM_CDR(hp);
+		Scm_Apply(SCM_CDAR(hp), SCM_NIL, NULL);
+	}
 
-    /* Call the C-registered cleanup handlers. */
-    for (struct cleanup_handler_rec *ch = cleanup.handlers; ch; ch = ch->next) {
-        ch->handler(ch->data);
-    }
+	/* Call the C-registered cleanup handlers. */
+	for (struct cleanup_handler_rec *ch = cleanup.handlers; ch; ch = ch->next) {
+		ch->handler(ch->data);
+	}
 
-    /* Flush Scheme ports. */
-    Scm_FlushAllPorts(TRUE);
+	/* Flush Scheme ports. */
+	Scm_FlushAllPorts(TRUE);
 }
 
 void Scm_Panic(const char *msg, ...)
 {
-    va_list args;
-    va_start(args, msg);
-    vfprintf(stderr, msg, args);
-    va_end(args);
-    fputc('\n', stderr);
-    fflush(stderr);
-    _exit(EXIT_CODE(1));
+	va_list args;
+	va_start(args, msg);
+	vfprintf(stderr, msg, args);
+	va_end(args);
+	fputc('\n', stderr);
+	fflush(stderr);
+	_exit(EXIT_CODE(1));
 }
 
 /* Use this for absolute emergency.  Newline is not attached to msg. */
 void Scm_Abort(const char *msg)
 {
-    int size = (int)strlen(msg);
-    /* this may return an error, but we don't care, since we exit anyway. */
-    SCM_IGNORE_RESULT(write(2, msg, size));
-    _exit(EXIT_CODE(1));
+	int size = (int)strlen(msg);
+	/* this may return an error, but we don't care, since we exit anyway. */
+	SCM_IGNORE_RESULT(write(2, msg, size));
+	_exit(EXIT_CODE(1));
 }
 
 /*=============================================================
@@ -432,7 +432,7 @@ void Scm_Abort(const char *msg)
 ScmObj
 Scm_GetFeatures()
 {
-    return cond_features.alist;
+	return cond_features.alist;
 }
 
 /*
@@ -453,14 +453,14 @@ Scm_GetFeatures()
 void
 Scm_AddFeature(const char *feature, const char *module)
 {
-    ScmObj f = SCM_INTERN(feature);
-    ScmObj cell = module? SCM_LIST2(f, SCM_INTERN(module)): SCM_LIST1(f);
+	ScmObj f = SCM_INTERN(feature);
+	ScmObj cell = module ? SCM_LIST2(f, SCM_INTERN(module)) : SCM_LIST1(f);
 
-    (void)SCM_INTERNAL_MUTEX_LOCK(cond_features.mutex);
-    if (SCM_FALSEP(Scm_Memq(f, cond_features.dlist))) {
-        cond_features.alist = Scm_Cons(cell, cond_features.alist);
-    }
-    (void)SCM_INTERNAL_MUTEX_UNLOCK(cond_features.mutex);
+	(void)SCM_INTERNAL_MUTEX_LOCK(cond_features.mutex);
+	if (SCM_FALSEP(Scm_Memq(f, cond_features.dlist))) {
+		cond_features.alist = Scm_Cons(cell, cond_features.alist);
+	}
+	(void)SCM_INTERNAL_MUTEX_UNLOCK(cond_features.mutex);
 }
 
 /*
@@ -471,131 +471,131 @@ Scm_AddFeature(const char *feature, const char *module)
 void
 Scm_DisableFeature(const char *feature)
 {
-    ScmObj f = SCM_INTERN(feature);
-    (void)SCM_INTERNAL_MUTEX_LOCK(cond_features.mutex);
-    cond_features.dlist = Scm_Cons(f, cond_features.dlist);
-    cond_features.alist = Scm_AssocDelete(f, cond_features.alist, SCM_CMP_EQ);
-    (void)SCM_INTERNAL_MUTEX_UNLOCK(cond_features.mutex);
+	ScmObj f = SCM_INTERN(feature);
+	(void)SCM_INTERNAL_MUTEX_LOCK(cond_features.mutex);
+	cond_features.dlist = Scm_Cons(f, cond_features.dlist);
+	cond_features.alist = Scm_AssocDelete(f, cond_features.alist, SCM_CMP_EQ);
+	(void)SCM_INTERNAL_MUTEX_UNLOCK(cond_features.mutex);
 }
 
 
 static void
 init_cond_features()
 {
-    /* The initial cond-features list. */
-    static struct {
-        const char *feature;
-        const char *module;
-    } init_features[] = {
-        { "gauche", NULL },
-        { "gauche-" GAUCHE_VERSION , NULL },
+	/* The initial cond-features list. */
+	static struct {
+		const char *feature;
+		const char *module;
+	} init_features[] = {
+		{ "gauche", NULL },
+		{ "gauche-" GAUCHE_VERSION, NULL },
 
-        /* Platform */
+		/* Platform */
 #if   defined(GAUCHE_WINDOWS)
-        { "gauche.os.windows", NULL },
-        { "gauche-windows", NULL }, /* for backward compatibility */
+		{ "gauche.os.windows", NULL },
+		{ "gauche-windows", NULL }, /* for backward compatibility */
 #elif defined(__CYGWIN__)  /* cygwin is different enough to deserve this */
-        { "gauche.os.cygwin", NULL },
+		{ "gauche.os.cygwin", NULL },
 #endif
 
-        /* R7RS */
-        /* NB: We should probably make checking 'r7rs' trigger loading
-           r7rs module and setting up the environment. */
-        { "r7rs", NULL },
-            
-        /* R7RS Appendix B */
-        { "exact-closed", NULL },
-        // { "exact-complex", NULL }, /* not yet */
-        { "ieee-float", NULL },
-        { "full-unicode", NULL },
-        { "ratios", NULL },
+		/* R7RS */
+		/* NB: We should probably make checking 'r7rs' trigger loading
+		   r7rs module and setting up the environment. */
+		{ "r7rs", NULL },
+
+		/* R7RS Appendix B */
+		{ "exact-closed", NULL },
+		// { "exact-complex", NULL }, /* not yet */
+		{ "ieee-float", NULL },
+		{ "full-unicode", NULL },
+		{ "ratios", NULL },
 #if   defined(GAUCHE_WINDOWS)
-        { "windows", NULL },
+		{ "windows", NULL },
 #else
-        { "posix", NULL },
+		{ "posix", NULL },
 #endif
-        /* TODO: OS Flags, CPU arch flags and C memory model flags */
+		/* TODO: OS Flags, CPU arch flags and C memory model flags */
 #if   defined(WORDS_BIGENDIAN)
-        { "big-endian", NULL },
+		{ "big-endian", NULL },
 #else
-        { "little-endian", NULL }, /* NB: r7rs say nothing on mixed endian */
+		{ "little-endian", NULL }, /* NB: r7rs say nothing on mixed endian */
 #endif
 
-        /* Threads */
+		/* Threads */
 #if   defined(GAUCHE_USE_PTHREADS)
-        { "gauche.sys.threads", "gauche.threads" },
-        { "gauche.sys.pthreads", "gauche.threads" },
+		{ "gauche.sys.threads", "gauche.threads" },
+		{ "gauche.sys.pthreads", "gauche.threads" },
 #elif defined(GAUCHE_USE_WTHREADS)
-        { "gauche.sys.threads", "gauche.threads" },
-        { "gauche.sys.wthreads", "gauche.threads" },
+		{ "gauche.sys.threads", "gauche.threads" },
+		{ "gauche.sys.wthreads", "gauche.threads" },
 #endif
 
-        /* TLS/SSL.  This nees to be in the core in order to switch
-           code _before_ loading rfc.tls */
+		/* TLS/SSL.  This nees to be in the core in order to switch
+		   code _before_ loading rfc.tls */
 #if defined(GAUCHE_USE_AXTLS) || defined(GAUCHE_USE_MBEDTLS)
-        { "gauche.net.tls", "rfc.tls" },
+		{ "gauche.net.tls", "rfc.tls" },
 #endif
 #if defined(GAUCHE_USE_AXTLS)
-        { "gauche.net.tls.axtls", "rfc.tls" },
+		{ "gauche.net.tls.axtls", "rfc.tls" },
 #endif
 #if defined(GAUCHE_USE_MBEDTLS)
-        /* NB: Kludge - mbedTLS is implemented in a separate module rfc.tls.mbed,
-           but we don't autoload it with cond-expand gauche.net.tls.mbedtls.
-           If the gauche is compiled with mbedTLS support but the target system
-           lacks mbed DSO, using rfc.tls.mbed causes runtime error.  We don't
-           want that merely by checking feature identifier.  We set autoload
-           in rfc.tls, so the runtime error only occur when the program actually
-           try to use <mbed-tls>. */
-        { "gauche.net.tls.mbedtls", NULL },
+		/* NB: Kludge - mbedTLS is implemented in a separate module rfc.tls.mbed,
+		   but we don't autoload it with cond-expand gauche.net.tls.mbedtls.
+		   If the gauche is compiled with mbedTLS support but the target system
+		   lacks mbed DSO, using rfc.tls.mbed causes runtime error.  We don't
+		   want that merely by checking feature identifier.  We set autoload
+		   in rfc.tls, so the runtime error only occur when the program actually
+		   try to use <mbed-tls>. */
+		{ "gauche.net.tls.mbedtls", NULL },
 #endif
 
-        /* zlib */
+		/* zlib */
 #if defined(USE_ZLIB)
-        { "gauche.sys.zlib", "rfc.zlib" },
+		{ "gauche.sys.zlib", "rfc.zlib" },
 #endif
 
-        { "regexp-non-greedy", "srfi.115" },
-        { "regexp-look-around", "srfi.115" },
-        { "regexp-backrefs", "srfi.115" },
-        { "regexp-unicode", "srfi.115" },
+		{ "regexp-non-greedy", "srfi.115" },
+		{ "regexp-look-around", "srfi.115" },
+		{ "regexp-backrefs", "srfi.115" },
+		{ "regexp-unicode", "srfi.115" },
 
 #include "features.c"
-        
-        { NULL, NULL }
-    };
 
-    for (int i=0; init_features[i].feature; i++) {
-        Scm_AddFeature(init_features[i].feature, init_features[i].module);
-    }
+		{ NULL, NULL }
+	};
+
+	for (int i=0; init_features[i].feature; i++) {
+		Scm_AddFeature(init_features[i].feature, init_features[i].module);
+	}
 }
 
 /* TRANSIENT: These used to be in paths.c but no longer needed.  We keep
    the entries just for ABI compatibility.  These shouldn't be called.
    Remove on 1.0 release.
-*/
+ */
 const char *Scm_GetLibraryDirectory(void (*errfn)(const char *, ...) SCM_UNUSED)
 {
-    Scm_Abort("Scm_GetLibraryDirectory is called (it shouldn't).");
+	Scm_Abort("Scm_GetLibraryDirectory is called (it shouldn't).");
 }
 
 const char *Scm_GetArchitectureDirectory(void (*errfn)(const char *, ...) SCM_UNUSED)
 {
-    Scm_Abort("Scm_GetArchitectureDirectory is called (it shouldn't).");
+	Scm_Abort("Scm_GetArchitectureDirectory is called (it shouldn't).");
 }
 
 const char *Scm_GetSiteLibraryDirectory(void (*errfn)(const char *, ...) SCM_UNUSED)
 {
-    Scm_Abort("Scm_GetSiteLibraryDirectory is called (it shouldn't).");
+	Scm_Abort("Scm_GetSiteLibraryDirectory is called (it shouldn't).");
 }
 
 const char *Scm_GetSiteArchitectureDirectory(void (*errfn)(const char *, ...) SCM_UNUSED)
 {
-    Scm_Abort("Scm_GetSiteArchitectureDirectory is called (it shouldn't).");
+	Scm_Abort("Scm_GetSiteArchitectureDirectory is called (it shouldn't).");
 }
 
 const char *Scm_GetRuntimeDirectory(void (*errfn)(const char *, ...) SCM_UNUSED)
 {
-    Scm_Abort("Scm_GetRuntimeDirectory is called (it shouldn't).");
+	Scm_Abort("Scm_GetRuntimeDirectory is called (it shouldn't).");
 }
 
 /*=============================================================
@@ -604,13 +604,13 @@ const char *Scm_GetRuntimeDirectory(void (*errfn)(const char *, ...) SCM_UNUSED)
 
 ScmObj Scm_InitCommandLine(int argc, const char *argv[])
 {
-    static ScmObj command_line_proc = SCM_UNDEFINED;
-    ScmObj args = Scm_CStringArrayToList(argv, argc, SCM_STRING_IMMUTABLE);
-    SCM_BIND_PROC(command_line_proc, "command-line", Scm_GaucheModule());
-    Scm_ApplyRec1(command_line_proc, args);
-    SCM_DEFINE(Scm_UserModule(), "*program-name*", SCM_CAR(args));
-    SCM_DEFINE(Scm_UserModule(), "*argv*", SCM_CDR(args));
-    return args;
+	static ScmObj command_line_proc = SCM_UNDEFINED;
+	ScmObj args = Scm_CStringArrayToList(argv, argc, SCM_STRING_IMMUTABLE);
+	SCM_BIND_PROC(command_line_proc, "command-line", Scm_GaucheModule());
+	Scm_ApplyRec1(command_line_proc, args);
+	SCM_DEFINE(Scm_UserModule(), "*program-name*", SCM_CAR(args));
+	SCM_DEFINE(Scm_UserModule(), "*argv*", SCM_CDR(args));
+	return args;
 }
 
 /*=============================================================
@@ -625,7 +625,7 @@ ScmObj Scm_InitCommandLine(int argc, const char *argv[])
 #ifdef __CYGWIN__
 int main(void)
 {
-    return 0;
+	return 0;
 }
 #endif /*__CYGWIN__*/
 
@@ -636,27 +636,27 @@ int main(void)
 void Scm_SimpleMain(int argc, const char *argv[],
                     const char *script, u_long flags SCM_UNUSED)
 {
-    SCM_ASSERT(argc > 0);
-    ScmObj args = Scm_InitCommandLine(argc, argv);
+	SCM_ASSERT(argc > 0);
+	ScmObj args = Scm_InitCommandLine(argc, argv);
 
-    if (script) {
-        ScmObj s = SCM_MAKE_STR(script);
-        ScmObj p = Scm_MakeInputStringPort(SCM_STRING(s), TRUE);
-        Scm_LoadFromPort(SCM_PORT(p), SCM_LOAD_PROPAGATE_ERROR, NULL);
-    }
+	if (script) {
+		ScmObj s = SCM_MAKE_STR(script);
+		ScmObj p = Scm_MakeInputStringPort(SCM_STRING(s), TRUE);
+		Scm_LoadFromPort(SCM_PORT(p), SCM_LOAD_PROPAGATE_ERROR, NULL);
+	}
 
-    ScmModule *user = Scm_UserModule();
-    ScmObj mainproc = Scm_GlobalVariableRef(user, SCM_SYMBOL(SCM_INTERN("main")), 0);
-    if (SCM_PROCEDUREP(mainproc)) {
-        static ScmObj run_main_proc = SCM_UNDEFINED;
-        SCM_BIND_PROC(run_main_proc, "run-main", Scm_GaucheInternalModule());
-        SCM_ASSERT(SCM_PROCEDUREP(run_main_proc));
+	ScmModule *user = Scm_UserModule();
+	ScmObj mainproc = Scm_GlobalVariableRef(user, SCM_SYMBOL(SCM_INTERN("main")), 0);
+	if (SCM_PROCEDUREP(mainproc)) {
+		static ScmObj run_main_proc = SCM_UNDEFINED;
+		SCM_BIND_PROC(run_main_proc, "run-main", Scm_GaucheInternalModule());
+		SCM_ASSERT(SCM_PROCEDUREP(run_main_proc));
 
-        ScmEvalPacket epak;
-        int r = Scm_Apply(run_main_proc, SCM_LIST2(mainproc, args), &epak);
-        SCM_ASSERT(r == 1 && SCM_INTP(epak.results[0]));
-        Scm_Exit(SCM_INT_VALUE(epak.results[0]));
-    } else {
-        Scm_Exit(70);
-    }
+		ScmEvalPacket epak;
+		int r = Scm_Apply(run_main_proc, SCM_LIST2(mainproc, args), &epak);
+		SCM_ASSERT(r == 1 && SCM_INTP(epak.results[0]));
+		Scm_Exit(SCM_INT_VALUE(epak.results[0]));
+	} else {
+		Scm_Exit(70);
+	}
 }

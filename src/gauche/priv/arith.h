@@ -83,10 +83,10 @@
 #ifndef UADD
 /* Portable version */
 #define UADD(r, c, x, y)                                        \
-  do {                                                          \
-    (r) = (x) + (y) + (c);                                      \
-    (c) = ((r)<(x) || ((r)==(x) && ((y)>0||(c)>0)))? 1 : 0;     \
-  } while (0)
+	do {                                                          \
+		(r) = (x) + (y) + (c);                                      \
+		(c) = ((r)<(x) || ((r)==(x) && ((y)>0||(c)>0))) ? 1 : 0;     \
+	} while (0)
 #endif /*UADD*/
 
 /*-----------------------------------------------------------------
@@ -99,10 +99,10 @@
 #ifndef UADDOV
 /* Portable version */
 #define UADDOV(r, v, x, y)                      \
-  do {                                          \
-    (r) = (x) + (y);                            \
-    (v) = ((r) < (x))? 1 : 0;                   \
-  } while (0)
+	do {                                          \
+		(r) = (x) + (y);                            \
+		(v) = ((r) < (x)) ? 1 : 0;                   \
+	} while (0)
 #endif /*UADDOV*/
 
 /*-----------------------------------------------------------------
@@ -115,16 +115,16 @@
 #ifndef SADDOV
 /* Portable version */
 #define SADDOV(r, v, x, y)                      \
-  do {                                          \
-    (r) = (x) + (y);                            \
-    if ((x) >= 0) {                             \
-      if ((y) >= 0 && (r) < 0) (v) = 1;         \
-      else (v) = 0;                             \
-    } else {                                    \
-      if ((y) < 0 && (r) >= 0) (v) = -1;        \
-      else (v) = 0;                             \
-    }                                           \
-  } while (0)
+	do {                                          \
+		(r) = (x) + (y);                            \
+		if ((x) >= 0) {                             \
+			if ((y) >= 0 && (r) < 0) (v) = 1;         \
+			else (v) = 0;                             \
+		} else {                                    \
+			if ((y) < 0 && (r) >= 0) (v) = -1;        \
+			else (v) = 0;                             \
+		}                                           \
+	} while (0)
 #endif /*SADDOV*/
 
 /*-----------------------------------------------------------------
@@ -137,10 +137,10 @@
 #ifndef USUB
 /* Portable version */
 #define USUB(r, c, x, y)                                        \
-  do {                                                          \
-    (r) = (x) - (y) - (c);                                      \
-    (c) = ((r)>(x) || ((r)==(x) && ((y)>0||(c)>0)))? 1 : 0;     \
-  } while (0)
+	do {                                                          \
+		(r) = (x) - (y) - (c);                                      \
+		(c) = ((r)>(x) || ((r)==(x) && ((y)>0||(c)>0))) ? 1 : 0;     \
+	} while (0)
 #endif /*USUB*/
 
 /*-----------------------------------------------------------------
@@ -153,10 +153,10 @@
 #ifndef USUBOV
 /* Portable version */
 #define USUBOV(r, v, x, y)                      \
-  do {                                          \
-    (r) = (x) - (y);                            \
-    (v) = ((r) > (x))? 1 : 0;                   \
-  } while (0)
+	do {                                          \
+		(r) = (x) - (y);                            \
+		(v) = ((r) > (x)) ? 1 : 0;                   \
+	} while (0)
 #endif /*USUBOV*/
 
 /*-----------------------------------------------------------------
@@ -169,16 +169,16 @@
 #ifndef SSUBOV
 /* Portable version */
 #define SSUBOV(r, v, x, y)                      \
-  do {                                          \
-    (r) = (x) - (y);                            \
-    if ((x) >= 0) {                             \
-      if ((y) < 0 && (r) <= 0) (v) = 1;         \
-      else (v) = 0;                             \
-    } else {                                    \
-      if ((y) >= 0 && (r) > 0) (v) = -1;        \
-      else (v) = 0;                             \
-    }                                           \
-  } while (0)
+	do {                                          \
+		(r) = (x) - (y);                            \
+		if ((x) >= 0) {                             \
+			if ((y) < 0 && (r) <= 0) (v) = 1;         \
+			else (v) = 0;                             \
+		} else {                                    \
+			if ((y) >= 0 && (r) > 0) (v) = -1;        \
+			else (v) = 0;                             \
+		}                                           \
+	} while (0)
 #endif /*SSUBOV*/
 
 /*-----------------------------------------------------------------
@@ -190,20 +190,20 @@
 #ifndef UMUL
 /* Portable version */
 #define UMUL(hi, lo, x, y)                                              \
-    do {                                                                \
-        u_long xl_ = LO(x), xh_ = HI(x), yl_ = LO(y), yh_ = HI(y);      \
-        u_long t1_, t2_, t3_, t4_;                                      \
-        lo = xl_ * yl_;                                                 \
-        t1_ = xl_ * yh_;                                                \
-        t2_ = xh_ * yl_;                                                \
-        hi = xh_ * yh_;                                                 \
-        t3_ = t1_ + t2_;                                                \
-        if (t3_ < t1_) hi += HALF_WORD;                                 \
-        hi += HI(t3_);                                                  \
-        t4_ = LO(t3_) << HALF_BITS;                                     \
-        lo += t4_;                                                      \
-        if (lo < t4_) hi++;                                             \
-    } while (0)
+	do {                                                                \
+		u_long xl_ = LO(x), xh_ = HI(x), yl_ = LO(y), yh_ = HI(y);      \
+		u_long t1_, t2_, t3_, t4_;                                      \
+		lo = xl_ * yl_;                                                 \
+		t1_ = xl_ * yh_;                                                \
+		t2_ = xh_ * yl_;                                                \
+		hi = xh_ * yh_;                                                 \
+		t3_ = t1_ + t2_;                                                \
+		if (t3_ < t1_) hi += HALF_WORD;                                 \
+		hi += HI(t3_);                                                  \
+		t4_ = LO(t3_) << HALF_BITS;                                     \
+		lo += t4_;                                                      \
+		if (lo < t4_) hi++;                                             \
+		} while (0)
 #endif /*UMUL*/
 
 /*-----------------------------------------------------------------
@@ -216,14 +216,14 @@
 
 #ifndef UMULOV
 #define UMULOV(r, v, x, y)                              \
-    do {                                                \
-        if ((x)==0 || (y)==0) { (v) = (r) = 0; }        \
-        else {                                          \
-            u_long t5_;                                 \
-            UMUL(t5_, r, x, y);                         \
-            (v) = (t5_)? 1 : 0;                         \
-        }                                               \
-    } while (0)
+	do {                                                \
+		if ((x)==0 || (y)==0) { (v) = (r) = 0; }        \
+		else {                                          \
+			u_long t5_;                                 \
+			UMUL(t5_, r, x, y);                         \
+			(v) = (t5_) ? 1 : 0;                         \
+		}                                               \
+	} while (0)
 #endif /*UMULOV*/
 
 /*-----------------------------------------------------------------
@@ -236,30 +236,30 @@
 
 #ifndef SMULOV
 #define SMULOV(r, v, x, y)                                      \
-    do {                                                        \
-        u_long t6_;                                             \
-        if ((x) >= 0) {                                         \
-            if ((y) >= 0) {                                     \
-                UMULOV(t6_, v, x, y);                           \
-                if ((v) || t6_ > LONG_MAX) (v) = 1;             \
-                else (r) = t6_;                                 \
-            } else {                                            \
-                UMULOV(t6_, v, x, -y);                          \
-                if ((v) || t6_ > LONG_MAX+1UL) (v) = -1;        \
-                else (r) = -(long)t6_;                          \
-            }                                                   \
-        } else {                                                \
-            if ((y) >= 0) {                                     \
-                UMULOV(t6_, v, -x, y);                          \
-                if ((v) || t6_ > LONG_MAX+1UL) (v) = -1;        \
-                else (r) = -(long)t6_;                          \
-            } else {                                            \
-                UMULOV(t6_, v, -x, -y);                         \
-                if ((v) || t6_ > LONG_MAX) (v) = 1;             \
-                else (r) = t6_;                                 \
-            }                                                   \
-        }                                                       \
-    } while (0)
+	do {                                                        \
+		u_long t6_;                                             \
+		if ((x) >= 0) {                                         \
+			if ((y) >= 0) {                                     \
+				UMULOV(t6_, v, x, y);                           \
+				if ((v) || t6_ > LONG_MAX) (v) = 1;             \
+				else (r) = t6_;                                 \
+			} else {                                            \
+				UMULOV(t6_, v, x, -y);                          \
+				if ((v) || t6_ > LONG_MAX+1UL) (v) = -1;        \
+				else (r) = -(long)t6_;                          \
+			}                                                   \
+		} else {                                                \
+			if ((y) >= 0) {                                     \
+				UMULOV(t6_, v, -x, y);                          \
+				if ((v) || t6_ > LONG_MAX+1UL) (v) = -1;        \
+				else (r) = -(long)t6_;                          \
+			} else {                                            \
+				UMULOV(t6_, v, -x, -y);                         \
+				if ((v) || t6_ > LONG_MAX) (v) = 1;             \
+				else (r) = t6_;                                 \
+			}                                                   \
+		}                                                       \
+	} while (0)
 #endif /*SMULOV*/
 
 

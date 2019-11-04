@@ -36,42 +36,42 @@
 
 /* Condition class hierarchy
 
-  <condition> ; srfi-35
-    +- <compound-condition>
-    +- <serious-condition> ; srfi-35
-    |    +- <serious-compound-condition> ; also inherits <compound-condition>
-    +- <message-condition> ; srfi-35
-    |    +- <error>             ; srfi-35, also inherits <serious-condition>
-    |         +- <system-error>
-    |         +- <unhandled-signal-error>
-    |         +- <read-error> ; srfi-36
-    |         +- <io-error>   ; srfi-36
-    |              +- <port-error> ; srfi-36
-    |                   +- <io-read-error>   ; srfi-36
-    |                   +- <io-write-error>  ; srfi-36
-    |                   +- <io-closed-error> ; srfi-36
-    |                   +- <io-unit-error>
-    +- <thread-exception> ; srfi-18
-    |    +- <join-timeout-exception>      ; srfi-18
-    |    +- <abandoned-mutex-exception>   ; srfi-18
-    |    +- <terminated-thread-exception> ; srfi-18
-    |    +- <uncaught-exception>          ; srfi-18
-    +- <mixin-condition>
-         +- <load-condition-mixin> ; compounded to an error during loading
-         +- <compile-error-mixin>  ; compounded to an error during compiling
-         +- <io-filename-error>    ; srfi-36; compounded to <system-error> (*)
-             +- <io-malformed-filename-error>     ; ditto (*)
-             +- <io-protection-error>             ; ditto (*)
-             |    +- <io-file-is-read-only-error> ; ditto (*)
-             +- <io-file-already-exists-error>    ; ditto (*)
-             +- <io-no-such-file-error>           ; ditto (*)
+   <condition> ; srfi-35
+ +- <compound-condition>
+ +- <serious-condition> ; srfi-35
+ |    +- <serious-compound-condition> ; also inherits <compound-condition>
+ +- <message-condition> ; srfi-35
+ |    +- <error>             ; srfi-35, also inherits <serious-condition>
+ |         +- <system-error>
+ |         +- <unhandled-signal-error>
+ |         +- <read-error> ; srfi-36
+ |         +- <io-error>   ; srfi-36
+ |              +- <port-error> ; srfi-36
+ |                   +- <io-read-error>   ; srfi-36
+ |                   +- <io-write-error>  ; srfi-36
+ |                   +- <io-closed-error> ; srfi-36
+ |                   +- <io-unit-error>
+ +- <thread-exception> ; srfi-18
+ |    +- <join-timeout-exception>      ; srfi-18
+ |    +- <abandoned-mutex-exception>   ; srfi-18
+ |    +- <terminated-thread-exception> ; srfi-18
+ |    +- <uncaught-exception>          ; srfi-18
+ +- <mixin-condition>
+ +- <load-condition-mixin> ; compounded to an error during loading
+ +- <compile-error-mixin>  ; compounded to an error during compiling
+ +- <io-filename-error>    ; srfi-36; compounded to <system-error> (*)
+ +- <io-malformed-filename-error>     ; ditto (*)
+ +- <io-protection-error>             ; ditto (*)
+ |    +- <io-file-is-read-only-error> ; ditto (*)
+ +- <io-file-already-exists-error>    ; ditto (*)
+ +- <io-no-such-file-error>           ; ditto (*)
 
- SRFI-35 does not make distinction between primary inheritance and mixin
- inheritance; the <condition-mixin> subtree is Gauche's convention.  The
- default error reporting routine treats mixins specially.
+   SRFI-35 does not make distinction between primary inheritance and mixin
+   inheritance; the <condition-mixin> subtree is Gauche's convention.  The
+   default error reporting routine treats mixins specially.
 
- (*) Those classes are defined, but not yet used.
-*/
+   (*) Those classes are defined, but not yet used.
+ */
 
 /*---------------------------------------------------
  * Base conditions.
@@ -107,8 +107,8 @@ SCM_EXTERN int Scm_ConditionHasType(ScmObj c, ScmObj k);
  */
 
 typedef struct ScmMessageConditionRec {
-    ScmCondition common;
-    ScmObj message;  /* message - should be accessed via Scm_ConditionMessage */
+	ScmCondition common;
+	ScmObj message; /* message - should be accessed via Scm_ConditionMessage */
 } ScmMessageCondition;
 
 SCM_CLASS_DECL(Scm_MessageConditionClass);
@@ -141,8 +141,8 @@ SCM_EXTERN ScmObj Scm_MakeError(ScmObj message);
 
 /* <system-error>: error from system calls */
 typedef struct ScmSystemErrorRec {
-    ScmError common;
-    int error_number;           /* errno */
+	ScmError common;
+	int error_number;       /* errno */
 } ScmSystemError;
 
 SCM_CLASS_DECL(Scm_SystemErrorClass);
@@ -154,8 +154,8 @@ SCM_EXTERN ScmObj Scm_MakeSystemError(ScmObj message, int error_num);
 
 /* <unhandled-signal-error>: unhandled signal */
 typedef struct ScmUnhandledSignalErrorRec {
-    ScmError common;
-    int signal;                 /* signal number */
+	ScmError common;
+	int signal;             /* signal number */
 } ScmUnhandledSignalError;
 
 SCM_CLASS_DECL(Scm_UnhandledSignalErrorClass);
@@ -165,9 +165,9 @@ SCM_CLASS_DECL(Scm_UnhandledSignalErrorClass);
 
 /* <read-error>: error from the reader */
 typedef struct ScmReadErrorRec {
-    ScmError common;
-    ScmPort *port;              /* input port where we're reading from. */
-    int line;                   /* line number (if available), or -1 */
+	ScmError common;
+	ScmPort *port;          /* input port where we're reading from. */
+	int line;               /* line number (if available), or -1 */
 } ScmReadError;
 
 SCM_CLASS_DECL(Scm_ReadErrorClass);
@@ -186,8 +186,8 @@ SCM_CLASS_DECL(Scm_IOErrorClass);
 
 /* <port-error>: Port related error, inherits <io-error> */
 typedef struct ScmPortErrorRec {
-    ScmIOError common;
-    ScmPort *port;              /* The port where I/O error occurs */
+	ScmIOError common;
+	ScmPort *port;          /* The port where I/O error occurs */
 } ScmPortError;
 
 SCM_CLASS_DECL(Scm_PortErrorClass);
@@ -224,8 +224,8 @@ SCM_CLASS_DECL(Scm_IOUnitErrorClass);
    isn't a compound condition itself. */
 
 typedef struct ScmCompoundConditionRec {
-    ScmCondition common;
-    ScmObj conditions;          /* list of simple conditions */
+	ScmCondition common;
+	ScmObj conditions;      /* list of simple conditions */
 } ScmCompoundCondition;
 
 SCM_CLASS_DECL(Scm_CompoundConditionClass);
@@ -245,14 +245,14 @@ SCM_EXTERN ScmObj Scm_ExtractSimpleCondition(ScmObj condition, ScmClass *type);
  */
 
 typedef struct ScmThreadExceptionRec {
-    SCM_HEADER;
-    ScmVM *thread;              /* the thread that caused the exception */
-    ScmObj data;                /* additional data.
-                                   <join-timeout-exception> : n/a
-                                   <abandoned-mutex-exception> : mutex
-                                   <terminated-thread-exception> : n/a
-                                   <uncaught-exception> : exception
-                                */
+	SCM_HEADER;
+	ScmVM *thread;          /* the thread that caused the exception */
+	ScmObj data;            /* additional data.
+	                           <join-timeout-exception> : n/a
+	                           <abandoned-mutex-exception> : mutex
+	                           <terminated-thread-exception> : n/a
+	                           <uncaught-exception> : exception
+	                         */
 } ScmThreadException;
 
 SCM_EXTERN ScmObj Scm_MakeThreadException(ScmClass*, ScmVM*);
@@ -294,9 +294,9 @@ SCM_CLASS_DECL(Scm_MixinConditionClass);
 #define SCM_MIXIN_CONDITION_P(obj)  SCM_ISA(obj, SCM_CLASS_MIXIN_CONDITION)
 
 typedef struct ScmLoadConditionMixinRec {
-    ScmCondition common;
-    ScmObj history;             /* current-load-history */
-    ScmObj port;                /* current-load-port */
+	ScmCondition common;
+	ScmObj history;         /* current-load-history */
+	ScmObj port;            /* current-load-port */
 } ScmLoadConditionMixin;
 
 SCM_CLASS_DECL(Scm_LoadConditionMixinClass);
@@ -305,8 +305,8 @@ SCM_CLASS_DECL(Scm_LoadConditionMixinClass);
 #define SCM_LOAD_CONDITION_MIXIN(obj)  ((ScmLoadConditionMixin*)(obj))
 
 typedef struct ScmCompileErrorMixinRec {
-    ScmCondition condition;
-    ScmObj expr;                /* offending expr */
+	ScmCondition condition;
+	ScmObj expr;            /* offending expr */
 } ScmCompileErrorMixin;
 
 SCM_CLASS_DECL(Scm_CompileErrorMixinClass);
@@ -316,8 +316,8 @@ SCM_CLASS_DECL(Scm_CompileErrorMixinClass);
 
 /* This struct is shared among all subclasses of &i/o-filename-error. */
 typedef struct ScmFilenameErrorMixinRec {
-    ScmCondition common;
-    ScmObj filename;            /* offending name */
+	ScmCondition common;
+	ScmObj filename;        /* offending name */
 } ScmFilenameErrorMixin;
 
 SCM_CLASS_DECL(Scm_FilenameErrorMixinClass);

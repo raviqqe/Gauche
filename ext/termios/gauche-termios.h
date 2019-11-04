@@ -65,8 +65,8 @@
 #include <gauche/extern.h>
 
 typedef struct ScmSysTermiosRec {
-    SCM_HEADER;
-    struct termios term;
+	SCM_HEADER;
+	struct termios term;
 } ScmSysTermios;
 
 SCM_CLASS_DECL(Scm_SysTermiosClass);

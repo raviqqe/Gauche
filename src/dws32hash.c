@@ -13,7 +13,7 @@ void DwSip_round(DwSH_WORD *v0, DwSH_WORD *v1, DwSH_WORD *v2, DwSH_WORD *v3) {
 	*v3 ^= *v2;
 	*v0 = (*v0 << DwSH_R3) | (*v0 >> DwSH_R3i);
 	*v2 += *v1;
-	*v0 += *v3; 
+	*v0 += *v3;
 	*v1 = (*v1 << DwSH_R4) | (*v1 >> DwSH_R4i);
 	*v3 = (*v3 << DwSH_R5) | (*v3 >> DwSH_R5i);
 	*v1 ^= *v2;
@@ -23,7 +23,7 @@ void DwSip_round(DwSH_WORD *v0, DwSH_WORD *v1, DwSH_WORD *v2, DwSH_WORD *v3) {
 
 /* Key setup.  Given two keys, set up the first state and final XOR constant */
 void DwSip_ksetup(DwSH_WORD *k0, DwSH_WORD *k1, DwSH_WORD *v0, DwSH_WORD *v1,
-		DwSH_WORD *v2, DwSH_WORD *v3, DwSH_WORD *fx) {
+                  DwSH_WORD *v2, DwSH_WORD *v3, DwSH_WORD *fx) {
 	*v0 = *k0 ^ DwSH_kc1;
 	*v1 = *k1 ^ DwSH_kc2;
 	*v2 = *k0 ^ DwSH_kc3;
@@ -36,7 +36,7 @@ DwSH_WORD DwSip_getword(uint32_t *offset, uint8_t *str, uint32_t len) {
 	uint32_t toffset = *offset;
 	int shift = 0;
 	DwSH_WORD out = 0;
-	do {	
+	do {
 		if(toffset >= len) {
 			out |= ((DwSH_WORD)len & 0xff) << (DwSH_BWIDTH - 8);
 			*offset = len + 1;
@@ -63,14 +63,14 @@ DwSH_WORD DwSip_hash(uint8_t *str, uint32_t len, DwSH_WORD k1, DwSH_WORD k2) {
 			DwSip_round(&v0,&v1,&v2,&v3);
 		}
 		v0 ^= m;
-	} 
+	}
 	v2 ^= fx;
 	for(a = 0; a < DwSH_FROUNDS; a++) {
 		DwSip_round(&v0,&v1,&v2,&v3);
 	}
 	return v0 ^ v1 ^ v2 ^ v3;
 }
-	
+
 #ifdef MAIN
 #include <stdio.h>
 int main() {

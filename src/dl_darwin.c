@@ -35,7 +35,7 @@
    http://developer.apple.com/technotes/tn2002/tn2071.html
    Cf: Object File Image Functions
    http://developer.apple.com/techpubs/macosx/DeveloperTools/MachORuntime/5rt_api_reference/chapter_5_section_3.html
-*/
+ */
 
 /* This file is included in load.c */
 
@@ -52,52 +52,52 @@ static const char *dl_open_errstr = NULL;
 
 static void *dl_open(const char *path)
 {
-    NSObjectFileImage image;
-    unsigned long options = NSLINKMODULE_OPTION_BINDNOW|NSLINKMODULE_OPTION_RETURN_ON_ERROR;
+	NSObjectFileImage image;
+	unsigned long options = NSLINKMODULE_OPTION_BINDNOW|NSLINKMODULE_OPTION_RETURN_ON_ERROR;
 
-    NSObjectFileImageReturnCode r = NSCreateObjectFileImageFromFile(path, &image);
-    if (r != NSObjectFileImageSuccess) {
-        switch (r) {
-        case NSObjectFileImageInappropriateFile:
-            dl_open_errstr = "The specified Mach-O file is not of a type this function can operate upon.";
-            break;
-        case NSObjectFileImageArch:
-            dl_open_errstr = "The specified Mach-O file is for a different CPU architecture.";
-            break;
-        case NSObjectFileImageFormat:
-            dl_open_errstr = "The specified file does not appear to be a Mach-O file.";
-            break;
-        case NSObjectFileImageAccess:
-            dl_open_errstr = "The access permissions for the specified file do not permit the creation of the image.";
-            break;
-        default:
-            dl_open_errstr = "Unknown error.";
-            break;
-        }
-        return NULL;
-    }
+	NSObjectFileImageReturnCode r = NSCreateObjectFileImageFromFile(path, &image);
+	if (r != NSObjectFileImageSuccess) {
+		switch (r) {
+		case NSObjectFileImageInappropriateFile:
+			dl_open_errstr = "The specified Mach-O file is not of a type this function can operate upon.";
+			break;
+		case NSObjectFileImageArch:
+			dl_open_errstr = "The specified Mach-O file is for a different CPU architecture.";
+			break;
+		case NSObjectFileImageFormat:
+			dl_open_errstr = "The specified file does not appear to be a Mach-O file.";
+			break;
+		case NSObjectFileImageAccess:
+			dl_open_errstr = "The access permissions for the specified file do not permit the creation of the image.";
+			break;
+		default:
+			dl_open_errstr = "Unknown error.";
+			break;
+		}
+		return NULL;
+	}
 
-    NSModule module = NSLinkModule(image, path, options);
-    NSDestroyObjectFileImage(image);
-    if (module == NULL) {
-        dl_open_errstr = "NSLinkModule failed";
-    }
-    return module;
+	NSModule module = NSLinkModule(image, path, options);
+	NSDestroyObjectFileImage(image);
+	if (module == NULL) {
+		dl_open_errstr = "NSLinkModule failed";
+	}
+	return module;
 }
 
 static const char *dl_error(void)
 {
-    return dl_open_errstr;
+	return dl_open_errstr;
 }
 
 static ScmDynLoadInitFn dl_sym(void *handle, const char *name)
 {
-    NSSymbol sym = NSLookupSymbolInModule((NSModule)handle, name);
-    if (sym == NULL) return NULL;
-    return (ScmDynLoadInitFn)NSAddressOfSymbol(sym);
+	NSSymbol sym = NSLookupSymbolInModule((NSModule)handle, name);
+	if (sym == NULL) return NULL;
+	return (ScmDynLoadInitFn)NSAddressOfSymbol(sym);
 }
 
 static void dl_close(void *handle)
 {
-    (void)NSUnLinkModule((NSModule)handle, NSUNLINKMODULE_OPTION_NONE);
+	(void)NSUnLinkModule((NSModule)handle, NSUNLINKMODULE_OPTION_NONE);
 }

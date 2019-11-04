@@ -62,30 +62,30 @@ static ScmInternalMutex compile_finish_mutex;
 
 ScmObj Scm_Compile(ScmObj program, ScmObj env)
 {
-    return Scm_ApplyRec2(SCM_GLOC_GET(compile_gloc), program, env);
+	return Scm_ApplyRec2(SCM_GLOC_GET(compile_gloc), program, env);
 }
 
 ScmObj Scm_CompilePartial(ScmObj program, ScmObj env)
 {
-    return Scm_ApplyRec2(SCM_GLOC_GET(compile_partial_gloc), program, env);
+	return Scm_ApplyRec2(SCM_GLOC_GET(compile_partial_gloc), program, env);
 }
 
 void Scm_CompileFinish(ScmCompiledCode *cc)
 {
-    if (cc->code == NULL) {
-        SCM_INTERNAL_MUTEX_LOCK(compile_finish_mutex);
-        SCM_UNWIND_PROTECT {
-            if (cc->code == NULL) {
-                Scm_ApplyRec1(SCM_GLOC_GET(compile_finish_gloc), SCM_OBJ(cc));
-            }
-        }
-        SCM_WHEN_ERROR {
-            SCM_INTERNAL_MUTEX_UNLOCK(compile_finish_mutex);
-            SCM_NEXT_HANDLER;
-        }
-        SCM_END_PROTECT;
-        SCM_INTERNAL_MUTEX_UNLOCK(compile_finish_mutex);
-    }
+	if (cc->code == NULL) {
+		SCM_INTERNAL_MUTEX_LOCK(compile_finish_mutex);
+		SCM_UNWIND_PROTECT {
+			if (cc->code == NULL) {
+				Scm_ApplyRec1(SCM_GLOC_GET(compile_finish_gloc), SCM_OBJ(cc));
+			}
+		}
+		SCM_WHEN_ERROR {
+			SCM_INTERNAL_MUTEX_UNLOCK(compile_finish_mutex);
+			SCM_NEXT_HANDLER;
+		}
+		SCM_END_PROTECT;
+		SCM_INTERNAL_MUTEX_UNLOCK(compile_finish_mutex);
+	}
 }
 
 /*-------------------------------------------------------------
@@ -95,79 +95,79 @@ void Scm_CompileFinish(ScmCompiledCode *cc)
 static void synclo_print(ScmObj obj, ScmPort *port,
                          ScmWriteContext *ctx SCM_UNUSED)
 {
-    Scm_Printf(port, "#<syntactic-closure %S>",
-               SCM_SYNTACTIC_CLOSURE(obj)->expr);
+	Scm_Printf(port, "#<syntactic-closure %S>",
+	           SCM_SYNTACTIC_CLOSURE(obj)->expr);
 }
 
 SCM_DEFINE_BUILTIN_CLASS_SIMPLE(Scm_SyntacticClosureClass, synclo_print);
 
 ScmObj Scm_MakeSyntacticClosure(ScmObj env, ScmObj literals, ScmObj expr)
 {
-    ScmSyntacticClosure *s = SCM_NEW(ScmSyntacticClosure);
-    SCM_SET_CLASS(s, SCM_CLASS_SYNTACTIC_CLOSURE);
-    s->env = env;
-    s->literals = literals;
-    s->expr = expr;
-    return SCM_OBJ(s);
+	ScmSyntacticClosure *s = SCM_NEW(ScmSyntacticClosure);
+	SCM_SET_CLASS(s, SCM_CLASS_SYNTACTIC_CLOSURE);
+	s->env = env;
+	s->literals = literals;
+	s->expr = expr;
+	return SCM_OBJ(s);
 }
 
 static ScmObj synclo_env_get(ScmObj obj)
 {
-    return SCM_SYNTACTIC_CLOSURE(obj)->env;
+	return SCM_SYNTACTIC_CLOSURE(obj)->env;
 }
 
 static ScmObj synclo_literals_get(ScmObj obj)
 {
-    return SCM_SYNTACTIC_CLOSURE(obj)->literals;
+	return SCM_SYNTACTIC_CLOSURE(obj)->literals;
 }
 
 static ScmObj synclo_expr_get(ScmObj obj)
 {
-    return SCM_SYNTACTIC_CLOSURE(obj)->expr;
+	return SCM_SYNTACTIC_CLOSURE(obj)->expr;
 }
 
 static ScmClassStaticSlotSpec synclo_slots[] = {
-    SCM_CLASS_SLOT_SPEC("env", synclo_env_get, NULL),
-    SCM_CLASS_SLOT_SPEC("literals", synclo_literals_get, NULL),
-    SCM_CLASS_SLOT_SPEC("expr", synclo_expr_get, NULL),
-    SCM_CLASS_SLOT_SPEC_END()
+	SCM_CLASS_SLOT_SPEC("env", synclo_env_get, NULL),
+	SCM_CLASS_SLOT_SPEC("literals", synclo_literals_get, NULL),
+	SCM_CLASS_SLOT_SPEC("expr", synclo_expr_get, NULL),
+	SCM_CLASS_SLOT_SPEC_END()
 };
 
 /*-------------------------------------------------------------
  * Identifier object
  */
 
-/* 
+/*
  * About identifier's ENV slot.
- * We close identifier's binding environment (list of frames), so that later 
+ * We close identifier's binding environment (list of frames), so that later
  * we can look up its bindings hygienically.  We truncate the frames up to
  * where the binding occur, for the efficient lookup and comparison.
- * Notably, the identifiers that are unbound or refer to toplevel variable 
+ * Notably, the identifiers that are unbound or refer to toplevel variable
  * has () in its env.
  * A caveat--we can't truncate frames at the time of construction, since
  * the entire frame structure may not be fixed while we're processing internal
- * defines.  The identifier may refer to another identifier that will be 
+ * defines.  The identifier may refer to another identifier that will be
  * inserted later.  Thus, we delay the truncation operation until it is
  * needed.
  * The ENV slot itself now contains (<flag> . <frames>), where <flag> is #f
  * if truncation hasn't be done, #t otherwise.  ENV should be treated as
- * an opaque data for the others; you should always get it with 
+ * an opaque data for the others; you should always get it with
  * Scm_IdentifierEnv(), and never directly access ENV slot itself.
  */
 
 static void identifier_print(ScmObj obj, ScmPort *port,
                              ScmWriteContext *ctx SCM_UNUSED)
 {
-    ScmIdentifier *id = SCM_IDENTIFIER(obj);
-    /* We may want to have an external identifier syntax, so that an
-       identifier can be written out and then read back.  It will be
-       convenient if we can embed a reference to other module's global
-       binding directly in the program.  However, it can also breaches
-       module-based sandbox implementation, so further consideration is
-       required.
-    */
-    Scm_Printf(port, "#<identifier %S#%S.%x>",
-               id->module->name, id->name, SCM_WORD(id));
+	ScmIdentifier *id = SCM_IDENTIFIER(obj);
+	/* We may want to have an external identifier syntax, so that an
+	   identifier can be written out and then read back.  It will be
+	   convenient if we can embed a reference to other module's global
+	   binding directly in the program.  However, it can also breaches
+	   module-based sandbox implementation, so further consideration is
+	   required.
+	 */
+	Scm_Printf(port, "#<identifier %S#%S.%x>",
+	           id->module->name, id->name, SCM_WORD(id));
 }
 
 SCM_DEFINE_BUILTIN_CLASS_SIMPLE(Scm_IdentifierClass, identifier_print);
@@ -175,103 +175,103 @@ SCM_DEFINE_BUILTIN_CLASS_SIMPLE(Scm_IdentifierClass, identifier_print);
 /* Truncate local frames */
 static ScmObj get_binding_frame(ScmObj var, ScmObj env)
 {
-    ScmObj frame, fp;
-    SCM_FOR_EACH(frame, env) {
-        if (!SCM_PAIRP(SCM_CAR(frame))) continue;
-        SCM_FOR_EACH(fp, SCM_CDAR(frame)) {
-            if (SCM_CAAR(fp) == var) {
-                SCM_ASSERT(SCM_LISTP(frame));
-                return frame;
-            }
-        }
-    }
-    return SCM_NIL;
+	ScmObj frame, fp;
+	SCM_FOR_EACH(frame, env) {
+		if (!SCM_PAIRP(SCM_CAR(frame))) continue;
+		SCM_FOR_EACH(fp, SCM_CDAR(frame)) {
+			if (SCM_CAAR(fp) == var) {
+				SCM_ASSERT(SCM_LISTP(frame));
+				return frame;
+			}
+		}
+	}
+	return SCM_NIL;
 }
 
 ScmObj Scm_MakeIdentifier(ScmObj name, ScmModule *mod, ScmObj env)
 {
-    ScmIdentifier *id = SCM_NEW(ScmIdentifier);
-    SCM_SET_CLASS(id, SCM_CLASS_IDENTIFIER);
-    id->name = name;
-    id->module = mod? mod : SCM_CURRENT_MODULE();
-    id->frames = Scm_Cons(SCM_FALSE, env); /* see the above comment */
-    return SCM_OBJ(id);
+	ScmIdentifier *id = SCM_NEW(ScmIdentifier);
+	SCM_SET_CLASS(id, SCM_CLASS_IDENTIFIER);
+	id->name = name;
+	id->module = mod ? mod : SCM_CURRENT_MODULE();
+	id->frames = Scm_Cons(SCM_FALSE, env); /* see the above comment */
+	return SCM_OBJ(id);
 }
 
 ScmObj Scm_IdentifierEnv(ScmIdentifier *id)
 {
-    SCM_ASSERT(SCM_PAIRP(id->frames));
-    if (SCM_FALSEP(SCM_CAR(id->frames))) {
-        /* MT safety: This operation is idempotent, so it's ok if more than
-           one thread execute here. */
-        ScmObj f = get_binding_frame(id->name, SCM_CDR(id->frames));
-        SCM_SET_CDR(id->frames, f);
-        SCM_SET_CAR(id->frames, SCM_TRUE);
-    }
-    return SCM_CDR(id->frames);
+	SCM_ASSERT(SCM_PAIRP(id->frames));
+	if (SCM_FALSEP(SCM_CAR(id->frames))) {
+		/* MT safety: This operation is idempotent, so it's ok if more than
+		   one thread execute here. */
+		ScmObj f = get_binding_frame(id->name, SCM_CDR(id->frames));
+		SCM_SET_CDR(id->frames, f);
+		SCM_SET_CAR(id->frames, SCM_TRUE);
+	}
+	return SCM_CDR(id->frames);
 }
 
 ScmIdentifier *Scm_OutermostIdentifier(ScmIdentifier *id)
 {
-    while (SCM_IDENTIFIERP(id->name)) {
-        id = SCM_IDENTIFIER(SCM_IDENTIFIER(id)->name);
-    }
-    return id;
+	while (SCM_IDENTIFIERP(id->name)) {
+		id = SCM_IDENTIFIER(SCM_IDENTIFIER(id)->name);
+	}
+	return id;
 }
 
 ScmSymbol *Scm_UnwrapIdentifier(ScmIdentifier *id)
 {
-    ScmObj z = Scm_OutermostIdentifier(id)->name;
-    SCM_ASSERT(SCM_SYMBOLP(z));
-    return SCM_SYMBOL(z);
+	ScmObj z = Scm_OutermostIdentifier(id)->name;
+	SCM_ASSERT(SCM_SYMBOLP(z));
+	return SCM_SYMBOL(z);
 }
 
 /* returns global binding of the identifier */
 ScmGloc *Scm_IdentifierGlobalBinding(ScmIdentifier *id)
 {
-    ScmIdentifier *z = Scm_OutermostIdentifier(id);
-    return Scm_FindBinding(z->module, SCM_SYMBOL(z->name), 0);
+	ScmIdentifier *z = Scm_OutermostIdentifier(id);
+	return Scm_FindBinding(z->module, SCM_SYMBOL(z->name), 0);
 }
 
 /* returns true if SYM has the same binding with ID in ENV. */
 int Scm_IdentifierBindingEqv(ScmIdentifier *id, ScmSymbol *sym, ScmObj env)
 {
-    ScmObj env1 = Scm_IdentifierEnv(id);
-    ScmObj env2 = get_binding_frame(SCM_OBJ(sym), env);
-    return (env1 == env2);
+	ScmObj env1 = Scm_IdentifierEnv(id);
+	ScmObj env2 = get_binding_frame(SCM_OBJ(sym), env);
+	return (env1 == env2);
 }
 
 ScmObj Scm_WrapIdentifier(ScmIdentifier *orig)
 {
-    ScmIdentifier *id = SCM_NEW(ScmIdentifier);
-    SCM_SET_CLASS(id, SCM_CLASS_IDENTIFIER);
-    id->name = SCM_OBJ(orig);
-    id->module = orig->module;
-    id->frames = orig->frames;
-    return SCM_OBJ(id);
+	ScmIdentifier *id = SCM_NEW(ScmIdentifier);
+	SCM_SET_CLASS(id, SCM_CLASS_IDENTIFIER);
+	id->name = SCM_OBJ(orig);
+	id->module = orig->module;
+	id->frames = orig->frames;
+	return SCM_OBJ(id);
 }
 
 static ScmObj identifier_name_get(ScmObj obj)
 {
-    return SCM_OBJ(SCM_IDENTIFIER(obj)->name);
+	return SCM_OBJ(SCM_IDENTIFIER(obj)->name);
 }
 
 static void   identifier_name_set(ScmObj obj, ScmObj val)
 {
-    if (!SCM_SYMBOLP(val) && !SCM_IDENTIFIERP(val)) {
-        Scm_Error("symbol or identifier required, but got %S", val);
-    }
-    SCM_IDENTIFIER(obj)->name = val;
+	if (!SCM_SYMBOLP(val) && !SCM_IDENTIFIERP(val)) {
+		Scm_Error("symbol or identifier required, but got %S", val);
+	}
+	SCM_IDENTIFIER(obj)->name = val;
 }
 
 static ScmObj identifier_module_get(ScmObj obj)
 {
-    return SCM_OBJ(SCM_IDENTIFIER(obj)->module);
+	return SCM_OBJ(SCM_IDENTIFIER(obj)->module);
 }
 
 static ScmObj identifier_env_get(ScmObj obj)
 {
-    return Scm_IdentifierEnv(SCM_IDENTIFIER(obj));
+	return Scm_IdentifierEnv(SCM_IDENTIFIER(obj));
 }
 
 /* Identifier name can be mutated during macro expansion to avoid
@@ -279,10 +279,10 @@ static ScmObj identifier_env_get(ScmObj obj)
    %rename-toplevel-identifier! in compiler pass1.
    Other than that, identifiers must be treated as immutable objects. */
 static ScmClassStaticSlotSpec identifier_slots[] = {
-    SCM_CLASS_SLOT_SPEC("name", identifier_name_get, identifier_name_set),
-    SCM_CLASS_SLOT_SPEC("module", identifier_module_get, NULL),
-    SCM_CLASS_SLOT_SPEC("env", identifier_env_get, NULL),
-    SCM_CLASS_SLOT_SPEC_END()
+	SCM_CLASS_SLOT_SPEC("name", identifier_name_get, identifier_name_set),
+	SCM_CLASS_SLOT_SPEC("module", identifier_module_get, NULL),
+	SCM_CLASS_SLOT_SPEC("env", identifier_env_get, NULL),
+	SCM_CLASS_SLOT_SPEC_END()
 };
 
 /*------------------------------------------------------------------
@@ -295,53 +295,53 @@ static ScmClassStaticSlotSpec identifier_slots[] = {
    substructure. */
 static ScmObj unwrap_rec(ScmObj form, ScmObj history)
 {
-    if (!SCM_PTRP(form)) return form;
-    if (!SCM_FALSEP(Scm_Memq(form, history))) return form;
+	if (!SCM_PTRP(form)) return form;
+	if (!SCM_FALSEP(Scm_Memq(form, history))) return form;
 
-    ScmObj newh;
+	ScmObj newh;
 
-    if (SCM_PAIRP(form)) {
-        ScmObj ca, cd;
-        newh = Scm_Cons(form, history);
-        ca = unwrap_rec(SCM_CAR(form), newh);
-        cd = unwrap_rec(SCM_CDR(form), newh);
-        if (ca == SCM_CAR(form) && cd == SCM_CDR(form)) {
-            return form;
-        } else {
-            return Scm_Cons(ca, cd);
-        }
-    }
-    if (SCM_IDENTIFIERP(form)) {
-        return SCM_OBJ(Scm_UnwrapIdentifier(SCM_IDENTIFIER(form)));
-    }
-    if (SCM_VECTORP(form)) {
-        int len = SCM_VECTOR_SIZE(form);
-        ScmObj *pelt = SCM_VECTOR_ELEMENTS(form);
-        newh = Scm_Cons(form, history);
-        for (int i=0; i<len; i++, pelt++) {
-            ScmObj elt = unwrap_rec(*pelt, newh);
-            if (elt != *pelt) {
-                ScmObj newvec = Scm_MakeVector(len, SCM_FALSE);
-                pelt = SCM_VECTOR_ELEMENTS(form);
-                int j;
-                for (j=0; j<i; j++, pelt++) {
-                    SCM_VECTOR_ELEMENT(newvec, j) = *pelt;
-                }
-                SCM_VECTOR_ELEMENT(newvec, i) = elt;
-                for (; j<len; j++, pelt++) {
-                    SCM_VECTOR_ELEMENT(newvec, j) = unwrap_rec(*pelt, newh);
-                }
-                return newvec;
-            }
-        }
-        return form;
-    }
-    return form;
+	if (SCM_PAIRP(form)) {
+		ScmObj ca, cd;
+		newh = Scm_Cons(form, history);
+		ca = unwrap_rec(SCM_CAR(form), newh);
+		cd = unwrap_rec(SCM_CDR(form), newh);
+		if (ca == SCM_CAR(form) && cd == SCM_CDR(form)) {
+			return form;
+		} else {
+			return Scm_Cons(ca, cd);
+		}
+	}
+	if (SCM_IDENTIFIERP(form)) {
+		return SCM_OBJ(Scm_UnwrapIdentifier(SCM_IDENTIFIER(form)));
+	}
+	if (SCM_VECTORP(form)) {
+		int len = SCM_VECTOR_SIZE(form);
+		ScmObj *pelt = SCM_VECTOR_ELEMENTS(form);
+		newh = Scm_Cons(form, history);
+		for (int i=0; i<len; i++, pelt++) {
+			ScmObj elt = unwrap_rec(*pelt, newh);
+			if (elt != *pelt) {
+				ScmObj newvec = Scm_MakeVector(len, SCM_FALSE);
+				pelt = SCM_VECTOR_ELEMENTS(form);
+				int j;
+				for (j=0; j<i; j++, pelt++) {
+					SCM_VECTOR_ELEMENT(newvec, j) = *pelt;
+				}
+				SCM_VECTOR_ELEMENT(newvec, i) = elt;
+				for (; j<len; j++, pelt++) {
+					SCM_VECTOR_ELEMENT(newvec, j) = unwrap_rec(*pelt, newh);
+				}
+				return newvec;
+			}
+		}
+		return form;
+	}
+	return form;
 }
 
 ScmObj Scm_UnwrapSyntax(ScmObj form)
 {
-    return unwrap_rec(form, SCM_NIL);
+	return unwrap_rec(form, SCM_NIL);
 }
 
 /*===================================================================
@@ -349,31 +349,31 @@ ScmObj Scm_UnwrapSyntax(ScmObj form)
  */
 
 #define INIT_GLOC(gloc, name, mod)                                      \
-    do {                                                                \
-        gloc = Scm_FindBinding(mod, SCM_SYMBOL(SCM_INTERN(name)),       \
-                               SCM_BINDING_STAY_IN_MODULE);             \
-        if (gloc == NULL) {                                             \
-            Scm_Panic("no " name " procedure in gauche.internal");      \
-        }                                                               \
-    } while (0)
+	do {                                                                \
+		gloc = Scm_FindBinding(mod, SCM_SYMBOL(SCM_INTERN(name)),       \
+		                       SCM_BINDING_STAY_IN_MODULE);             \
+		if (gloc == NULL) {                                             \
+			Scm_Panic("no " name " procedure in gauche.internal");      \
+		}                                                               \
+	} while (0)
 
 void Scm__InitCompaux(void)
 {
-    ScmModule *g = Scm_GaucheModule();
-    ScmModule *gi = Scm_GaucheInternalModule();
+	ScmModule *g = Scm_GaucheModule();
+	ScmModule *gi = Scm_GaucheInternalModule();
 
-    Scm_InitStaticClass(SCM_CLASS_SYNTACTIC_CLOSURE, "<syntactic-closure>", g,
-                        synclo_slots, 0);
-    Scm_InitStaticClass(SCM_CLASS_IDENTIFIER, "<identifier>", g,
-                        identifier_slots, 0);
+	Scm_InitStaticClass(SCM_CLASS_SYNTACTIC_CLOSURE, "<syntactic-closure>", g,
+	                    synclo_slots, 0);
+	Scm_InitStaticClass(SCM_CLASS_IDENTIFIER, "<identifier>", g,
+	                    identifier_slots, 0);
 
-    SCM_INTERNAL_MUTEX_INIT(compile_finish_mutex);
+	SCM_INTERNAL_MUTEX_INIT(compile_finish_mutex);
 
-    /* Grab the entry points of compile.scm */
-    INIT_GLOC(init_compiler_gloc,   "init-compiler", gi);
-    INIT_GLOC(compile_gloc,         "compile",       gi);
-    INIT_GLOC(compile_partial_gloc, "compile-partial", gi);
-    INIT_GLOC(compile_finish_gloc,  "compile-finish",  gi);
+	/* Grab the entry points of compile.scm */
+	INIT_GLOC(init_compiler_gloc,   "init-compiler", gi);
+	INIT_GLOC(compile_gloc,         "compile",       gi);
+	INIT_GLOC(compile_partial_gloc, "compile-partial", gi);
+	INIT_GLOC(compile_finish_gloc,  "compile-finish",  gi);
 
-    Scm_ApplyRec0(SCM_GLOC_GET(init_compiler_gloc));
+	Scm_ApplyRec0(SCM_GLOC_GET(init_compiler_gloc));
 }

@@ -37,10 +37,10 @@
 SCM_DECL_BEGIN
 
 struct ScmIdentifierRec {
-    SCM_HEADER;
-    ScmObj name;          /* symbol or identifier */
-    ScmModule *module;
-    ScmObj frames;        /* opaque - see compaux.c for the details */
+	SCM_HEADER;
+	ScmObj name;      /* symbol or identifier */
+	ScmModule *module;
+	ScmObj frames;    /* opaque - see compaux.c for the details */
 };
 
 

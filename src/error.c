@@ -55,28 +55,28 @@ static ScmObj compound_allocate(ScmClass *klass, ScmObj initargs);
    inheritance case. */
 
 #define CONDITION_CPL                           \
-    SCM_CLASS_STATIC_PTR(Scm_ConditionClass),   \
-    SCM_CLASS_STATIC_PTR(Scm_TopClass)
+	SCM_CLASS_STATIC_PTR(Scm_ConditionClass),   \
+	SCM_CLASS_STATIC_PTR(Scm_TopClass)
 
 #define MESSAGE_SERIOUS_CPL \
-    SCM_CLASS_STATIC_PTR(Scm_MessageConditionClass), \
-    SCM_CLASS_STATIC_PTR(Scm_SeriousConditionClass), \
-    CONDITION_CPL
+	SCM_CLASS_STATIC_PTR(Scm_MessageConditionClass), \
+	SCM_CLASS_STATIC_PTR(Scm_SeriousConditionClass), \
+	CONDITION_CPL
 
 #define ERROR_CPL \
-    SCM_CLASS_STATIC_PTR(Scm_ErrorClass),        \
-    MESSAGE_SERIOUS_CPL
+	SCM_CLASS_STATIC_PTR(Scm_ErrorClass),        \
+	MESSAGE_SERIOUS_CPL
 
 /*-----------------------------------------------------------
  * Base conditions
  */
 static ScmClass *condition_cpl[] = {
-    CONDITION_CPL,
-    NULL
+	CONDITION_CPL,
+	NULL
 };
 
 SCM_DEFINE_BASE_CLASS(Scm_ConditionClass, ScmInstance,
-                      NULL, NULL, NULL, 
+                      NULL, NULL, NULL,
                       condition_allocate, SCM_CLASS_DEFAULT_CPL);
 SCM_DEFINE_BASE_CLASS(Scm_MessageConditionClass, ScmMessageCondition,
                       message_print, NULL, NULL,
@@ -87,86 +87,86 @@ SCM_DEFINE_BASE_CLASS(Scm_SeriousConditionClass, ScmSeriousCondition,
 
 static ScmObj condition_allocate(ScmClass *klass, ScmObj initargs SCM_UNUSED)
 {
-    return SCM_OBJ(SCM_NEW_INSTANCE(ScmCondition, klass));
+	return SCM_OBJ(SCM_NEW_INSTANCE(ScmCondition, klass));
 }
 
-static void message_print(ScmObj obj, ScmPort *port, 
+static void message_print(ScmObj obj, ScmPort *port,
                           ScmWriteContext *ctx SCM_UNUSED)
 {
-    ScmClass *k = Scm_ClassOf(obj);
-    Scm_Printf(port, "#<%A \"%30.1A\">",
-               Scm_ShortClassName(k),
-               SCM_ERROR_MESSAGE(obj));
+	ScmClass *k = Scm_ClassOf(obj);
+	Scm_Printf(port, "#<%A \"%30.1A\">",
+	           Scm_ShortClassName(k),
+	           SCM_ERROR_MESSAGE(obj));
 }
 
 static ScmObj message_allocate(ScmClass *klass, ScmObj initargs SCM_UNUSED)
 {
-    ScmError *e = SCM_NEW_INSTANCE(ScmError, klass);
-    e->message = SCM_FALSE;     /* would be set by initialize */
-    return SCM_OBJ(e);
+	ScmError *e = SCM_NEW_INSTANCE(ScmError, klass);
+	e->message = SCM_FALSE; /* would be set by initialize */
+	return SCM_OBJ(e);
 }
 
 /* See comment on gauche/exception.h about hack in 'message' slot.
    TRANSIENT: Remove this hack on 1.0 release. */
 static ScmObj message_get(ScmMessageCondition *obj)
 {
-    ScmObj msglist = obj->message;
-    if (SCM_PAIRP(msglist)) return SCM_CAR(msglist);
-    else return msglist;
+	ScmObj msglist = obj->message;
+	if (SCM_PAIRP(msglist)) return SCM_CAR(msglist);
+	else return msglist;
 }
 
 static void message_set(ScmMessageCondition *obj, ScmObj val)
 {
-    ScmObj msglist = obj->message;
-    if (SCM_PAIRP(msglist)) SCM_SET_CAR(msglist, val);
-    else SCM_MESSAGE_CONDITION(obj)->message = SCM_LIST2(val, val);
+	ScmObj msglist = obj->message;
+	if (SCM_PAIRP(msglist)) SCM_SET_CAR(msglist, val);
+	else SCM_MESSAGE_CONDITION(obj)->message = SCM_LIST2(val, val);
 }
 
 static ScmObj message_prefix_get(ScmMessageCondition *obj)
 {
-    ScmObj msglist = obj->message;
-    if (SCM_PAIRP(msglist) && SCM_PAIRP(SCM_CDR(msglist))) {
-        return SCM_CADR(msglist);
-    } else {
-        return msglist;
-    }
+	ScmObj msglist = obj->message;
+	if (SCM_PAIRP(msglist) && SCM_PAIRP(SCM_CDR(msglist))) {
+		return SCM_CADR(msglist);
+	} else {
+		return msglist;
+	}
 }
 
 static void message_prefix_set(ScmMessageCondition *obj, ScmObj val)
 {
-    ScmObj msglist = obj->message;
-    if (SCM_PAIRP(msglist) && SCM_PAIRP(SCM_CDR(msglist))) {
-        SCM_SET_CAR(SCM_CDR(msglist), val);
-    } else {
-        obj->message = SCM_LIST2(msglist, val);
-    }
+	ScmObj msglist = obj->message;
+	if (SCM_PAIRP(msglist) && SCM_PAIRP(SCM_CDR(msglist))) {
+		SCM_SET_CAR(SCM_CDR(msglist), val);
+	} else {
+		obj->message = SCM_LIST2(msglist, val);
+	}
 }
 
 static ScmObj message_args_get(ScmMessageCondition *obj)
 {
-    ScmObj msglist = obj->message;
-    if (SCM_PAIRP(msglist) && SCM_PAIRP(SCM_CDR(msglist))) {
-        return SCM_CDDR(msglist);
-    } else {
-        return SCM_NIL;
-    }
+	ScmObj msglist = obj->message;
+	if (SCM_PAIRP(msglist) && SCM_PAIRP(SCM_CDR(msglist))) {
+		return SCM_CDDR(msglist);
+	} else {
+		return SCM_NIL;
+	}
 }
 
 static void message_args_set(ScmMessageCondition *obj, ScmObj val)
 {
-    ScmObj msglist = obj->message;
-    if (SCM_PAIRP(msglist) && SCM_PAIRP(SCM_CDR(msglist))) {
-        SCM_SET_CDR(SCM_CDR(msglist), val);
-    } else {
-        obj->message = Scm_Cons(msglist, Scm_Cons(msglist, val));
-    }
+	ScmObj msglist = obj->message;
+	if (SCM_PAIRP(msglist) && SCM_PAIRP(SCM_CDR(msglist))) {
+		SCM_SET_CDR(SCM_CDR(msglist), val);
+	} else {
+		obj->message = Scm_Cons(msglist, Scm_Cons(msglist, val));
+	}
 }
 
 static ScmClassStaticSlotSpec message_slots[] = {
-    SCM_CLASS_SLOT_SPEC("message", message_get, message_set),
-    SCM_CLASS_SLOT_SPEC("message-prefix",   message_prefix_get, message_prefix_set),
-    SCM_CLASS_SLOT_SPEC("message-args", message_args_get, message_args_set),
-    SCM_CLASS_SLOT_SPEC_END()
+	SCM_CLASS_SLOT_SPEC("message", message_get, message_set),
+	SCM_CLASS_SLOT_SPEC("message-prefix",   message_prefix_get, message_prefix_set),
+	SCM_CLASS_SLOT_SPEC("message-args", message_args_get, message_args_set),
+	SCM_CLASS_SLOT_SPEC_END()
 };
 
 /*------------------------------------------------------------
@@ -174,15 +174,15 @@ static ScmClassStaticSlotSpec message_slots[] = {
  */
 
 static ScmClass *error_cpl[] = {
-    ERROR_CPL,
-    NULL
+	ERROR_CPL,
+	NULL
 };
 
 static ScmClass *porterror_cpl[] = {
-    SCM_CLASS_STATIC_PTR(Scm_PortErrorClass),
-    SCM_CLASS_STATIC_PTR(Scm_IOErrorClass),
-    ERROR_CPL,
-    NULL
+	SCM_CLASS_STATIC_PTR(Scm_PortErrorClass),
+	SCM_CLASS_STATIC_PTR(Scm_IOErrorClass),
+	ERROR_CPL,
+	NULL
 };
 
 
@@ -219,142 +219,142 @@ SCM_DEFINE_BASE_CLASS(Scm_IOUnitErrorClass, ScmIOUnitError,
 
 static ScmObj syserror_allocate(ScmClass *klass, ScmObj initargs SCM_UNUSED)
 {
-    ScmSystemError *e = SCM_NEW_INSTANCE(ScmSystemError, klass);
-    e->common.message = SCM_FALSE; /* set by initialize */
-    e->error_number = 0;           /* set by initialize */
-    return SCM_OBJ(e);
+	ScmSystemError *e = SCM_NEW_INSTANCE(ScmSystemError, klass);
+	e->common.message = SCM_FALSE; /* set by initialize */
+	e->error_number = 0;       /* set by initialize */
+	return SCM_OBJ(e);
 }
 
 static ScmObj sigerror_allocate(ScmClass *klass, ScmObj initargs SCM_UNUSED)
 {
-    ScmUnhandledSignalError *e = SCM_NEW_INSTANCE(ScmUnhandledSignalError,
-                                                  klass);
-    e->common.message = SCM_FALSE; /* set by initialize */
-    e->signal = 0;                 /* set by initialize */
-    return SCM_OBJ(e);
+	ScmUnhandledSignalError *e = SCM_NEW_INSTANCE(ScmUnhandledSignalError,
+	                                              klass);
+	e->common.message = SCM_FALSE; /* set by initialize */
+	e->signal = 0;             /* set by initialize */
+	return SCM_OBJ(e);
 }
 
 static ScmObj readerror_allocate(ScmClass *klass, ScmObj initargs SCM_UNUSED)
 {
-    ScmReadError *e = SCM_NEW_INSTANCE(ScmReadError, klass);
-    e->common.message = SCM_FALSE; /* set by initialize */
-    e->port = NULL;                /* set by initialize */
-    e->line = -1;                  /* set by initialize */
-    return SCM_OBJ(e);
+	ScmReadError *e = SCM_NEW_INSTANCE(ScmReadError, klass);
+	e->common.message = SCM_FALSE; /* set by initialize */
+	e->port = NULL;            /* set by initialize */
+	e->line = -1;              /* set by initialize */
+	return SCM_OBJ(e);
 }
 
 static ScmObj porterror_allocate(ScmClass *klass, ScmObj initargs SCM_UNUSED)
 {
-    ScmPortError *e = SCM_NEW_INSTANCE(ScmPortError, klass);
-    e->common.message = SCM_FALSE; /* set by initialize */
-    e->port = NULL;                /* set by initialize */
-    return SCM_OBJ(e);
+	ScmPortError *e = SCM_NEW_INSTANCE(ScmPortError, klass);
+	e->common.message = SCM_FALSE; /* set by initialize */
+	e->port = NULL;            /* set by initialize */
+	return SCM_OBJ(e);
 }
 
 static ScmObj syserror_number_get(ScmSystemError *obj)
 {
-    return SCM_MAKE_INT(obj->error_number);
+	return SCM_MAKE_INT(obj->error_number);
 }
 
 static void syserror_number_set(ScmSystemError *obj, ScmObj val)
 {
-    if (!SCM_INTP(val)) {
-        Scm_Error("small integer required, but got %S", val);
-    }
-    obj->error_number = SCM_INT_VALUE(val);
+	if (!SCM_INTP(val)) {
+		Scm_Error("small integer required, but got %S", val);
+	}
+	obj->error_number = SCM_INT_VALUE(val);
 }
 
 static ScmObj sigerror_signal_get(ScmUnhandledSignalError *obj)
 {
-    return SCM_MAKE_INT(obj->signal);
+	return SCM_MAKE_INT(obj->signal);
 }
 
 static void sigerror_signal_set(ScmUnhandledSignalError *obj, ScmObj val)
 {
-    if (!SCM_INTP(val)) {
-        Scm_Error("small integer required, but got %S", val);
-    }
-    obj->signal = SCM_INT_VALUE(val);
+	if (!SCM_INTP(val)) {
+		Scm_Error("small integer required, but got %S", val);
+	}
+	obj->signal = SCM_INT_VALUE(val);
 }
 
 static ScmObj readerror_port_get(ScmReadError *obj)
 {
-    if (obj->port) return SCM_OBJ(obj->port);
-    else return SCM_FALSE;
+	if (obj->port) return SCM_OBJ(obj->port);
+	else return SCM_FALSE;
 }
 
 static void readerror_port_set(ScmReadError *obj, ScmObj val)
 {
-    if (SCM_IPORTP(val)) {
-        obj->port = SCM_PORT(val);
-    }
-    else if (SCM_FALSEP(val)) {
-        obj->port = NULL;
-    }
-    else {
-        Scm_Error("input port or #f required, but got %S", val);
-    }
+	if (SCM_IPORTP(val)) {
+		obj->port = SCM_PORT(val);
+	}
+	else if (SCM_FALSEP(val)) {
+		obj->port = NULL;
+	}
+	else {
+		Scm_Error("input port or #f required, but got %S", val);
+	}
 }
 
 static ScmObj readerror_line_get(ScmReadError *obj)
 {
-    return SCM_MAKE_INT(obj->line);
+	return SCM_MAKE_INT(obj->line);
 }
 
 static void readerror_line_set(ScmReadError *obj, ScmObj val)
 {
-    if (!SCM_INTP(val)){
-        Scm_Error("small integer required, but got %S", val);
-    }
-    obj->line = SCM_INT_VALUE(val);
+	if (!SCM_INTP(val)) {
+		Scm_Error("small integer required, but got %S", val);
+	}
+	obj->line = SCM_INT_VALUE(val);
 }
 
 static ScmObj readerror_dummy_get(ScmReadError *obj SCM_UNUSED)
 {
-    return SCM_FALSE;
+	return SCM_FALSE;
 }
 
 static void readerror_dummy_set(ScmReadError *obj SCM_UNUSED,
                                 ScmObj val SCM_UNUSED)
 {
-    /* nothing */
+	/* nothing */
 }
 
 static ScmObj porterror_port_get(ScmPortError *obj)
 {
-    return obj->port? SCM_OBJ(obj->port) : SCM_FALSE;
+	return obj->port ? SCM_OBJ(obj->port) : SCM_FALSE;
 }
 
 static void porterror_port_set(ScmPortError *obj, ScmObj val)
 {
-    if (!SCM_PORTP(val) && !SCM_FALSEP(val)) {
-        Scm_Error("port or #f required, but got %S", val);
-    }
-    obj->port = SCM_FALSEP(val)? NULL : SCM_PORT(val);
+	if (!SCM_PORTP(val) && !SCM_FALSEP(val)) {
+		Scm_Error("port or #f required, but got %S", val);
+	}
+	obj->port = SCM_FALSEP(val) ? NULL : SCM_PORT(val);
 }
 
 static ScmClassStaticSlotSpec syserror_slots[] = {
-    SCM_CLASS_SLOT_SPEC("errno", syserror_number_get, syserror_number_set),
-    SCM_CLASS_SLOT_SPEC_END()
+	SCM_CLASS_SLOT_SPEC("errno", syserror_number_get, syserror_number_set),
+	SCM_CLASS_SLOT_SPEC_END()
 };
 
 static ScmClassStaticSlotSpec sigerror_slots[] = {
-    SCM_CLASS_SLOT_SPEC("signal", sigerror_signal_get, sigerror_signal_set),
-    SCM_CLASS_SLOT_SPEC_END()
+	SCM_CLASS_SLOT_SPEC("signal", sigerror_signal_get, sigerror_signal_set),
+	SCM_CLASS_SLOT_SPEC_END()
 };
 
 static ScmClassStaticSlotSpec readerror_slots[] = {
-    SCM_CLASS_SLOT_SPEC("port", readerror_port_get, readerror_port_set),
-    SCM_CLASS_SLOT_SPEC("line", readerror_line_get, readerror_line_set),
-    SCM_CLASS_SLOT_SPEC("column", readerror_dummy_get, readerror_dummy_set),
-    SCM_CLASS_SLOT_SPEC("position", readerror_dummy_get, readerror_dummy_set),
-    SCM_CLASS_SLOT_SPEC("span", readerror_dummy_get, readerror_dummy_set),
-    SCM_CLASS_SLOT_SPEC_END()
+	SCM_CLASS_SLOT_SPEC("port", readerror_port_get, readerror_port_set),
+	SCM_CLASS_SLOT_SPEC("line", readerror_line_get, readerror_line_set),
+	SCM_CLASS_SLOT_SPEC("column", readerror_dummy_get, readerror_dummy_set),
+	SCM_CLASS_SLOT_SPEC("position", readerror_dummy_get, readerror_dummy_set),
+	SCM_CLASS_SLOT_SPEC("span", readerror_dummy_get, readerror_dummy_set),
+	SCM_CLASS_SLOT_SPEC_END()
 };
 
 static ScmClassStaticSlotSpec porterror_slots[] = {
-    SCM_CLASS_SLOT_SPEC("port", porterror_port_get, porterror_port_set),
-    SCM_CLASS_SLOT_SPEC_END()
+	SCM_CLASS_SLOT_SPEC("port", porterror_port_get, porterror_port_set),
+	SCM_CLASS_SLOT_SPEC_END()
 };
 
 /*------------------------------------------------------------
@@ -362,23 +362,23 @@ static ScmClassStaticSlotSpec porterror_slots[] = {
  */
 
 static ScmClass *compound_cpl[] = {
-    SCM_CLASS_STATIC_PTR(Scm_CompoundConditionClass),
-    SCM_CLASS_STATIC_PTR(Scm_SeriousConditionClass),
-    CONDITION_CPL,
-    NULL
+	SCM_CLASS_STATIC_PTR(Scm_CompoundConditionClass),
+	SCM_CLASS_STATIC_PTR(Scm_SeriousConditionClass),
+	CONDITION_CPL,
+	NULL
 };
 
-static void compound_print(ScmObj obj, ScmPort *port, 
+static void compound_print(ScmObj obj, ScmPort *port,
                            ScmWriteContext *ctx SCM_UNUSED)
 {
-    ScmClass *k = Scm_ClassOf(obj);
-    Scm_Printf(port, "#<%A", Scm_ShortClassName(k));
-    ScmCompoundCondition *c = SCM_COMPOUND_CONDITION(obj);
-    ScmObj cp;
-    SCM_FOR_EACH(cp, c->conditions) {
-        Scm_Printf(port, " %A", SCM_CAR(cp));
-    }
-    Scm_Printf(port, ">");
+	ScmClass *k = Scm_ClassOf(obj);
+	Scm_Printf(port, "#<%A", Scm_ShortClassName(k));
+	ScmCompoundCondition *c = SCM_COMPOUND_CONDITION(obj);
+	ScmObj cp;
+	SCM_FOR_EACH(cp, c->conditions) {
+		Scm_Printf(port, " %A", SCM_CAR(cp));
+	}
+	Scm_Printf(port, ">");
 }
 
 SCM_DEFINE_BASE_CLASS(Scm_CompoundConditionClass, ScmCompoundCondition,
@@ -390,56 +390,56 @@ SCM_DEFINE_BASE_CLASS(Scm_SeriousCompoundConditionClass, ScmCompoundCondition,
 
 static ScmObj compound_allocate(ScmClass *klass, ScmObj initargs SCM_UNUSED)
 {
-    ScmCompoundCondition *e = SCM_NEW_INSTANCE(ScmCompoundCondition, klass);
-    e->conditions = SCM_NIL;
-    return SCM_OBJ(e);
+	ScmCompoundCondition *e = SCM_NEW_INSTANCE(ScmCompoundCondition, klass);
+	e->conditions = SCM_NIL;
+	return SCM_OBJ(e);
 }
 
 ScmObj Scm_MakeCompoundCondition(ScmObj conditions)
 {
-    ScmObj h = SCM_NIL, t = SCM_NIL;
-    int serious = FALSE;
-    int nconds = Scm_Length(conditions);
+	ScmObj h = SCM_NIL, t = SCM_NIL;
+	int serious = FALSE;
+	int nconds = Scm_Length(conditions);
 
-    /* some boundary cases */
-    if (nconds < 0) {
-        Scm_Error("Scm_MakeCompoundCondition: list required, but got %S",
-                  conditions);
-    }
-    if (nconds == 0) {
-        return compound_allocate(SCM_CLASS_COMPOUND_CONDITION, SCM_NIL);
-    }
-    if (nconds == 1) {
-        if (!SCM_CONDITIONP(SCM_CAR(conditions))) {
-            Scm_Error("make-compound-condition: given non-condition object: %S", SCM_CAR(conditions));
-        }
-        return SCM_CAR(conditions);
-    }
+	/* some boundary cases */
+	if (nconds < 0) {
+		Scm_Error("Scm_MakeCompoundCondition: list required, but got %S",
+		          conditions);
+	}
+	if (nconds == 0) {
+		return compound_allocate(SCM_CLASS_COMPOUND_CONDITION, SCM_NIL);
+	}
+	if (nconds == 1) {
+		if (!SCM_CONDITIONP(SCM_CAR(conditions))) {
+			Scm_Error("make-compound-condition: given non-condition object: %S", SCM_CAR(conditions));
+		}
+		return SCM_CAR(conditions);
+	}
 
-    /* collect conditions and creates compound one */
-    ScmObj cp;
-    SCM_FOR_EACH(cp, conditions) {
-        ScmObj c = SCM_CAR(cp);
-        if (!SCM_CONDITIONP(c)) {
-            Scm_Error("make-compound-condition: given non-condition object: %S", SCM_CAR(cp));
-        }
-        if (SCM_SERIOUS_CONDITION_P(c)) {
-            serious = TRUE;
-        }
+	/* collect conditions and creates compound one */
+	ScmObj cp;
+	SCM_FOR_EACH(cp, conditions) {
+		ScmObj c = SCM_CAR(cp);
+		if (!SCM_CONDITIONP(c)) {
+			Scm_Error("make-compound-condition: given non-condition object: %S", SCM_CAR(cp));
+		}
+		if (SCM_SERIOUS_CONDITION_P(c)) {
+			serious = TRUE;
+		}
 
-        if (SCM_COMPOUND_CONDITION_P(c)) {
-            ScmCompoundCondition *cc = SCM_COMPOUND_CONDITION(c);
-            SCM_APPEND(h, t, cc->conditions);
-        } else {
-            SCM_APPEND1(h, t, c);
-        }
-    }
-    ScmObj cond = compound_allocate((serious?
-                                     SCM_CLASS_COMPOUND_CONDITION :
-                                     SCM_CLASS_SERIOUS_COMPOUND_CONDITION),
-                                    SCM_NIL);
-    SCM_COMPOUND_CONDITION(cond)->conditions = h;
-    return cond;
+		if (SCM_COMPOUND_CONDITION_P(c)) {
+			ScmCompoundCondition *cc = SCM_COMPOUND_CONDITION(c);
+			SCM_APPEND(h, t, cc->conditions);
+		} else {
+			SCM_APPEND1(h, t, c);
+		}
+	}
+	ScmObj cond = compound_allocate((serious ?
+	                                 SCM_CLASS_COMPOUND_CONDITION :
+	                                 SCM_CLASS_SERIOUS_COMPOUND_CONDITION),
+	                                SCM_NIL);
+	SCM_COMPOUND_CONDITION(cond)->conditions = h;
+	return cond;
 }
 
 /* Extract condition of type TYPE from a compound condition CONDITION.
@@ -452,37 +452,37 @@ ScmObj Scm_MakeCompoundCondition(ScmObj conditions)
  */
 ScmObj Scm_ExtractSimpleCondition(ScmObj condition, ScmClass *type)
 {
-    ScmObj cs = (SCM_COMPOUND_CONDITION_P(condition)
-                 ? SCM_COMPOUND_CONDITION(condition)->conditions
-                 : SCM_LIST1(condition));
-    ScmObj cp;
-    SCM_FOR_EACH(cp, cs) {
-        if (SCM_ISA(SCM_CAR(cp), type)) return SCM_CAR(cp);
-    }
-    return SCM_FALSE;
+	ScmObj cs = (SCM_COMPOUND_CONDITION_P(condition)
+	             ? SCM_COMPOUND_CONDITION(condition)->conditions
+	             : SCM_LIST1(condition));
+	ScmObj cp;
+	SCM_FOR_EACH(cp, cs) {
+		if (SCM_ISA(SCM_CAR(cp), type)) return SCM_CAR(cp);
+	}
+	return SCM_FALSE;
 }
 
 static ScmObj conditions_get(ScmCompoundCondition *obj)
 {
-    return obj->conditions;
+	return obj->conditions;
 }
 
 static void   conditions_set(ScmCompoundCondition *obj, ScmObj conds)
 {
-    ScmObj cp;
-    SCM_FOR_EACH(cp, conds) {
-        if (!SCM_CONDITIONP(SCM_CAR(cp))) goto err;
-    }
-    if (!SCM_NULLP(cp)) {
-      err:
-        Scm_Error("conditions slot of a compound condition must be a list of conditions, but got %S", conds);
-    }
-    obj->conditions = conds;
+	ScmObj cp;
+	SCM_FOR_EACH(cp, conds) {
+		if (!SCM_CONDITIONP(SCM_CAR(cp))) goto err;
+	}
+	if (!SCM_NULLP(cp)) {
+err:
+		Scm_Error("conditions slot of a compound condition must be a list of conditions, but got %S", conds);
+	}
+	obj->conditions = conds;
 }
 
 static ScmClassStaticSlotSpec compound_slots[] = {
-    SCM_CLASS_SLOT_SPEC("%conditions", conditions_get, conditions_set),
-    SCM_CLASS_SLOT_SPEC_END()
+	SCM_CLASS_SLOT_SPEC("%conditions", conditions_get, conditions_set),
+	SCM_CLASS_SLOT_SPEC_END()
 };
 
 
@@ -493,65 +493,65 @@ static ScmClassStaticSlotSpec compound_slots[] = {
 /* actual class structure of thread exceptions are in ext/threads */
 ScmObj Scm_MakeThreadException(ScmClass *klass, ScmVM *thread)
 {
-    ScmThreadException *e = SCM_NEW(ScmThreadException);
-    SCM_SET_CLASS(e, klass);
-    e->thread = thread;
-    e->data = SCM_UNDEFINED;
-    return SCM_OBJ(e);
+	ScmThreadException *e = SCM_NEW(ScmThreadException);
+	SCM_SET_CLASS(e, klass);
+	e->thread = thread;
+	e->data = SCM_UNDEFINED;
+	return SCM_OBJ(e);
 }
 
 ScmObj Scm_MakeError(ScmObj message)
 {
-    ScmError *e = SCM_ERROR(message_allocate(SCM_CLASS_ERROR, SCM_NIL));
-    e->message = SCM_LIST2(message, message);
-    return SCM_OBJ(e);
+	ScmError *e = SCM_ERROR(message_allocate(SCM_CLASS_ERROR, SCM_NIL));
+	e->message = SCM_LIST2(message, message);
+	return SCM_OBJ(e);
 }
 
 ScmObj Scm_MakeSystemError(ScmObj message, int en)
 {
-    ScmSystemError *e =
-        SCM_SYSTEM_ERROR(syserror_allocate(SCM_CLASS_SYSTEM_ERROR, SCM_NIL));
-    e->common.message = SCM_LIST2(message, message);
-    e->error_number = en;
-    return SCM_OBJ(e);
+	ScmSystemError *e =
+		SCM_SYSTEM_ERROR(syserror_allocate(SCM_CLASS_SYSTEM_ERROR, SCM_NIL));
+	e->common.message = SCM_LIST2(message, message);
+	e->error_number = en;
+	return SCM_OBJ(e);
 }
 
 ScmObj Scm_MakeReadError(ScmObj message, ScmPort *port, int line)
 {
-    ScmReadError *e =
-        SCM_READ_ERROR(readerror_allocate(SCM_CLASS_READ_ERROR, SCM_NIL));
-    e->common.message = SCM_LIST2(message, message);
-    e->port = port;
-    e->line = line;
-    return SCM_OBJ(e);
+	ScmReadError *e =
+		SCM_READ_ERROR(readerror_allocate(SCM_CLASS_READ_ERROR, SCM_NIL));
+	e->common.message = SCM_LIST2(message, message);
+	e->port = port;
+	e->line = line;
+	return SCM_OBJ(e);
 }
 
 int Scm_ConditionHasType(ScmObj c, ScmObj k)
 {
-    if (!SCM_CONDITIONP(c)) return FALSE;
-    if (!SCM_CLASSP(k)) return FALSE;
-    if (!SCM_COMPOUND_CONDITION_P(c)) return SCM_ISA(c, SCM_CLASS(k));
+	if (!SCM_CONDITIONP(c)) return FALSE;
+	if (!SCM_CLASSP(k)) return FALSE;
+	if (!SCM_COMPOUND_CONDITION_P(c)) return SCM_ISA(c, SCM_CLASS(k));
 
-    ScmObj cp;
-    SCM_FOR_EACH(cp, SCM_COMPOUND_CONDITION(c)->conditions) {
-        if (SCM_ISA(SCM_CAR(cp), SCM_CLASS(k))) return TRUE;
-    }
-    return FALSE;
+	ScmObj cp;
+	SCM_FOR_EACH(cp, SCM_COMPOUND_CONDITION(c)->conditions) {
+		if (SCM_ISA(SCM_CAR(cp), SCM_CLASS(k))) return TRUE;
+	}
+	return FALSE;
 }
 
 ScmObj Scm_ConditionMessage(ScmObj c)
 {
-    if (SCM_MESSAGE_CONDITION_P(c)) {
-        return message_get(SCM_MESSAGE_CONDITION(c));
-    } else if (SCM_COMPOUND_CONDITION_P(c)) {
-        ScmObj cp;
-        SCM_FOR_EACH(cp, SCM_COMPOUND_CONDITION(c)->conditions) {
-            if (SCM_MESSAGE_CONDITION_P(SCM_CAR(cp))) {
-                return message_get(SCM_MESSAGE_CONDITION(SCM_CAR(cp)));
-            }
-        }
-    }
-    return SCM_FALSE;
+	if (SCM_MESSAGE_CONDITION_P(c)) {
+		return message_get(SCM_MESSAGE_CONDITION(c));
+	} else if (SCM_COMPOUND_CONDITION_P(c)) {
+		ScmObj cp;
+		SCM_FOR_EACH(cp, SCM_COMPOUND_CONDITION(c)->conditions) {
+			if (SCM_MESSAGE_CONDITION_P(SCM_CAR(cp))) {
+				return message_get(SCM_MESSAGE_CONDITION(SCM_CAR(cp)));
+			}
+		}
+	}
+	return SCM_FALSE;
 }
 
 /* Returns a ScmString representiong the 'type name' of the condition,
@@ -559,40 +559,40 @@ ScmObj Scm_ConditionMessage(ScmObj c)
    and backward compatibility, I upcase the class name of the condition
    sans brackets.  If it is a composite condition, the component's typenames
    are joind with commas, excluding mixin conditions.
-*/
+ */
 ScmObj Scm_ConditionTypeName(ScmObj c)
 {
-    ScmObj sname;
-    static SCM_DEFINE_STRING_CONST(cond_name_delim, ",", 1, 1);
+	ScmObj sname;
+	static SCM_DEFINE_STRING_CONST(cond_name_delim, ",", 1, 1);
 
-    /* just a safety net */
-    if (!SCM_CONDITIONP(c)) return SCM_MAKE_STR("(not a condition)");
+	/* just a safety net */
+	if (!SCM_CONDITIONP(c)) return SCM_MAKE_STR("(not a condition)");
 
-    if (!SCM_COMPOUND_CONDITION_P(c)) {
-        sname = Scm_ShortClassName(Scm_ClassOf(c));
-    } else {
-        ScmObj h = SCM_NIL, t = SCM_NIL, cp;
-        SCM_FOR_EACH(cp, SCM_COMPOUND_CONDITION(c)->conditions) {
-            ScmObj cc = SCM_CAR(cp);
-            if (SCM_MIXIN_CONDITION_P(cc)) continue;
-            SCM_APPEND1(h, t, Scm_ShortClassName(Scm_ClassOf(cc)));
-        }
-        if (SCM_NULLP(h)) {
-            /* not usual, but tolerate */
-            sname = Scm_ShortClassName(Scm_ClassOf(c));
-        } else {
-            sname = Scm_StringJoin(h, &cond_name_delim, SCM_STRING_JOIN_INFIX);
-        }
-    }
+	if (!SCM_COMPOUND_CONDITION_P(c)) {
+		sname = Scm_ShortClassName(Scm_ClassOf(c));
+	} else {
+		ScmObj h = SCM_NIL, t = SCM_NIL, cp;
+		SCM_FOR_EACH(cp, SCM_COMPOUND_CONDITION(c)->conditions) {
+			ScmObj cc = SCM_CAR(cp);
+			if (SCM_MIXIN_CONDITION_P(cc)) continue;
+			SCM_APPEND1(h, t, Scm_ShortClassName(Scm_ClassOf(cc)));
+		}
+		if (SCM_NULLP(h)) {
+			/* not usual, but tolerate */
+			sname = Scm_ShortClassName(Scm_ClassOf(c));
+		} else {
+			sname = Scm_StringJoin(h, &cond_name_delim, SCM_STRING_JOIN_INFIX);
+		}
+	}
 
-    ScmDString ds;
-    Scm_DStringInit(&ds);
-    ScmObj p = Scm_MakeInputStringPort(SCM_STRING(sname), TRUE);
-    int ch;
-    while ((ch = Scm_Getc(SCM_PORT(p))) != EOF) {
-        Scm_DStringPutc(&ds, Scm_CharUpcase(ch));
-    }
-    return Scm_DStringGet(&ds, 0);
+	ScmDString ds;
+	Scm_DStringInit(&ds);
+	ScmObj p = Scm_MakeInputStringPort(SCM_STRING(sname), TRUE);
+	int ch;
+	while ((ch = Scm_Getc(SCM_PORT(p))) != EOF) {
+		Scm_DStringPutc(&ds, Scm_CharUpcase(ch));
+	}
+	return Scm_DStringGet(&ds, 0);
 }
 
 /*================================================================
@@ -616,62 +616,62 @@ ScmObj Scm_ConditionTypeName(ScmObj c)
 /* Double fault check
  * In order to aviod infinite loop when error throwing routine
  * throws an error, we use vm flag SCM_ERROR_BEING_HANDLED to
- * check that.  Ideally a common single API should handle it,   
+ * check that.  Ideally a common single API should handle it,
  * but for the time being, we add the check at the beginning
  * of Scm_*Error APIs.
  * The SCM_ERROR_BEING_HANDLED flag is cleared in Scm_VMThrowException().
  */
 #define SCM_ERROR_DOUBLE_FAULT_CHECK(vm, msg)                           \
-    do {                                                                \
-        if (SCM_VM_RUNTIME_FLAG_IS_SET(vm, SCM_ERROR_BEING_HANDLED)) {  \
-            ScmDString ds;                                              \
-            Scm_DStringInit(&ds);                                       \
-            Scm_DStringPutz(&ds, "Error occurred in error handler (", -1); \
-            Scm_DStringPutz(&ds, msg, -1);                              \
-            Scm_DStringPutz(&ds, ")", -1);                              \
-            ScmObj e = Scm_MakeError(Scm_DStringGet(&ds, 0));           \
-            Scm_VMThrowException(vm, e, SCM_RAISE_NON_CONTINUABLE);     \
-        }                                                               \
-        SCM_VM_RUNTIME_FLAG_SET(vm, SCM_ERROR_BEING_HANDLED);           \
-    } while (0)
+	do {                                                                \
+		if (SCM_VM_RUNTIME_FLAG_IS_SET(vm, SCM_ERROR_BEING_HANDLED)) {  \
+			ScmDString ds;                                              \
+			Scm_DStringInit(&ds);                                       \
+			Scm_DStringPutz(&ds, "Error occurred in error handler (", -1); \
+			Scm_DStringPutz(&ds, msg, -1);                              \
+			Scm_DStringPutz(&ds, ")", -1);                              \
+			ScmObj e = Scm_MakeError(Scm_DStringGet(&ds, 0));           \
+			Scm_VMThrowException(vm, e, SCM_RAISE_NON_CONTINUABLE);     \
+		}                                                               \
+		SCM_VM_RUNTIME_FLAG_SET(vm, SCM_ERROR_BEING_HANDLED);           \
+	} while (0)
 
-/* Common part to format error message passed as varargs.  
+/* Common part to format error message passed as varargs.
  * ostr must be declared as ScmObj, and msg must be the last
  * arg of function before '...'.
  */
 #define SCM_ERROR_MESSAGE_FORMAT(ostr, msg)             \
-    do {                                                \
-        ostr = Scm_MakeOutputStringPort(TRUE);          \
-        va_list args__;                                 \
-        va_start(args__, msg);                          \
-        Scm_Vprintf(SCM_PORT(ostr), msg, args__, TRUE); \
-        va_end(args__);                                 \
-    } while (0)
+	do {                                                \
+		ostr = Scm_MakeOutputStringPort(TRUE);          \
+		va_list args__;                                 \
+		va_start(args__, msg);                          \
+		Scm_Vprintf(SCM_PORT(ostr), msg, args__, TRUE); \
+		va_end(args__);                                 \
+	} while (0)
 
 /* Like SCM_ERROR_MESSAGE_FORMAT, but we also append system error message.
  * Need to pass errno, which should be fetched by get_errno() *before*
  * calling Scm_VM().
  */
 #define SCM_SYSERROR_MESSAGE_FORMAT(ostr, msg, en)      \
-    do {                                                \
-        SCM_ERROR_MESSAGE_FORMAT(ostr, msg);            \
-        ScmObj syserr = get_syserrmsg(en);              \
-        SCM_PUTZ(": ", -1, ostr);                       \
-        SCM_PUTS(syserr, ostr);                         \
-    } while (0)
+	do {                                                \
+		SCM_ERROR_MESSAGE_FORMAT(ostr, msg);            \
+		ScmObj syserr = get_syserrmsg(en);              \
+		SCM_PUTZ(": ", -1, ostr);                       \
+		SCM_PUTS(syserr, ostr);                         \
+	} while (0)
 
 /*
  * C-like interface
  */
 void Scm_Error(const char *msg, ...)
 {
-    ScmVM *vm = Scm_VM();
-    SCM_ERROR_DOUBLE_FAULT_CHECK(vm, msg);
-    ScmObj ostr;
-    SCM_ERROR_MESSAGE_FORMAT(ostr, msg);
-    ScmObj e = Scm_MakeError(Scm_GetOutputString(SCM_PORT(ostr), TRUE));
-    Scm_VMThrowException(vm, e, SCM_RAISE_NON_CONTINUABLE);
-    Scm_Panic("Scm_Error: Scm_VMThrowException returned.  something wrong.");
+	ScmVM *vm = Scm_VM();
+	SCM_ERROR_DOUBLE_FAULT_CHECK(vm, msg);
+	ScmObj ostr;
+	SCM_ERROR_MESSAGE_FORMAT(ostr, msg);
+	ScmObj e = Scm_MakeError(Scm_GetOutputString(SCM_PORT(ostr), TRUE));
+	Scm_VMThrowException(vm, e, SCM_RAISE_NON_CONTINUABLE);
+	Scm_Panic("Scm_Error: Scm_VMThrowException returned.  something wrong.");
 }
 
 /*
@@ -680,70 +680,70 @@ void Scm_Error(const char *msg, ...)
  */
 static ScmObj get_syserrmsg(int en)
 {
-    ScmObj syserr;
+	ScmObj syserr;
 #if !defined(GAUCHE_WINDOWS)
-    syserr = SCM_MAKE_STR_COPYING(strerror(en));
+	syserr = SCM_MAKE_STR_COPYING(strerror(en));
 #else  /*GAUCHE_WINDOWS*/
-    if (en < 0) {
-      ScmObj ostr = Scm_MakeOutputStringPort(TRUE);
-      LPTSTR msgbuf = NULL;
-      const char *xmsgbuf;
-      if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                        FORMAT_MESSAGE_FROM_SYSTEM |
-                        FORMAT_MESSAGE_IGNORE_INSERTS,
-                        NULL,
-                        -en,
-                        MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT),
-                        (LPTSTR)&msgbuf,
-                        0, NULL)) {
-        xmsgbuf = SCM_WCS2MBS(msgbuf);
-        SCM_PUTZ(xmsgbuf, -1, ostr);
-      }
-      LocalFree(msgbuf);
-      Scm_Printf(SCM_PORT(ostr), "(error code = %d)", -en);
-      syserr = Scm_GetOutputString(SCM_PORT(ostr), 0);
-    } else {
-      syserr = SCM_MAKE_STR_COPYING(strerror(en));
-    }
+	if (en < 0) {
+		ScmObj ostr = Scm_MakeOutputStringPort(TRUE);
+		LPTSTR msgbuf = NULL;
+		const char *xmsgbuf;
+		if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		                  FORMAT_MESSAGE_FROM_SYSTEM |
+		                  FORMAT_MESSAGE_IGNORE_INSERTS,
+		                  NULL,
+		                  -en,
+		                  MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT),
+		                  (LPTSTR)&msgbuf,
+		                  0, NULL)) {
+			xmsgbuf = SCM_WCS2MBS(msgbuf);
+			SCM_PUTZ(xmsgbuf, -1, ostr);
+		}
+		LocalFree(msgbuf);
+		Scm_Printf(SCM_PORT(ostr), "(error code = %d)", -en);
+		syserr = Scm_GetOutputString(SCM_PORT(ostr), 0);
+	} else {
+		syserr = SCM_MAKE_STR_COPYING(strerror(en));
+	}
 #endif /*GAUCHE_WINDOWS*/
-    return syserr;
+	return syserr;
 }
 
 static int get_errno(void)
 {
 #if !defined(GAUCHE_WINDOWS)
-    return errno;
+	return errno;
 #else  /*GAUCHE_WINDOWS*/
-    int en;
-    
-    if (errno == 0) {
-        en = -(int)GetLastError();
-    } else {
-        en = errno;             /* NB: MSDN says we should use _get_errno,
-                                   but MinGW doesn't seem to have it yet.*/
-    }
+	int en;
 
-    /* Reset the error code, so that we can find which is the actual
-       error code in the next occasion. */
-    errno = 0;                  /* NB: MSDN says we should use _set_errno,
-                                   but MinGW doesn't seem to have it yet. */
-    SetLastError(0);
+	if (errno == 0) {
+		en = -(int)GetLastError();
+	} else {
+		en = errno;     /* NB: MSDN says we should use _get_errno,
+		                   but MinGW doesn't seem to have it yet.*/
+	}
 
-    return en;
+	/* Reset the error code, so that we can find which is the actual
+	   error code in the next occasion. */
+	errno = 0;              /* NB: MSDN says we should use _set_errno,
+	                           but MinGW doesn't seem to have it yet. */
+	SetLastError(0);
+
+	return en;
 #endif /*GAUCHE_WINDOWS*/
 }
 
 void Scm_SysError(const char *msg, ...)
 {
-    int en = get_errno();       /* must take this before Scm_VM() */
-    ScmVM *vm = Scm_VM();
-    SCM_ERROR_DOUBLE_FAULT_CHECK(vm, msg);
+	int en = get_errno();   /* must take this before Scm_VM() */
+	ScmVM *vm = Scm_VM();
+	SCM_ERROR_DOUBLE_FAULT_CHECK(vm, msg);
 
-    ScmObj ostr;
-    SCM_SYSERROR_MESSAGE_FORMAT(ostr, msg, en);
-    ScmObj e = Scm_MakeSystemError(Scm_GetOutputString(SCM_PORT(ostr), TRUE), en);
-    Scm_VMThrowException(vm, e, SCM_RAISE_NON_CONTINUABLE);
-    Scm_Panic("Scm_Error: Scm_VMThrowException returned.  something wrong.");
+	ScmObj ostr;
+	SCM_SYSERROR_MESSAGE_FORMAT(ostr, msg, en);
+	ScmObj e = Scm_MakeSystemError(Scm_GetOutputString(SCM_PORT(ostr), TRUE), en);
+	Scm_VMThrowException(vm, e, SCM_RAISE_NON_CONTINUABLE);
+	Scm_Panic("Scm_Error: Scm_VMThrowException returned.  something wrong.");
 }
 
 /*
@@ -753,8 +753,8 @@ void Scm_SysError(const char *msg, ...)
  */
 void Scm_TypeError(const char *what, const char *expected, ScmObj got)
 {
-    Scm_Error("%s is supposed to be of type %s, but got %S",
-              what, expected, got);
+	Scm_Error("%s is supposed to be of type %s, but got %S",
+	          what, expected, got);
 }
 
 
@@ -769,40 +769,40 @@ void Scm_TypeError(const char *what, const char *expected, ScmObj got)
  */
 void Scm_PortError(ScmPort *port, int reason, const char *msg, ...)
 {
-    int en = get_errno();       /* must take this before Scm_VM() */
-    ScmVM *vm = Scm_VM();
-    SCM_ERROR_DOUBLE_FAULT_CHECK(vm, msg);
+	int en = get_errno();   /* must take this before Scm_VM() */
+	ScmVM *vm = Scm_VM();
+	SCM_ERROR_DOUBLE_FAULT_CHECK(vm, msg);
 
-    ScmObj ostr;
-    if (en != 0) SCM_SYSERROR_MESSAGE_FORMAT(ostr, msg, en);
-    else         SCM_ERROR_MESSAGE_FORMAT(ostr, msg);
-    ScmObj smsg = Scm_GetOutputString(SCM_PORT(ostr), TRUE);
+	ScmObj ostr;
+	if (en != 0) SCM_SYSERROR_MESSAGE_FORMAT(ostr, msg, en);
+	else SCM_ERROR_MESSAGE_FORMAT(ostr, msg);
+	ScmObj smsg = Scm_GetOutputString(SCM_PORT(ostr), TRUE);
 
-    ScmClass *peclass;
-    switch (reason) {
-    case SCM_PORT_ERROR_INPUT:
-        peclass = SCM_CLASS_IO_READ_ERROR; break;
-    case SCM_PORT_ERROR_OUTPUT:
-        peclass = SCM_CLASS_IO_WRITE_ERROR; break;
-    case SCM_PORT_ERROR_CLOSED:
-        peclass = SCM_CLASS_IO_CLOSED_ERROR; break;
-    case SCM_PORT_ERROR_UNIT:
-        peclass = SCM_CLASS_IO_UNIT_ERROR; break;
-    default:
-        peclass = SCM_CLASS_PORT_ERROR; break;
-    }
+	ScmClass *peclass;
+	switch (reason) {
+	case SCM_PORT_ERROR_INPUT:
+		peclass = SCM_CLASS_IO_READ_ERROR; break;
+	case SCM_PORT_ERROR_OUTPUT:
+		peclass = SCM_CLASS_IO_WRITE_ERROR; break;
+	case SCM_PORT_ERROR_CLOSED:
+		peclass = SCM_CLASS_IO_CLOSED_ERROR; break;
+	case SCM_PORT_ERROR_UNIT:
+		peclass = SCM_CLASS_IO_UNIT_ERROR; break;
+	default:
+		peclass = SCM_CLASS_PORT_ERROR; break;
+	}
 
-    ScmObj pe = porterror_allocate(peclass, SCM_NIL);
-    SCM_ERROR(pe)->message = SCM_LIST2(smsg, smsg);
-    SCM_PORT_ERROR(pe)->port = port;
+	ScmObj pe = porterror_allocate(peclass, SCM_NIL);
+	SCM_ERROR(pe)->message = SCM_LIST2(smsg, smsg);
+	SCM_PORT_ERROR(pe)->port = port;
 
-    ScmObj e = pe;
-    if (en != 0) {
-        e = Scm_MakeCompoundCondition(SCM_LIST2(Scm_MakeSystemError(smsg, en),
-                                                pe));
-    }
-    Scm_VMThrowException(vm, e, SCM_RAISE_NON_CONTINUABLE);
-    Scm_Panic("Scm_Error: Scm_VMThrowException returned.  something wrong.");
+	ScmObj e = pe;
+	if (en != 0) {
+		e = Scm_MakeCompoundCondition(SCM_LIST2(Scm_MakeSystemError(smsg, en),
+		                                        pe));
+	}
+	Scm_VMThrowException(vm, e, SCM_RAISE_NON_CONTINUABLE);
+	Scm_Panic("Scm_Error: Scm_VMThrowException returned.  something wrong.");
 }
 
 /*
@@ -812,18 +812,18 @@ void Scm_PortError(ScmPort *port, int reason, const char *msg, ...)
 
 void Scm_Warn(const char *msg, ...)
 {
-    if (Scm_GetEnv("GAUCHE_SUPPRESS_WARNING") != NULL) return;
-    va_list args;
-    va_start(args, msg);
-    Scm_Printf(SCM_CURERR, "WARNING: %A\n", Scm_Vsprintf(msg, args, TRUE));
-    Scm_Flush(SCM_CURERR);
-    va_end(args);
+	if (Scm_GetEnv("GAUCHE_SUPPRESS_WARNING") != NULL) return;
+	va_list args;
+	va_start(args, msg);
+	Scm_Printf(SCM_CURERR, "WARNING: %A\n", Scm_Vsprintf(msg, args, TRUE));
+	Scm_Flush(SCM_CURERR);
+	va_end(args);
 }
 
 /* OBSOLETED: 'warn' is now in Scheme. */
 void Scm_FWarn(ScmString *fmt SCM_UNUSED, ScmObj args SCM_UNUSED)
 {
-    Scm_Error("Scm_FWarn is obsoleted");
+	Scm_Error("Scm_FWarn is obsoleted");
 }
 
 /*
@@ -833,7 +833,7 @@ void Scm_FWarn(ScmString *fmt SCM_UNUSED, ScmObj args SCM_UNUSED)
 /* An external API to hide Scm_VMThrowException. */
 ScmObj Scm_Raise(ScmObj condition, u_long flags)
 {
-    return Scm_VMThrowException(Scm_VM(), condition, flags);
+	return Scm_VMThrowException(Scm_VM(), condition, flags);
 }
 
 
@@ -862,40 +862,40 @@ ScmObj Scm_Raise(ScmObj condition, u_long flags)
      <condition-type> {<string-slot-name> <value>}* <terminator>
 
      <terminator> : SCM_RAISE_CONDITION_MESSAGE <fmtstr> <fmtarg> ...
-                  | NULL
-*/
+ | NULL
+ */
 
 ScmObj Scm_RaiseCondition(ScmObj condition_type, ...)
 {
-    ScmObj argh = SCM_NIL, argt = SCM_NIL;
-    va_list ap;
+	ScmObj argh = SCM_NIL, argt = SCM_NIL;
+	va_list ap;
 
-    if (!SCM_CLASSP(condition_type)
-        || !Scm_SubtypeP(SCM_CLASS(condition_type), SCM_CLASS_CONDITION)) {
-        /* If we don't get a condition type, fallback to a normal error. */
-        condition_type = SCM_OBJ(SCM_CLASS_ERROR);
-    }
-    SCM_APPEND1(argh, argt, condition_type);
-    va_start(ap, condition_type);
-    for (;;) {
-        const char *key = va_arg(ap, const char *);
-        if (key == NULL) {
-            break;
-        } else if (key == SCM_RAISE_CONDITION_MESSAGE) {
-            const char *msg = va_arg(ap, const char*);
-            ScmObj ostr = Scm_MakeOutputStringPort(TRUE);
-            Scm_Vprintf(SCM_PORT(ostr), msg, ap, TRUE);
-            SCM_APPEND1(argh, argt, SCM_MAKE_KEYWORD("message"));
-            SCM_APPEND1(argh, argt, Scm_GetOutputString(SCM_PORT(ostr), 0));
-            break;
-        } else {
-            ScmObj arg = va_arg(ap, ScmObj);
-            SCM_APPEND1(argh, argt, SCM_MAKE_KEYWORD(key));
-            SCM_APPEND1(argh, argt, arg);
-        }
-    }
-    va_end(ap);
-    return Scm_ApplyRec(SCM_SYMBOL_VALUE("gauche", "error"), argh);
+	if (!SCM_CLASSP(condition_type)
+	    || !Scm_SubtypeP(SCM_CLASS(condition_type), SCM_CLASS_CONDITION)) {
+		/* If we don't get a condition type, fallback to a normal error. */
+		condition_type = SCM_OBJ(SCM_CLASS_ERROR);
+	}
+	SCM_APPEND1(argh, argt, condition_type);
+	va_start(ap, condition_type);
+	for (;;) {
+		const char *key = va_arg(ap, const char *);
+		if (key == NULL) {
+			break;
+		} else if (key == SCM_RAISE_CONDITION_MESSAGE) {
+			const char *msg = va_arg(ap, const char*);
+			ScmObj ostr = Scm_MakeOutputStringPort(TRUE);
+			Scm_Vprintf(SCM_PORT(ostr), msg, ap, TRUE);
+			SCM_APPEND1(argh, argt, SCM_MAKE_KEYWORD("message"));
+			SCM_APPEND1(argh, argt, Scm_GetOutputString(SCM_PORT(ostr), 0));
+			break;
+		} else {
+			ScmObj arg = va_arg(ap, ScmObj);
+			SCM_APPEND1(argh, argt, SCM_MAKE_KEYWORD(key));
+			SCM_APPEND1(argh, argt, arg);
+		}
+	}
+	va_end(ap);
+	return Scm_ApplyRec(SCM_SYMBOL_VALUE("gauche", "error"), argh);
 }
 
 /*
@@ -911,16 +911,16 @@ ScmObj Scm_RaiseCondition(ScmObj condition_type, ...)
  *   format   - SCM_STACK_TRACE_FORMAT_* enum value.  No longer used.
  */
 void Scm_ShowStackTrace(ScmPort *out, ScmObj stacklite,
-                        int maxdepth, int skip, int offset, 
+                        int maxdepth, int skip, int offset,
                         int format SCM_UNUSED)
 {
-    static ScmObj show_stack_trace = SCM_UNDEFINED;
-    SCM_BIND_PROC(show_stack_trace,
-                  "%show-stack-trace",
-                  Scm_GaucheInternalModule());
-    Scm_ApplyRec5(show_stack_trace, stacklite, SCM_OBJ(out),
-                  SCM_MAKE_INT(maxdepth), SCM_MAKE_INT(skip),
-                  SCM_MAKE_INT(offset));
+	static ScmObj show_stack_trace = SCM_UNDEFINED;
+	SCM_BIND_PROC(show_stack_trace,
+	              "%show-stack-trace",
+	              Scm_GaucheInternalModule());
+	Scm_ApplyRec5(show_stack_trace, stacklite, SCM_OBJ(out),
+	              SCM_MAKE_INT(maxdepth), SCM_MAKE_INT(skip),
+	              SCM_MAKE_INT(offset));
 }
 
 /* Dump stack trace.  Called from the default error reporter.
@@ -928,19 +928,19 @@ void Scm_ShowStackTrace(ScmPort *out, ScmObj stacklite,
    to mean the current VM, and port to be NULL for the current error port. */
 void Scm_DumpStackTrace(ScmVM *vm, ScmPort *port)
 {
-    if (vm == NULL) vm = Scm_VM();
-    if (port == NULL) port = SCM_VM_CURRENT_ERROR_PORT(vm);
-    ScmObj stack = Scm_VMGetStackLite(vm);
-    SCM_PUTZ("Stack Trace:\n", -1, port);
-    SCM_PUTZ("_______________________________________\n", -1, port);
-    Scm_ShowStackTrace(port, stack, 0, 0, 0, 0);
-    if (vm->callTrace) {
-        ScmObj trace = Scm_VMGetCallTraceLite(vm);
-        SCM_PUTZ("Call Trace:\n", -1, port);
-        SCM_PUTZ("_______________________________________\n", -1, port);
-        Scm_ShowStackTrace(port, trace, 0, 0, 0, 0);
-    }
-    SCM_FLUSH(port);
+	if (vm == NULL) vm = Scm_VM();
+	if (port == NULL) port = SCM_VM_CURRENT_ERROR_PORT(vm);
+	ScmObj stack = Scm_VMGetStackLite(vm);
+	SCM_PUTZ("Stack Trace:\n", -1, port);
+	SCM_PUTZ("_______________________________________\n", -1, port);
+	Scm_ShowStackTrace(port, stack, 0, 0, 0, 0);
+	if (vm->callTrace) {
+		ScmObj trace = Scm_VMGetCallTraceLite(vm);
+		SCM_PUTZ("Call Trace:\n", -1, port);
+		SCM_PUTZ("_______________________________________\n", -1, port);
+		Scm_ShowStackTrace(port, trace, 0, 0, 0, 0);
+	}
+	SCM_FLUSH(port);
 }
 
 /*
@@ -953,25 +953,25 @@ void Scm_DumpStackTrace(ScmVM *vm, ScmPort *port)
    The actual operation is written in Scheme (libexc.scm).  However,
    we can't use that before the infrastructure is fully booted; so
    this routine has a fallback which will be used only during initialization.
-*/
+ */
 static void Scm_PrintDefaultErrorHeading(ScmObj e, ScmPort *out)
 {
-    if (Scm_InitializedP()) {
-        static ScmObj print_default_error_heading = SCM_UNDEFINED;
-        SCM_BIND_PROC(print_default_error_heading,
-                      "print-default-error-heading",
-                      Scm_GaucheModule());
-        Scm_ApplyRec2(print_default_error_heading, e, SCM_OBJ(out));
-    } else {
-        /* Error during initialization. */
-        if (SCM_CONDITIONP(e)) {
-            Scm_Printf(out, "*** %A: %A\n",
-                       Scm_ConditionTypeName(e),
-                       Scm_ConditionMessage(e));
-        } else {
-            Scm_Printf(out, "*** ERROR: Unhandled condition: %S\n", e);
-        }
-    }
+	if (Scm_InitializedP()) {
+		static ScmObj print_default_error_heading = SCM_UNDEFINED;
+		SCM_BIND_PROC(print_default_error_heading,
+		              "print-default-error-heading",
+		              Scm_GaucheModule());
+		Scm_ApplyRec2(print_default_error_heading, e, SCM_OBJ(out));
+	} else {
+		/* Error during initialization. */
+		if (SCM_CONDITIONP(e)) {
+			Scm_Printf(out, "*** %A: %A\n",
+			           Scm_ConditionTypeName(e),
+			           Scm_ConditionMessage(e));
+		} else {
+			Scm_Printf(out, "*** ERROR: Unhandled condition: %S\n", e);
+		}
+	}
 }
 
 /* We treat out == #f or #t just like 'format' - #t for the current output
@@ -981,22 +981,22 @@ static void Scm_PrintDefaultErrorHeading(ScmObj e, ScmPort *out)
    and raising an error there masks the original error.  However, the
    caller should explicitly pass SCM_OBJ(SCM_CURERR) if that's what it intends,
    instead of relying on the permissive behavior.
-*/
+ */
 ScmObj Scm_ReportError(ScmObj e, ScmObj out)
 {
-    ScmVM *vm = Scm_VM();
-    ScmPort *port = SCM_VM_CURRENT_ERROR_PORT(vm);
-    if (SCM_FALSEP(out)) {
-        port = SCM_PORT(Scm_MakeOutputStringPort(TRUE));
-    } else if (SCM_TRUEP(out)) {
-        port = SCM_VM_CURRENT_OUTPUT_PORT(vm);
-    } else if (SCM_OPORTP(out)) {
-        port = SCM_PORT(out);
-    }
-    Scm_PrintDefaultErrorHeading(e, port);
-    Scm_DumpStackTrace(vm, port);
-    if (SCM_FALSEP(out)) return Scm_GetOutputString(SCM_PORT(port), 0);
-    else return SCM_UNDEFINED;
+	ScmVM *vm = Scm_VM();
+	ScmPort *port = SCM_VM_CURRENT_ERROR_PORT(vm);
+	if (SCM_FALSEP(out)) {
+		port = SCM_PORT(Scm_MakeOutputStringPort(TRUE));
+	} else if (SCM_TRUEP(out)) {
+		port = SCM_VM_CURRENT_OUTPUT_PORT(vm);
+	} else if (SCM_OPORTP(out)) {
+		port = SCM_PORT(out);
+	}
+	Scm_PrintDefaultErrorHeading(e, port);
+	Scm_DumpStackTrace(vm, port);
+	if (SCM_FALSEP(out)) return Scm_GetOutputString(SCM_PORT(port), 0);
+	else return SCM_UNDEFINED;
 }
 
 /*
@@ -1004,74 +1004,74 @@ ScmObj Scm_ReportError(ScmObj e, ScmObj out)
  */
 void Scm__InitExceptions(void)
 {
-    ScmModule *mod = Scm_GaucheModule();
+	ScmModule *mod = Scm_GaucheModule();
 
-    ScmObj mes_ser_supers
-        = SCM_LIST2(SCM_OBJ(SCM_CLASS_MESSAGE_CONDITION),
-                    SCM_OBJ(SCM_CLASS_SERIOUS_CONDITION));
-    ScmObj com_ser_supers
-        = SCM_LIST2(SCM_OBJ(SCM_CLASS_COMPOUND_CONDITION),
-                    SCM_OBJ(SCM_CLASS_SERIOUS_CONDITION));
+	ScmObj mes_ser_supers
+	        = SCM_LIST2(SCM_OBJ(SCM_CLASS_MESSAGE_CONDITION),
+	                    SCM_OBJ(SCM_CLASS_SERIOUS_CONDITION));
+	ScmObj com_ser_supers
+	        = SCM_LIST2(SCM_OBJ(SCM_CLASS_COMPOUND_CONDITION),
+	                    SCM_OBJ(SCM_CLASS_SERIOUS_CONDITION));
 
-    Scm_InitStaticClassWithMeta(SCM_CLASS_CONDITION,
-                                "<condition>",
-                                mod, NULL, SCM_FALSE, NULL, 0);
-    ScmClass *cond_meta = Scm_ClassOf(SCM_OBJ(SCM_CLASS_CONDITION));
-    Scm_InitStaticClassWithMeta(SCM_CLASS_SERIOUS_CONDITION,
-                                "<serious-condition>",
-                                mod, cond_meta, SCM_FALSE, NULL, 0);
-    Scm_InitStaticClassWithMeta(SCM_CLASS_MESSAGE_CONDITION,
-                                "<message-condition>",
-                                mod, cond_meta, SCM_FALSE, message_slots, 0);
+	Scm_InitStaticClassWithMeta(SCM_CLASS_CONDITION,
+	                            "<condition>",
+	                            mod, NULL, SCM_FALSE, NULL, 0);
+	ScmClass *cond_meta = Scm_ClassOf(SCM_OBJ(SCM_CLASS_CONDITION));
+	Scm_InitStaticClassWithMeta(SCM_CLASS_SERIOUS_CONDITION,
+	                            "<serious-condition>",
+	                            mod, cond_meta, SCM_FALSE, NULL, 0);
+	Scm_InitStaticClassWithMeta(SCM_CLASS_MESSAGE_CONDITION,
+	                            "<message-condition>",
+	                            mod, cond_meta, SCM_FALSE, message_slots, 0);
 
-    Scm_InitStaticClassWithMeta(SCM_CLASS_ERROR,
-                                "<error>",
-                                mod, cond_meta, mes_ser_supers,
-                                message_slots, 0);
-    Scm_InitStaticClassWithMeta(SCM_CLASS_SYSTEM_ERROR,
-                                "<system-error>",
-                                mod, cond_meta, SCM_FALSE,
-                                syserror_slots, 0);
-    Scm_InitStaticClassWithMeta(SCM_CLASS_UNHANDLED_SIGNAL_ERROR,
-                                "<unhandled-signal-error>",
-                                mod, cond_meta, SCM_FALSE,
-                                sigerror_slots, 0);
-    Scm_InitStaticClassWithMeta(SCM_CLASS_READ_ERROR,
-                                "<read-error>",
-                                mod, cond_meta, SCM_FALSE,
-                                readerror_slots, 0);
-    Scm_InitStaticClassWithMeta(SCM_CLASS_IO_ERROR,
-                                "<io-error>",
-                                mod, cond_meta, SCM_FALSE,
-                                NULL, 0);
-    Scm_InitStaticClassWithMeta(SCM_CLASS_PORT_ERROR,
-                                "<port-error>",
-                                mod, cond_meta, SCM_FALSE,
-                                porterror_slots, 0);
-    Scm_InitStaticClassWithMeta(SCM_CLASS_IO_READ_ERROR,
-                                "<io-read-error>",
-                                mod, cond_meta, SCM_FALSE,
-                                porterror_slots, 0);
-    Scm_InitStaticClassWithMeta(SCM_CLASS_IO_WRITE_ERROR,
-                                "<io-write-error>",
-                                mod, cond_meta, SCM_FALSE,
-                                porterror_slots, 0);
-    Scm_InitStaticClassWithMeta(SCM_CLASS_IO_CLOSED_ERROR,
-                                "<io-closed-error>",
-                                mod, cond_meta, SCM_FALSE,
-                                porterror_slots, 0);
-    Scm_InitStaticClassWithMeta(SCM_CLASS_IO_UNIT_ERROR,
-                                "<io-unit-error>",
-                                mod, cond_meta, SCM_FALSE,
-                                porterror_slots, 0);
+	Scm_InitStaticClassWithMeta(SCM_CLASS_ERROR,
+	                            "<error>",
+	                            mod, cond_meta, mes_ser_supers,
+	                            message_slots, 0);
+	Scm_InitStaticClassWithMeta(SCM_CLASS_SYSTEM_ERROR,
+	                            "<system-error>",
+	                            mod, cond_meta, SCM_FALSE,
+	                            syserror_slots, 0);
+	Scm_InitStaticClassWithMeta(SCM_CLASS_UNHANDLED_SIGNAL_ERROR,
+	                            "<unhandled-signal-error>",
+	                            mod, cond_meta, SCM_FALSE,
+	                            sigerror_slots, 0);
+	Scm_InitStaticClassWithMeta(SCM_CLASS_READ_ERROR,
+	                            "<read-error>",
+	                            mod, cond_meta, SCM_FALSE,
+	                            readerror_slots, 0);
+	Scm_InitStaticClassWithMeta(SCM_CLASS_IO_ERROR,
+	                            "<io-error>",
+	                            mod, cond_meta, SCM_FALSE,
+	                            NULL, 0);
+	Scm_InitStaticClassWithMeta(SCM_CLASS_PORT_ERROR,
+	                            "<port-error>",
+	                            mod, cond_meta, SCM_FALSE,
+	                            porterror_slots, 0);
+	Scm_InitStaticClassWithMeta(SCM_CLASS_IO_READ_ERROR,
+	                            "<io-read-error>",
+	                            mod, cond_meta, SCM_FALSE,
+	                            porterror_slots, 0);
+	Scm_InitStaticClassWithMeta(SCM_CLASS_IO_WRITE_ERROR,
+	                            "<io-write-error>",
+	                            mod, cond_meta, SCM_FALSE,
+	                            porterror_slots, 0);
+	Scm_InitStaticClassWithMeta(SCM_CLASS_IO_CLOSED_ERROR,
+	                            "<io-closed-error>",
+	                            mod, cond_meta, SCM_FALSE,
+	                            porterror_slots, 0);
+	Scm_InitStaticClassWithMeta(SCM_CLASS_IO_UNIT_ERROR,
+	                            "<io-unit-error>",
+	                            mod, cond_meta, SCM_FALSE,
+	                            porterror_slots, 0);
 
 
-    Scm_InitStaticClassWithMeta(SCM_CLASS_COMPOUND_CONDITION,
-                                "<compound-condition>",
-                                mod, cond_meta, SCM_FALSE,
-                                compound_slots, 0);
-    Scm_InitStaticClassWithMeta(SCM_CLASS_SERIOUS_COMPOUND_CONDITION,
-                                "<serious-compound-condition>",
-                                mod, cond_meta, com_ser_supers,
-                                compound_slots, 0);
+	Scm_InitStaticClassWithMeta(SCM_CLASS_COMPOUND_CONDITION,
+	                            "<compound-condition>",
+	                            mod, cond_meta, SCM_FALSE,
+	                            compound_slots, 0);
+	Scm_InitStaticClassWithMeta(SCM_CLASS_SERIOUS_COMPOUND_CONDITION,
+	                            "<serious-compound-condition>",
+	                            mod, cond_meta, com_ser_supers,
+	                            compound_slots, 0);
 }

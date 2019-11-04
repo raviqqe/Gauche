@@ -38,36 +38,36 @@
 
 /* Unicode general categories */
 enum {
-    SCM_CHAR_CATEGORY_Lu,       /* Uppercase_Letter */
-    SCM_CHAR_CATEGORY_Ll,       /* Lowercase_Letter */
-    SCM_CHAR_CATEGORY_Lt,       /* Titlecase_Letter */
-    SCM_CHAR_CATEGORY_Lm,       /* Modifier_Letter */
-    SCM_CHAR_CATEGORY_Lo,       /* Other_Letter */
-    SCM_CHAR_CATEGORY_Mn,       /* Nonspacing_Mark */
-    SCM_CHAR_CATEGORY_Mc,       /* Spacing_Mark */
-    SCM_CHAR_CATEGORY_Me,       /* Enclosing_Mark */
-    SCM_CHAR_CATEGORY_Nd,       /* Decimal_Number */
-    SCM_CHAR_CATEGORY_Nl,       /* Letter_Number */
-    SCM_CHAR_CATEGORY_No,       /* Other_Number */
-    SCM_CHAR_CATEGORY_Pc,       /* Connector_Punctuation */
-    SCM_CHAR_CATEGORY_Pd,       /* Dash_Punctuation */
-    SCM_CHAR_CATEGORY_Ps,       /* Open_Punctuation */
-    SCM_CHAR_CATEGORY_Pe,       /* Close_Punctuation */
-    SCM_CHAR_CATEGORY_Pi,       /* Initial_Punctuation */
-    SCM_CHAR_CATEGORY_Pf,       /* Final_Punctuation */
-    SCM_CHAR_CATEGORY_Po,       /* Other_Punctuation */
-    SCM_CHAR_CATEGORY_Sm,       /* Math_Symbol */
-    SCM_CHAR_CATEGORY_Sc,       /* Currency_Symbol */
-    SCM_CHAR_CATEGORY_Sk,       /* Modifier_Symbol */
-    SCM_CHAR_CATEGORY_So,       /* Other_Symbol */
-    SCM_CHAR_CATEGORY_Zs,       /* Space_Separator */
-    SCM_CHAR_CATEGORY_Zl,       /* Line_Separator */
-    SCM_CHAR_CATEGORY_Zp,       /* Paragraph_Separator */
-    SCM_CHAR_CATEGORY_Cc,       /* Control */
-    SCM_CHAR_CATEGORY_Cf,       /* Format */
-    SCM_CHAR_CATEGORY_Cs,       /* Surrogate */
-    SCM_CHAR_CATEGORY_Co,       /* Private_Use */
-    SCM_CHAR_CATEGORY_Cn        /* Unassigned */
+	SCM_CHAR_CATEGORY_Lu,   /* Uppercase_Letter */
+	SCM_CHAR_CATEGORY_Ll,   /* Lowercase_Letter */
+	SCM_CHAR_CATEGORY_Lt,   /* Titlecase_Letter */
+	SCM_CHAR_CATEGORY_Lm,   /* Modifier_Letter */
+	SCM_CHAR_CATEGORY_Lo,   /* Other_Letter */
+	SCM_CHAR_CATEGORY_Mn,   /* Nonspacing_Mark */
+	SCM_CHAR_CATEGORY_Mc,   /* Spacing_Mark */
+	SCM_CHAR_CATEGORY_Me,   /* Enclosing_Mark */
+	SCM_CHAR_CATEGORY_Nd,   /* Decimal_Number */
+	SCM_CHAR_CATEGORY_Nl,   /* Letter_Number */
+	SCM_CHAR_CATEGORY_No,   /* Other_Number */
+	SCM_CHAR_CATEGORY_Pc,   /* Connector_Punctuation */
+	SCM_CHAR_CATEGORY_Pd,   /* Dash_Punctuation */
+	SCM_CHAR_CATEGORY_Ps,   /* Open_Punctuation */
+	SCM_CHAR_CATEGORY_Pe,   /* Close_Punctuation */
+	SCM_CHAR_CATEGORY_Pi,   /* Initial_Punctuation */
+	SCM_CHAR_CATEGORY_Pf,   /* Final_Punctuation */
+	SCM_CHAR_CATEGORY_Po,   /* Other_Punctuation */
+	SCM_CHAR_CATEGORY_Sm,   /* Math_Symbol */
+	SCM_CHAR_CATEGORY_Sc,   /* Currency_Symbol */
+	SCM_CHAR_CATEGORY_Sk,   /* Modifier_Symbol */
+	SCM_CHAR_CATEGORY_So,   /* Other_Symbol */
+	SCM_CHAR_CATEGORY_Zs,   /* Space_Separator */
+	SCM_CHAR_CATEGORY_Zl,   /* Line_Separator */
+	SCM_CHAR_CATEGORY_Zp,   /* Paragraph_Separator */
+	SCM_CHAR_CATEGORY_Cc,   /* Control */
+	SCM_CHAR_CATEGORY_Cf,   /* Format */
+	SCM_CHAR_CATEGORY_Cs,   /* Surrogate */
+	SCM_CHAR_CATEGORY_Co,   /* Private_Use */
+	SCM_CHAR_CATEGORY_Cn    /* Unassigned */
 };
 
 #define SCM_CHAR_CATEGORY_MASK  (0x1f)
@@ -90,12 +90,12 @@ enum {
 #define SCM_CHAR_FULL_CASE_MAPPING_SIZE 4
 
 typedef struct {
-    int to_upper_simple;  /* offset to add to produce uppercase */
-    int to_lower_simple;  /* offset to add to produce lowercase */
-    int to_title_simple;  /* offset to add to produce titlecase */
-    ScmChar to_upper_full[SCM_CHAR_FULL_CASE_MAPPING_SIZE];
-    ScmChar to_lower_full[SCM_CHAR_FULL_CASE_MAPPING_SIZE];
-    ScmChar to_title_full[SCM_CHAR_FULL_CASE_MAPPING_SIZE];
+	int to_upper_simple; /* offset to add to produce uppercase */
+	int to_lower_simple; /* offset to add to produce lowercase */
+	int to_title_simple; /* offset to add to produce titlecase */
+	ScmChar to_upper_full[SCM_CHAR_FULL_CASE_MAPPING_SIZE];
+	ScmChar to_lower_full[SCM_CHAR_FULL_CASE_MAPPING_SIZE];
+	ScmChar to_title_full[SCM_CHAR_FULL_CASE_MAPPING_SIZE];
 } ScmCharCaseMap;
 
 /* Internal function to access case map info */

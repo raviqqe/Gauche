@@ -100,7 +100,7 @@ extern "C" {
  */
 #if 0
 typedef unsigned char u_int8_t;        /* 1-byte  (8-bits)  */
-typedef unsigned int  u_int32_t;       /* 4-bytes (32-bits) */
+typedef unsigned int u_int32_t;        /* 4-bytes (32-bits) */
 typedef unsigned long long u_int64_t;  /* 8-bytes (64-bits) */
 #endif
 /*
@@ -122,51 +122,51 @@ typedef unsigned long long u_int64_t;  /* 8-bytes (64-bits) */
 #ifdef SHA2_USE_INTTYPES_H
 
 typedef union _SHA_CTX {
-    /* SHA-1 uses this part of the union: */
-    struct {
-        uint32_t state[5];
-        uint64_t bitcount;
-        uint8_t  buffer[64];
-    } s1;
+	/* SHA-1 uses this part of the union: */
+	struct {
+		uint32_t state[5];
+		uint64_t bitcount;
+		uint8_t buffer[64];
+	} s1;
 
-    /* SHA-224 and SHA-256 use this part of the union: */
-    struct {
-        uint32_t state[8];
-        uint64_t bitcount;
-        uint8_t  buffer[64];
-    } s256;
+	/* SHA-224 and SHA-256 use this part of the union: */
+	struct {
+		uint32_t state[8];
+		uint64_t bitcount;
+		uint8_t buffer[64];
+	} s256;
 
-    /* SHA-384 and SHA-512 use this part of the union: */
-    struct {
-        uint64_t state[8];
-        uint64_t bitcount[2];
-        uint8_t  buffer[128];
-    } s512;
+	/* SHA-384 and SHA-512 use this part of the union: */
+	struct {
+		uint64_t state[8];
+		uint64_t bitcount[2];
+		uint8_t buffer[128];
+	} s512;
 } SHA_CTX;
 
 #else /* SHA2_USE_INTTYPES_H */
 
 typedef union _SHA_CTX {
-    /* SHA-1 uses this part of the union: */
-    struct {
-        u_int32_t state[5];
-        u_int64_t bitcount;
-        u_int8_t  buffer[64];
-    } s1;
+	/* SHA-1 uses this part of the union: */
+	struct {
+		u_int32_t state[5];
+		u_int64_t bitcount;
+		u_int8_t buffer[64];
+	} s1;
 
-    /* SHA-224 and SHA-256 use this part of the union: */
-    struct {
-        u_int32_t state[8];
-        u_int64_t bitcount;
-        u_int8_t  buffer[64];
-    } s256;
+	/* SHA-224 and SHA-256 use this part of the union: */
+	struct {
+		u_int32_t state[8];
+		u_int64_t bitcount;
+		u_int8_t buffer[64];
+	} s256;
 
-    /* SHA-384 and SHA-512 use this part of the union: */
-    struct {
-        u_int64_t state[8];
-        u_int64_t bitcount[2];
-        u_int8_t  buffer[128];
-    } s512;
+	/* SHA-384 and SHA-512 use this part of the union: */
+	struct {
+		u_int64_t state[8];
+		u_int64_t bitcount[2];
+		u_int8_t buffer[128];
+	} s512;
 } SHA_CTX;
 
 #endif /* SHA2_USE_INTTYPES_H */

@@ -52,22 +52,22 @@ typedef struct SparseVectorDescriptorRec SparseVectorDescriptor;
    ScmSparseVector uses CompactTrie as a backing storage.  The 'leaf'
    of the CompactTrie may contain 1 to 16 elements of the vector,
    depending on the type of the sparse vector.
-*/
+ */
 typedef struct SparseVectorRec {
-    SCM_HEADER;
-    SparseVectorDescriptor *desc;
-    CompactTrie trie;
-    u_long      numEntries;
-    u_long      flags;          /* reserved */
-    ScmObj      defaultValue;
+	SCM_HEADER;
+	SparseVectorDescriptor *desc;
+	CompactTrie trie;
+	u_long numEntries;
+	u_long flags;           /* reserved */
+	ScmObj defaultValue;
 } SparseVector;
 
 /* Iterator. */
 typedef struct SparseVectorIterRec {
-    SparseVector   *sv;
-    Leaf           *leaf;
-    int             leafIndex;
-    CompactTrieIter citer;
+	SparseVector   *sv;
+	Leaf           *leaf;
+	int leafIndex;
+	CompactTrieIter citer;
 } SparseVectorIter;
 
 /* SparseVectorDescriptor has common information per class (it should be
@@ -89,16 +89,16 @@ typedef struct SparseVectorIterRec {
    The numEntries field is taken care of by generic routine.
  */
 struct SparseVectorDescriptorRec {
-    ScmObj   (*ref)(Leaf*, u_long index);
-    int      (*set)(Leaf*, u_long index, ScmObj value);
-    Leaf    *(*allocate)(void *data);
-    ScmObj   (*delete)(Leaf*, u_long index);
-    void     (*clear)(Leaf*, void*);
-    Leaf    *(*copy)(Leaf*, void*);
-    ScmObj   (*iter)(Leaf*, int*);
-    void     (*dump)(ScmPort *out, Leaf *leaf, int indent, void *data);
+	ScmObj (*ref)(Leaf*, u_long index);
+	int (*set)(Leaf*, u_long index, ScmObj value);
+	Leaf    *(*allocate)(void *data);
+	ScmObj   (*delete)(Leaf*, u_long index);
+	void (*clear)(Leaf*, void*);
+	Leaf    *(*copy)(Leaf*, void*);
+	ScmObj (*iter)(Leaf*, int*);
+	void (*dump)(ScmPort *out, Leaf *leaf, int indent, void *data);
 
-    int shift;                  /* # of shift bits to access Leaf */
+	int shift;              /* # of shift bits to access Leaf */
 };
 
 /* Max # of bits for index.  Theoretrically we can extend this
@@ -107,7 +107,7 @@ struct SparseVectorDescriptorRec {
 
 /* Flags for constructors (currently unused) */
 enum {
-    SPARSE_VECTOR_ORDERED = (1L<<0)
+	SPARSE_VECTOR_ORDERED = (1L<<0)
 };
 
 /* Generic API. */

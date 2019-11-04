@@ -73,9 +73,9 @@
 #define TRIE_MASK     (0x1f)
 
 typedef struct NodeRec {
-    u_long   emap;              /* bitmap: 1 = has child */
-    u_long   lmap;              /* bitmap: 1 = child is leaf */
-    void    *entries[2];        /* variable length; 2 is the minimum entries */
+	u_long emap;            /* bitmap: 1 = has child */
+	u_long lmap;            /* bitmap: 1 = child is leaf */
+	void    *entries[2];    /* variable length; 2 is the minimum entries */
 } Node;
 
 /* The leaf stores key bits.
@@ -83,8 +83,8 @@ typedef struct NodeRec {
    distinguish from pointers by our conserative GC, and sometimes lead
    to poor GC performance when we have very large table.  */
 typedef struct LeafRec {
-    u_long   key0; /* lower half word of the key + flags */
-    u_long   key1; /* upper half word of the key */
+	u_long key0; /* lower half word of the key + flags */
+	u_long key1; /* upper half word of the key */
 } Leaf;
 
 #define LEAF(x) ((Leaf*)(x))
@@ -101,54 +101,54 @@ typedef struct LeafRec {
 
 static inline u_long leaf_key(Leaf *leaf)
 {
-    return (((leaf->key1&LEAF_KEY_MASK) << LEAF_KEY_BITS)
-            + (leaf->key0&LEAF_KEY_MASK));
+	return (((leaf->key1&LEAF_KEY_MASK) << LEAF_KEY_BITS)
+	        + (leaf->key0&LEAF_KEY_MASK));
 }
 
 static inline void leaf_key_set(Leaf *leaf, u_long key)
 {
-    leaf->key0 = key & LEAF_KEY_MASK;
-    leaf->key1 = (key >> LEAF_KEY_BITS) & LEAF_KEY_MASK;
+	leaf->key0 = key & LEAF_KEY_MASK;
+	leaf->key1 = (key >> LEAF_KEY_BITS) & LEAF_KEY_MASK;
 }
 
 static inline u_long leaf_data(Leaf *leaf)
-{       
-    return (leaf->key0 >> LEAF_KEY_BITS);
+{
+	return (leaf->key0 >> LEAF_KEY_BITS);
 }
 
 static inline void leaf_data_set(Leaf *leaf, u_long data)
 {
-    leaf->key0 = (leaf->key0 & LEAF_KEY_MASK) | (data << LEAF_KEY_BITS);
+	leaf->key0 = (leaf->key0 & LEAF_KEY_MASK) | (data << LEAF_KEY_BITS);
 }
 
 static inline int leaf_data_bit_test(Leaf *leaf, int bit)
 {
-    return !!(leaf->key0 & (1UL << (bit + LEAF_KEY_BITS)));
+	return !!(leaf->key0 & (1UL << (bit + LEAF_KEY_BITS)));
 }
 
 static inline void leaf_data_bit_set(Leaf *leaf, int bit)
 {
-    leaf->key0 |= (1UL << (bit + LEAF_KEY_BITS));
+	leaf->key0 |= (1UL << (bit + LEAF_KEY_BITS));
 }
 
 static inline void leaf_data_bit_reset(Leaf *leaf, int bit)
 {
-    leaf->key0 &= ~(1UL << (bit + LEAF_KEY_BITS));
+	leaf->key0 &= ~(1UL << (bit + LEAF_KEY_BITS));
 }
 
 /*
  * Anchor to hold the trie
  */
 typedef struct CompactTrieRec {
-    u_int    numEntries;
-    Node     *root;
+	u_int numEntries;
+	Node     *root;
 } CompactTrie;
 
 typedef struct CompactTrieIterRec {
-    CompactTrie *trie;
-    u_long       key;
-    char         begin;
-    char         end;
+	CompactTrie *trie;
+	u_long key;
+	char begin;
+	char end;
 } CompactTrieIter;
 
 /* Create empty CompactTrie */

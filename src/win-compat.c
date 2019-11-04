@@ -18,42 +18,42 @@
 static WCHAR *mbs2wcs(const char *s, int use_gc,
                       void (*errfn)(const char *, ...))
 {
-    WCHAR *wb;
-    int nc = MultiByteToWideChar(CP_UTF8, 0, s, -1, NULL, 0);
-    if (nc == 0) {
-        errfn("Windows error %d on MultiByteToWideChar", GetLastError());
-    }
+	WCHAR *wb;
+	int nc = MultiByteToWideChar(CP_UTF8, 0, s, -1, NULL, 0);
+	if (nc == 0) {
+		errfn("Windows error %d on MultiByteToWideChar", GetLastError());
+	}
 #if defined(GAUCHE_H)
-    if (use_gc) wb = SCM_NEW_ATOMIC_ARRAY(WCHAR, nc);
-    else        wb = (WCHAR*)malloc(nc * sizeof(WCHAR));
+	if (use_gc) wb = SCM_NEW_ATOMIC_ARRAY(WCHAR, nc);
+	else wb = (WCHAR*)malloc(nc * sizeof(WCHAR));
 #else
-    (void)use_gc; /* suppress unused var warning */
-    wb = (WCHAR*)malloc(nc * sizeof(WCHAR));
+	(void)use_gc; /* suppress unused var warning */
+	wb = (WCHAR*)malloc(nc * sizeof(WCHAR));
 #endif
-    if (MultiByteToWideChar(CP_UTF8, 0, s, -1, wb, nc) == 0) {
-        errfn("Windows error %d on MultiByteToWideChar", GetLastError());
-    }
-    return wb;
+	if (MultiByteToWideChar(CP_UTF8, 0, s, -1, wb, nc) == 0) {
+		errfn("Windows error %d on MultiByteToWideChar", GetLastError());
+	}
+	return wb;
 }
 
 static const char *wcs2mbs(const WCHAR *s, int use_gc,
                            void (*errfn)(const char*, ...))
 {
-    char *mb;
-    int nb = WideCharToMultiByte(CP_UTF8, 0, s, -1, NULL, 0, 0, 0);
-    if (nb == 0) {
-        errfn("Windows error %d on WideCharToMultiByte", GetLastError());
-    }
+	char *mb;
+	int nb = WideCharToMultiByte(CP_UTF8, 0, s, -1, NULL, 0, 0, 0);
+	if (nb == 0) {
+		errfn("Windows error %d on WideCharToMultiByte", GetLastError());
+	}
 #if defined(GAUCHE_H)
-    if (use_gc) mb = SCM_NEW_ATOMIC_ARRAY(char, nb);
-    else        mb = (char*)malloc(nb);
+	if (use_gc) mb = SCM_NEW_ATOMIC_ARRAY(char, nb);
+	else mb = (char*)malloc(nb);
 #else
-    (void)use_gc; /* suppress unused var warning */
-    mb = (char*)malloc(nb);
+	(void)use_gc; /* suppress unused var warning */
+	mb = (char*)malloc(nb);
 #endif
-    if (WideCharToMultiByte(CP_UTF8, 0, s, -1, mb, nb, 0, 0) == 0) {
-        errfn("Windows error %d on WideCharToMultiByte", GetLastError());
-    }
-    return mb;
+	if (WideCharToMultiByte(CP_UTF8, 0, s, -1, mb, nb, 0, 0) == 0) {
+		errfn("Windows error %d on WideCharToMultiByte", GetLastError());
+	}
+	return mb;
 }
 

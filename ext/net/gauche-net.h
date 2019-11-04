@@ -79,8 +79,8 @@ SCM_DECL_BEGIN
 /* windows stuff */
 #if defined(GAUCHE_WINDOWS)
 struct sockaddr_un {
-    unsigned short sun_family;
-    char sun_path[108];
+	unsigned short sun_family;
+	char sun_path[108];
 };
 
 #if !defined(InetNtopA)
@@ -98,8 +98,8 @@ const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);
 /* for MinGW32 runtime v5.0 */
 #if defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR) && (__MINGW32_MAJOR_VERSION >= 5)
 void WSAAPI freeaddrinfo(struct addrinfo*);
-int  WSAAPI getaddrinfo(const char*, const char*, const struct addrinfo*, struct addrinfo**);
-int  WSAAPI getnameinfo(const struct sockaddr*, socklen_t, char*, DWORD, char*, DWORD, int);
+int WSAAPI getaddrinfo(const char*, const char*, const struct addrinfo*, struct addrinfo**);
+int WSAAPI getnameinfo(const struct sockaddr*, socklen_t, char*, DWORD, char*, DWORD, int);
 #endif /* defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR) && (__MINGW32_MAJOR_VERSION >= 5) */
 #endif /* HAVE_IPV6 */
 #endif /*GAUCHE_WINDOWS*/
@@ -113,7 +113,7 @@ int  WSAAPI getnameinfo(const struct sockaddr*, socklen_t, char*, DWORD, char*, 
  */
 
 #if !defined(HAVE_STRUCT_SOCKADDR_STORAGE) && !defined(_MSC_VER) \
-    && !defined(_SS_MAXSIZE)
+        && !defined(_SS_MAXSIZE)
 /* Alternative implementation in case the system doesn't provide
    sockaddr_storage.  The code is based on the reference implementation
    provided in RFC3493.
@@ -125,13 +125,13 @@ int  WSAAPI getnameinfo(const struct sockaddr*, socklen_t, char*, DWORD, char*, 
 
 #define _SS_PAD1SIZE   (_SS_ALIGNSIZE - sizeof(sa_family_t))
 #define _SS_PAD2SIZE   (_SS_MAXSIZE - (sizeof(sa_family_t) + \
-                                      _SS_PAD1SIZE + _SS_ALIGNSIZE))
+	                               _SS_PAD1SIZE + _SS_ALIGNSIZE))
 
 struct sockaddr_storage {
-    sa_family_t  ss_family;
-    char      __ss_pad1[_SS_PAD1SIZE];
-    int64_t   __ss_align;     /* force alignment */
-    char      __ss_pad2[_SS_PAD2SIZE];
+	sa_family_t ss_family;
+	char __ss_pad1[_SS_PAD1SIZE];
+	int64_t __ss_align;   /* force alignment */
+	char __ss_pad2[_SS_PAD2SIZE];
 };
 
 #endif /*HAVE_STRUCT_SOCKADDR_STORAGE*/
@@ -148,9 +148,9 @@ struct sockaddr_storage {
    bound to global variables. */
 
 typedef struct ScmSockAddrRec {
-    SCM_HEADER;
-    socklen_t addrlen;
-    struct sockaddr addr;
+	SCM_HEADER;
+	socklen_t addrlen;
+	struct sockaddr addr;
 } ScmSockAddr;
 
 SCM_CLASS_DECL(Scm_SockAddrClass);
@@ -171,18 +171,18 @@ extern ScmGeneric Scm_GenericSockAddrAddr;
 extern ScmGeneric Scm_GenericSockAddrPort;
 
 typedef struct ScmSockAddrUnRec {
-    SCM_HEADER;
-    int addrlen;
-    struct sockaddr_un addr;
+	SCM_HEADER;
+	int addrlen;
+	struct sockaddr_un addr;
 } ScmSockAddrUn;
 
 SCM_CLASS_DECL(Scm_SockAddrUnClass);
 #define SCM_CLASS_SOCKADDR_UN   (&Scm_SockAddrUnClass)
 
 typedef struct ScmSockAddrInRec {
-    SCM_HEADER;
-    int addrlen;
-    struct sockaddr_in addr;
+	SCM_HEADER;
+	int addrlen;
+	struct sockaddr_in addr;
 } ScmSockAddrIn;
 
 SCM_CLASS_DECL(Scm_SockAddrInClass);
@@ -191,9 +191,9 @@ SCM_CLASS_DECL(Scm_SockAddrInClass);
 #ifdef HAVE_IPV6
 
 typedef struct ScmSockAddrIn6Rec {
-    SCM_HEADER;
-    int addrlen;
-    struct sockaddr_in6 addr;
+	SCM_HEADER;
+	int addrlen;
+	struct sockaddr_in6 addr;
 } ScmSockAddrIn6;
 
 SCM_CLASS_DECL(Scm_SockAddrIn6Class);
@@ -213,18 +213,18 @@ extern ScmObj Scm_InetAddressToString(ScmObj addr, int proto);
  */
 
 typedef struct ScmSocketRec {
-    SCM_HEADER;
-    Socket fd;                     /* INVALID_SOCKET if closed */
-    int status;
-    int type;
-    ScmSockAddr *address;
-    ScmPort *inPort;
-    ScmPort *outPort;
-    ScmString *name;
+	SCM_HEADER;
+	Socket fd;                 /* INVALID_SOCKET if closed */
+	int status;
+	int type;
+	ScmSockAddr *address;
+	ScmPort *inPort;
+	ScmPort *outPort;
+	ScmString *name;
 #if defined(GAUCHE_WINDOWS)
-    /* Save a C run-time file descriptor so that we can close it
-       when the socket is closed. */
-    int cfd;
+	/* Save a C run-time file descriptor so that we can close it
+	   when the socket is closed. */
+	int cfd;
 #endif /*GAUCHE_WINDOWS*/
 } ScmSocket;
 
@@ -237,12 +237,12 @@ typedef struct ScmSocketRec {
 #endif /* !GAUCHE_WINDOWS */
 
 enum {
-    SCM_SOCKET_STATUS_NONE,
-    SCM_SOCKET_STATUS_BOUND,
-    SCM_SOCKET_STATUS_LISTENING,
-    SCM_SOCKET_STATUS_CONNECTED,
-    SCM_SOCKET_STATUS_SHUTDOWN,
-    SCM_SOCKET_STATUS_CLOSED
+	SCM_SOCKET_STATUS_NONE,
+	SCM_SOCKET_STATUS_BOUND,
+	SCM_SOCKET_STATUS_LISTENING,
+	SCM_SOCKET_STATUS_CONNECTED,
+	SCM_SOCKET_STATUS_SHUTDOWN,
+	SCM_SOCKET_STATUS_CLOSED
 };
 
 SCM_CLASS_DECL(Scm_SocketClass);
@@ -292,10 +292,10 @@ extern ScmObj Scm_SocketIoctl(ScmSocket *s, u_long requiest, ScmObj data);
  * Host entry
  */
 typedef struct ScmSysHostentRec {
-    SCM_HEADER;
-    ScmObj name;                /* Scheme string of the host */
-    ScmObj aliases;             /* list of aliases */
-    ScmObj addresses;           /* list of addresses */
+	SCM_HEADER;
+	ScmObj name;            /* Scheme string of the host */
+	ScmObj aliases;         /* list of aliases */
+	ScmObj addresses;       /* list of addresses */
 } ScmSysHostent;
 
 SCM_CLASS_DECL(Scm_SysHostentClass);
@@ -312,10 +312,10 @@ extern int Scm_HostNameToAddr(const char *name, char *addrbuf, int *addrlen);
  */
 
 typedef struct ScmSysProtoentRec {
-    SCM_HEADER;
-    ScmObj name;
-    ScmObj aliases;
-    ScmObj proto;
+	SCM_HEADER;
+	ScmObj name;
+	ScmObj aliases;
+	ScmObj proto;
 } ScmSysProtoent;
 
 SCM_CLASS_DECL(Scm_SysProtoentClass);
@@ -331,11 +331,11 @@ extern ScmObj Scm_GetProtoByNumber(int proto);
  */
 
 typedef struct ScmSysServentRec {
-    SCM_HEADER;
-    ScmObj name;
-    ScmObj aliases;
-    ScmObj port;
-    ScmObj proto;
+	SCM_HEADER;
+	ScmObj name;
+	ScmObj aliases;
+	ScmObj port;
+	ScmObj proto;
 } ScmSysServent;
 
 SCM_CLASS_DECL(Scm_SysServentClass);
@@ -353,14 +353,14 @@ extern ScmObj Scm_GetServByPort(int port, const char *proto);
 #ifdef HAVE_IPV6
 
 typedef struct ScmSysAddrinfoRec {
-    SCM_HEADER;
-    int flags;
-    int family;
-    int socktype;
-    int protocol;
-    socklen_t addrlen;
-    ScmString *canonname;
-    ScmSockAddr *addr;
+	SCM_HEADER;
+	int flags;
+	int family;
+	int socktype;
+	int protocol;
+	socklen_t addrlen;
+	ScmString *canonname;
+	ScmSockAddr *addr;
 } ScmSysAddrinfo;
 
 SCM_CLASS_DECL(Scm_SysAddrinfoClass);

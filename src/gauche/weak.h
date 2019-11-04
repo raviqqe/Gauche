@@ -52,9 +52,9 @@ SCM_EXTERN void       *Scm_WeakBoxRef(ScmWeakBox *wbox);
  */
 
 typedef struct ScmWeakVectorRec {
-    SCM_HEADER;
-    ScmSmallInt size;
-    void *pointers;  /* opaque */
+	SCM_HEADER;
+	ScmSmallInt size;
+	void *pointers; /* opaque */
 } ScmWeakVector;
 
 #define SCM_WEAK_VECTOR(obj)   ((ScmWeakVector*)(obj))
@@ -73,26 +73,26 @@ SCM_EXTERN ScmObj Scm_WeakVectorSet(ScmWeakVector *v,
  */
 
 typedef enum {
-    SCM_WEAK_KEY   = (1L<<0),
-    SCM_WEAK_VALUE = (1L<<1),
-    SCM_WEAK_BOTH  = (SCM_WEAK_KEY|SCM_WEAK_VALUE)
+	SCM_WEAK_KEY   = (1L<<0),
+	SCM_WEAK_VALUE = (1L<<1),
+	SCM_WEAK_BOTH  = (SCM_WEAK_KEY|SCM_WEAK_VALUE)
 } ScmWeakness;
 
 
 typedef struct ScmWeakHashTableRec {
-    SCM_HEADER;
-    ScmWeakness weakness;
-    ScmHashType type;
-    ScmHashCore core;
-    ScmObj      defaultValue;
-    ScmHashProc        *hashfn;
-    ScmHashCompareProc *cmpfn;
-    u_int       goneEntries;
+	SCM_HEADER;
+	ScmWeakness weakness;
+	ScmHashType type;
+	ScmHashCore core;
+	ScmObj defaultValue;
+	ScmHashProc        *hashfn;
+	ScmHashCompareProc *cmpfn;
+	u_int goneEntries;
 } ScmWeakHashTable;
 
 typedef struct ScmWeakHashIterRec {
-    ScmWeakHashTable *table;
-    ScmHashIter iter;
+	ScmWeakHashTable *table;
+	ScmHashIter iter;
 } ScmWeakHashIter;
 
 

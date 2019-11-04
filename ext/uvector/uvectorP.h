@@ -43,99 +43,99 @@
  */
 static void range_error(const char *type, ScmObj obj)
 {
-    if (SCM_INTP(obj) && SCM_INT_VALUE(obj) == 0) {
-        Scm_Error("value out of domain for %svector", type);
-    } else {
-        Scm_Error("value out of domain for %svector: %S", type, obj);
-    }
+	if (SCM_INTP(obj) && SCM_INT_VALUE(obj) == 0) {
+		Scm_Error("value out of domain for %svector", type);
+	} else {
+		Scm_Error("value out of domain for %svector: %S", type, obj);
+	}
 }
 
 static inline long range_s8hi(long val, int clamp)
 {
-    if (!(clamp & SCM_CLAMP_HI)) range_error("s8", Scm_MakeInteger(val));
-    return 127;
+	if (!(clamp & SCM_CLAMP_HI)) range_error("s8", Scm_MakeInteger(val));
+	return 127;
 }
 
 static inline long range_s8lo(long val, int clamp)
 {
-    if (!(clamp & SCM_CLAMP_LO)) range_error("s8", Scm_MakeInteger(val));
-    return -128;
+	if (!(clamp & SCM_CLAMP_LO)) range_error("s8", Scm_MakeInteger(val));
+	return -128;
 }
 
 static inline long clamp_s8(long val, int clamp)
 {
-    if (val > 127)  return range_s8hi(val, clamp);
-    if (val < -128) return range_s8lo(val, clamp);
-    return val;
+	if (val > 127) return range_s8hi(val, clamp);
+	if (val < -128) return range_s8lo(val, clamp);
+	return val;
 }
 
 static inline long range_u8hi(long val, int clamp)
 {
-    if (!(clamp & SCM_CLAMP_HI)) range_error("u8", Scm_MakeInteger(val));
-    return 255;
+	if (!(clamp & SCM_CLAMP_HI)) range_error("u8", Scm_MakeInteger(val));
+	return 255;
 }
 
 static inline long range_u8lo(long val, int clamp)
 {
-    if (!(clamp & SCM_CLAMP_LO)) range_error("u8", Scm_MakeInteger(val));
-    return 0;
+	if (!(clamp & SCM_CLAMP_LO)) range_error("u8", Scm_MakeInteger(val));
+	return 0;
 }
 
 static inline long clamp_u8(long val, int clamp)
 {
-    if (val > 255)  return range_u8hi(val, clamp);
-    if (val < 0)    return range_u8lo(val, clamp);
-    return val;
+	if (val > 255) return range_u8hi(val, clamp);
+	if (val < 0) return range_u8lo(val, clamp);
+	return val;
 }
 
 static inline long range_s16hi(long val, int clamp)
 {
-    if (!(clamp & SCM_CLAMP_HI)) range_error("s16", Scm_MakeInteger(val));
-    return 32767;
+	if (!(clamp & SCM_CLAMP_HI)) range_error("s16", Scm_MakeInteger(val));
+	return 32767;
 }
 
 static inline long range_s16lo(long val, int clamp)
 {
-    if (!(clamp & SCM_CLAMP_LO)) range_error("s16", Scm_MakeInteger(val));
-    return -32768;
+	if (!(clamp & SCM_CLAMP_LO)) range_error("s16", Scm_MakeInteger(val));
+	return -32768;
 }
 
 static inline long clamp_s16(long val, int clamp)
 {
-    if (val > 32767)  return range_s16hi(val, clamp);
-    if (val < -32768) return range_s16lo(val, clamp);
-    return val;
+	if (val > 32767) return range_s16hi(val, clamp);
+	if (val < -32768) return range_s16lo(val, clamp);
+	return val;
 }
 
 static inline long range_u16hi(long val, int clamp)
 {
-    if (!(clamp & SCM_CLAMP_HI)) range_error("u16", Scm_MakeInteger(val));
-    return 65535;
+	if (!(clamp & SCM_CLAMP_HI)) range_error("u16", Scm_MakeInteger(val));
+	return 65535;
 }
 
 static inline long range_u16lo(long val, int clamp)
 {
-    if (!(clamp & SCM_CLAMP_LO)) range_error("u16", Scm_MakeInteger(val));
-    return 0;
+	if (!(clamp & SCM_CLAMP_LO)) range_error("u16", Scm_MakeInteger(val));
+	return 0;
 }
 
 static inline long clamp_u16(long val, int clamp)
 {
-    if (val > 65535)  return range_u16hi(val, clamp);
-    if (val < 0)      return range_u16lo(val, clamp);
-    return val;
+	if (val > 65535) return range_u16hi(val, clamp);
+	if (val < 0) return range_u16lo(val, clamp);
+	return val;
 }
 
 static inline long range_s32hi(long val, int clamp)
 {
-    if (!(clamp & SCM_CLAMP_HI)) range_error("s32", Scm_MakeInteger(val));
-    return 2147483647L;
+	if (!(clamp & SCM_CLAMP_HI)) range_error("s32", Scm_MakeInteger(val));
+	return 2147483647L;
 }
 
 static inline long range_s32lo(long val, int clamp)
 {
-    if (!(clamp & SCM_CLAMP_LO)) range_error("s32", Scm_MakeInteger(val));
-    return -2147483647L-1;
+	if (!(clamp & SCM_CLAMP_LO)) range_error("s32", Scm_MakeInteger(val));
+	return -2147483647L-1;
 }
 
 #if SIZEOF_LONG == 4
@@ -143,22 +143,22 @@ static inline long range_s32lo(long val, int clamp)
 #else
 static inline long clamp_s32(long val, int clamp)
 {
-    if (val > 2147483647L)  return range_s32hi(val, clamp);
-    if (val < -2147483648L) return range_s32lo(val, clamp);
-    return val;
+	if (val > 2147483647L) return range_s32hi(val, clamp);
+	if (val < -2147483648L) return range_s32lo(val, clamp);
+	return val;
 }
 #endif
 
 static inline long range_u32hi(u_long val, int clamp)
 {
-    if (!(clamp & SCM_CLAMP_HI)) range_error("u32", Scm_MakeIntegerU(val));
-    return 4294967295UL;
+	if (!(clamp & SCM_CLAMP_HI)) range_error("u32", Scm_MakeIntegerU(val));
+	return 4294967295UL;
 }
 
 static inline long range_u32lo(u_long val, int clamp)
 {
-    if (!(clamp & SCM_CLAMP_LO)) range_error("u32", Scm_MakeIntegerU(val));
-    return 0;
+	if (!(clamp & SCM_CLAMP_LO)) range_error("u32", Scm_MakeIntegerU(val));
+	return 0;
 }
 
 #if SIZEOF_LONG == 4
@@ -166,37 +166,37 @@ static inline long range_u32lo(u_long val, int clamp)
 #else
 static inline long clamp_u32(u_long val, int clamp)
 {
-    if (val > 4294967295UL)    return range_u32hi(val, clamp);
-    return val;
+	if (val > 4294967295UL) return range_u32hi(val, clamp);
+	return val;
 }
 #endif
 
 static inline int64_t range_s64hi(int64_t val, int clamp)
 {
-    if (!(clamp & SCM_CLAMP_HI)) range_error("s64", Scm_MakeInteger64(val));
-    val = INT64_MAX;
-    return val;
+	if (!(clamp & SCM_CLAMP_HI)) range_error("s64", Scm_MakeInteger64(val));
+	val = INT64_MAX;
+	return val;
 }
 
 static inline int64_t range_s64lo(int64_t val, int clamp)
 {
-    if (!(clamp & SCM_CLAMP_LO)) range_error("s64", Scm_MakeInteger64(val));
-    val = INT64_MIN;
-    return val;
+	if (!(clamp & SCM_CLAMP_LO)) range_error("s64", Scm_MakeInteger64(val));
+	val = INT64_MIN;
+	return val;
 }
 
 static inline uint64_t range_u64hi(uint64_t val, int clamp)
 {
-    if (!(clamp & SCM_CLAMP_HI)) range_error("u64", Scm_MakeIntegerU64(val));
-    val = UINT64_MAX;
-    return val;
+	if (!(clamp & SCM_CLAMP_HI)) range_error("u64", Scm_MakeIntegerU64(val));
+	val = UINT64_MAX;
+	return val;
 }
 
 static inline uint64_t range_u64lo(uint64_t val, int clamp)
 {
-    if (!(clamp & SCM_CLAMP_LO)) range_error("u64", Scm_MakeIntegerU64(val));
-    val = 0;
-    return val;
+	if (!(clamp & SCM_CLAMP_LO)) range_error("u64", Scm_MakeIntegerU64(val));
+	val = 0;
+	return val;
 }
 
 /*
@@ -204,9 +204,9 @@ static inline uint64_t range_u64lo(uint64_t val, int clamp)
  */
 
 enum {
-    SWAPB_STD,                  /* simple swapping */
-    SWAPB_ARM_LE,               /* arm-little-endian <-> little-endian */
-    SWAPB_ARM_BE                /* arm-little-endian <-> big-endian */
+	SWAPB_STD,              /* simple swapping */
+	SWAPB_ARM_LE,           /* arm-little-endian <-> little-endian */
+	SWAPB_ARM_BE            /* arm-little-endian <-> big-endian */
 };
 
 

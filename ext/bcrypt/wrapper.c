@@ -34,8 +34,8 @@
 #endif
 #endif
 
-#define CRYPT_OUTPUT_SIZE		(7 + 22 + 31 + 1)
-#define CRYPT_GENSALT_OUTPUT_SIZE	(7 + 22 + 1)
+#define CRYPT_OUTPUT_SIZE               (7 + 22 + 31 + 1)
+#define CRYPT_GENSALT_OUTPUT_SIZE       (7 + 22 + 1)
 
 #if defined(__GLIBC__) && defined(_LIBC)
 #define __SKIP_GNU
@@ -49,11 +49,11 @@
 /* crypt.h from glibc-crypt-2.1 will define struct crypt_data for us */
 #include "crypt.h"
 extern char *__md5_crypt_r(const char *key, const char *salt,
-	char *buffer, int buflen);
+                           char *buffer, int buflen);
 /* crypt-entry.c needs to be patched to define __des_crypt_r rather than
  * __crypt_r, and not define crypt_r and crypt at all */
 extern char *__des_crypt_r(const char *key, const char *salt,
-	struct crypt_data *data);
+                           struct crypt_data *data);
 extern struct crypt_data _ufc_foobar;
 #endif
 
@@ -85,7 +85,7 @@ static int _crypt_data_alloc(void **data, int *size, int need)
 }
 
 static char *_crypt_retval_magic(char *retval, const char *setting,
-	char *output, int size)
+                                 char *output, int size)
 {
 	if (retval)
 		return retval;
@@ -110,7 +110,7 @@ static char *_crypt_retval_magic(char *retval, const char *setting,
  */
 
 char *__crypt_rn(__const char *key, __const char *setting,
-	void *data, int size)
+                 void *data, int size)
 {
 	if (setting[0] == '$' && setting[1] == '2')
 		return _crypt_blowfish_rn(key, setting, (char *)data, size);
@@ -127,7 +127,7 @@ char *__crypt_rn(__const char *key, __const char *setting,
 }
 
 char *__crypt_ra(__const char *key, __const char *setting,
-	void **data, int *size)
+                 void **data, int *size)
 {
 	if (setting[0] == '$' && setting[1] == '2') {
 		if (_crypt_data_alloc(data, size, CRYPT_OUTPUT_SIZE))
@@ -149,7 +149,7 @@ char *__crypt_ra(__const char *key, __const char *setting,
 }
 
 char *__crypt_r(__const char *key, __const char *setting,
-	struct crypt_data *data)
+                struct crypt_data *data)
 {
 	return _crypt_retval_magic(
 		__crypt_rn(key, setting, data, sizeof(*data)),
@@ -169,7 +169,7 @@ char *crypt_rn(const char *key, const char *setting, void *data, int size)
 }
 
 char *crypt_ra(const char *key, const char *setting,
-	void **data, int *size)
+               void **data, int *size)
 {
 	if (_crypt_data_alloc(data, size, CRYPT_OUTPUT_SIZE))
 		return NULL;
@@ -198,11 +198,11 @@ char *crypt(const char *key, const char *setting)
 #endif
 
 char *__crypt_gensalt_rn(const char *prefix, unsigned long count,
-	const char *input, int size, char *output, int output_size)
+                         const char *input, int size, char *output, int output_size)
 {
 	char *(*use)(const char *_prefix, unsigned long _count,
-		const char *_input, int _size,
-		char *_output, int _output_size);
+	             const char *_input, int _size,
+	             char *_output, int _output_size);
 
 	/* This may be supported on some platforms in the future */
 	if (!input) {
@@ -222,8 +222,8 @@ char *__crypt_gensalt_rn(const char *prefix, unsigned long count,
 	else
 	if (!prefix[0] ||
 	    (prefix[0] && prefix[1] &&
-	    memchr(_crypt_itoa64, prefix[0], 64) &&
-	    memchr(_crypt_itoa64, prefix[1], 64)))
+	     memchr(_crypt_itoa64, prefix[0], 64) &&
+	     memchr(_crypt_itoa64, prefix[1], 64)))
 		use = _crypt_gensalt_traditional_rn;
 	else {
 		__set_errno(EINVAL);
@@ -234,13 +234,13 @@ char *__crypt_gensalt_rn(const char *prefix, unsigned long count,
 }
 
 char *__crypt_gensalt_ra(const char *prefix, unsigned long count,
-	const char *input, int size)
+                         const char *input, int size)
 {
 	char output[CRYPT_GENSALT_OUTPUT_SIZE];
 	char *retval;
 
 	retval = __crypt_gensalt_rn(prefix, count,
-		input, size, output, sizeof(output));
+	                            input, size, output, sizeof(output));
 
 	if (retval) {
 		retval = strdup(retval);
@@ -255,12 +255,12 @@ char *__crypt_gensalt_ra(const char *prefix, unsigned long count,
 }
 
 char *__crypt_gensalt(const char *prefix, unsigned long count,
-	const char *input, int size)
+                      const char *input, int size)
 {
 	static char output[CRYPT_GENSALT_OUTPUT_SIZE];
 
 	return __crypt_gensalt_rn(prefix, count,
-		input, size, output, sizeof(output));
+	                          input, size, output, sizeof(output));
 }
 
 #if defined(__GLIBC__) && defined(_LIBC)
@@ -277,79 +277,79 @@ weak_alias(crypt, fcrypt)
 #ifdef TEST
 static const char *tests[][3] = {
 	{"$2a$05$CCCCCCCCCCCCCCCCCCCCC.E5YPO9kmyuRGyh0XouQYb4YMJKvyOeW",
-		"U*U"},
+	 "U*U"},
 	{"$2a$05$CCCCCCCCCCCCCCCCCCCCC.VGOzA784oUp/Z0DY336zx7pLYAy0lwK",
-		"U*U*"},
+	 "U*U*"},
 	{"$2a$05$XXXXXXXXXXXXXXXXXXXXXOAcXxm9kjPGEMsLznoKqmqw7tc8WCx4a",
-		"U*U*U"},
+	 "U*U*U"},
 	{"$2a$05$abcdefghijklmnopqrstuu5s2v8.iXieOjg/.AySBTTZIIVFJeBui",
-		"0123456789abcdefghijklmnopqrstuvwxyz"
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-		"chars after 72 are ignored"},
+	 "0123456789abcdefghijklmnopqrstuvwxyz"
+	 "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	 "chars after 72 are ignored"},
 	{"$2x$05$/OK.fbVrR/bpIqNJ5ianF.CE5elHaaO4EbggVDjb8P19RukzXSM3e",
-		"\xa3"},
+	 "\xa3"},
 	{"$2x$05$/OK.fbVrR/bpIqNJ5ianF.CE5elHaaO4EbggVDjb8P19RukzXSM3e",
-		"\xff\xff\xa3"},
+	 "\xff\xff\xa3"},
 	{"$2y$05$/OK.fbVrR/bpIqNJ5ianF.CE5elHaaO4EbggVDjb8P19RukzXSM3e",
-		"\xff\xff\xa3"},
+	 "\xff\xff\xa3"},
 	{"$2a$05$/OK.fbVrR/bpIqNJ5ianF.nqd1wy.pTMdcvrRWxyiGL2eMz.2a85.",
-		"\xff\xff\xa3"},
+	 "\xff\xff\xa3"},
 	{"$2b$05$/OK.fbVrR/bpIqNJ5ianF.CE5elHaaO4EbggVDjb8P19RukzXSM3e",
-		"\xff\xff\xa3"},
+	 "\xff\xff\xa3"},
 	{"$2y$05$/OK.fbVrR/bpIqNJ5ianF.Sa7shbm4.OzKpvFnX1pQLmQW96oUlCq",
-		"\xa3"},
+	 "\xa3"},
 	{"$2a$05$/OK.fbVrR/bpIqNJ5ianF.Sa7shbm4.OzKpvFnX1pQLmQW96oUlCq",
-		"\xa3"},
+	 "\xa3"},
 	{"$2b$05$/OK.fbVrR/bpIqNJ5ianF.Sa7shbm4.OzKpvFnX1pQLmQW96oUlCq",
-		"\xa3"},
+	 "\xa3"},
 	{"$2x$05$/OK.fbVrR/bpIqNJ5ianF.o./n25XVfn6oAPaUvHe.Csk4zRfsYPi",
-		"1\xa3" "345"},
+	 "1\xa3" "345"},
 	{"$2x$05$/OK.fbVrR/bpIqNJ5ianF.o./n25XVfn6oAPaUvHe.Csk4zRfsYPi",
-		"\xff\xa3" "345"},
+	 "\xff\xa3" "345"},
 	{"$2x$05$/OK.fbVrR/bpIqNJ5ianF.o./n25XVfn6oAPaUvHe.Csk4zRfsYPi",
-		"\xff\xa3" "34" "\xff\xff\xff\xa3" "345"},
+	 "\xff\xa3" "34" "\xff\xff\xff\xa3" "345"},
 	{"$2y$05$/OK.fbVrR/bpIqNJ5ianF.o./n25XVfn6oAPaUvHe.Csk4zRfsYPi",
-		"\xff\xa3" "34" "\xff\xff\xff\xa3" "345"},
+	 "\xff\xa3" "34" "\xff\xff\xff\xa3" "345"},
 	{"$2a$05$/OK.fbVrR/bpIqNJ5ianF.ZC1JEJ8Z4gPfpe1JOr/oyPXTWl9EFd.",
-		"\xff\xa3" "34" "\xff\xff\xff\xa3" "345"},
+	 "\xff\xa3" "34" "\xff\xff\xff\xa3" "345"},
 	{"$2y$05$/OK.fbVrR/bpIqNJ5ianF.nRht2l/HRhr6zmCp9vYUvvsqynflf9e",
-		"\xff\xa3" "345"},
+	 "\xff\xa3" "345"},
 	{"$2a$05$/OK.fbVrR/bpIqNJ5ianF.nRht2l/HRhr6zmCp9vYUvvsqynflf9e",
-		"\xff\xa3" "345"},
+	 "\xff\xa3" "345"},
 	{"$2a$05$/OK.fbVrR/bpIqNJ5ianF.6IflQkJytoRVc1yuaNtHfiuq.FRlSIS",
-		"\xa3" "ab"},
+	 "\xa3" "ab"},
 	{"$2x$05$/OK.fbVrR/bpIqNJ5ianF.6IflQkJytoRVc1yuaNtHfiuq.FRlSIS",
-		"\xa3" "ab"},
+	 "\xa3" "ab"},
 	{"$2y$05$/OK.fbVrR/bpIqNJ5ianF.6IflQkJytoRVc1yuaNtHfiuq.FRlSIS",
-		"\xa3" "ab"},
+	 "\xa3" "ab"},
 	{"$2x$05$6bNw2HLQYeqHYyBfLMsv/OiwqTymGIGzFsA4hOTWebfehXHNprcAS",
-		"\xd1\x91"},
+	 "\xd1\x91"},
 	{"$2x$05$6bNw2HLQYeqHYyBfLMsv/O9LIGgn8OMzuDoHfof8AQimSGfcSWxnS",
-		"\xd0\xc1\xd2\xcf\xcc\xd8"},
+	 "\xd0\xc1\xd2\xcf\xcc\xd8"},
 	{"$2a$05$/OK.fbVrR/bpIqNJ5ianF.swQOIzjOiJ9GHEPuhEkvqrUyvWhEMx6",
-		"\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-		"\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-		"\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-		"\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-		"\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-		"\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-		"chars after 72 are ignored as usual"},
+	 "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
+	 "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
+	 "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
+	 "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
+	 "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
+	 "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
+	 "chars after 72 are ignored as usual"},
 	{"$2a$05$/OK.fbVrR/bpIqNJ5ianF.R9xrDjiycxMbQE2bp.vgqlYpW5wx2yy",
-		"\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55"
-		"\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55"
-		"\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55"
-		"\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55"
-		"\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55"
-		"\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55"},
+	 "\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55"
+	 "\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55"
+	 "\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55"
+	 "\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55"
+	 "\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55"
+	 "\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55\xaa\x55"},
 	{"$2a$05$/OK.fbVrR/bpIqNJ5ianF.9tQZzcJfm3uj2NvJ/n5xkhpqLrMpWCe",
-		"\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff"
-		"\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff"
-		"\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff"
-		"\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff"
-		"\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff"
-		"\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff"},
+	 "\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff"
+	 "\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff"
+	 "\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff"
+	 "\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff"
+	 "\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff"
+	 "\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff\x55\xaa\xff"},
 	{"$2a$05$CCCCCCCCCCCCCCCCCCCCC.7uG0VCzI2bS7j6ymqJi9CdcdxiRTWNy",
-		""},
+	 ""},
 	{"*0", "", "$2a$03$CCCCCCCCCCCCCCCCCCCCC."},
 	{"*0", "", "$2a$32$CCCCCCCCCCCCCCCCCCCCC."},
 	{"*0", "", "$2c$05$CCCCCCCCCCCCCCCCCCCCC."},
@@ -360,7 +360,7 @@ static const char *tests[][3] = {
 	{NULL}
 };
 
-#define which				tests[0]
+#define which                           tests[0]
 
 static volatile sig_atomic_t running;
 
@@ -390,7 +390,7 @@ static void *run(void *arg)
 
 		if (strcmp(crypt_ra(key, hash, &data, &size), hash)) {
 			printf("%d: FAILED (crypt_ra/%d/%lu)\n",
-				(int)((char *)arg - (char *)0), i, count);
+			       (int)((char *)arg - (char *)0), i, count);
 			free(data);
 			return NULL;
 		}
@@ -518,8 +518,8 @@ int main(void)
 	if (end_virtual == start_virtual) end_virtual++;
 
 	printf("%.1f c/s real, %.1f c/s virtual\n",
-		(float)count * clk_tck / (end_real - start_real),
-		(float)count * clk_tck / (end_virtual - start_virtual));
+	       (float)count * clk_tck / (end_real - start_real),
+	       (float)count * clk_tck / (end_virtual - start_virtual));
 
 #ifdef TEST_THREADS
 	running = 1;
@@ -528,10 +528,10 @@ int main(void)
 	start_real = times(&buf);
 
 	for (i = 0; i < TEST_THREADS; i++)
-	if (pthread_create(&t[i], NULL, run, i + (char *)0)) {
-		perror("pthread_create");
-		return 1;
-	}
+		if (pthread_create(&t[i], NULL, run, i + (char *)0)) {
+			perror("pthread_create");
+			return 1;
+		}
 
 	for (i = 0; i < TEST_THREADS; i++) {
 		if (pthread_join(t[i], &t_retval)) {
@@ -542,7 +542,7 @@ int main(void)
 		count = (char *)t_retval - (char *)0;
 		end_real = times(&buf);
 		printf("%d: %.1f c/s real\n", i,
-			(float)count * clk_tck / (end_real - start_real));
+		       (float)count * clk_tck / (end_real - start_real));
 	}
 #endif
 

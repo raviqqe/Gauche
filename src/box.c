@@ -71,17 +71,17 @@
 static void box_print(ScmObj obj, ScmPort *port,
                       ScmWriteContext *ctx SCM_UNUSED)
 {
-    Scm_Printf(port, "#<box %S>", SCM_BOX_VALUE(obj));
+	Scm_Printf(port, "#<box %S>", SCM_BOX_VALUE(obj));
 }
 
 static int box_compare(ScmObj x, ScmObj y, int equalp)
 {
-    if (equalp) {
-        /* should return 0 if x == y */
-        return (Scm_EqualP(SCM_BOX_VALUE(x), SCM_BOX_VALUE(y))? 0:1);
-    } else {
-        return Scm_Compare(SCM_BOX_VALUE(x), SCM_BOX_VALUE(y));
-    }
+	if (equalp) {
+		/* should return 0 if x == y */
+		return (Scm_EqualP(SCM_BOX_VALUE(x), SCM_BOX_VALUE(y)) ? 0 : 1);
+	} else {
+		return Scm_Compare(SCM_BOX_VALUE(x), SCM_BOX_VALUE(y));
+	}
 }
 
 SCM_DEFINE_BUILTIN_CLASS(Scm_BoxClass, box_print, box_compare,
@@ -89,8 +89,8 @@ SCM_DEFINE_BUILTIN_CLASS(Scm_BoxClass, box_print, box_compare,
 
 ScmBox *Scm_MakeBox(ScmObj value)
 {
-    ScmBox *b = SCM_NEW(ScmBox);
-    SCM_SET_CLASS(b, &Scm_BoxClass);
-    SCM_BOX_SET(b, value);
-    return b;
+	ScmBox *b = SCM_NEW(ScmBox);
+	SCM_SET_CLASS(b, &Scm_BoxClass);
+	SCM_BOX_SET(b, value);
+	return b;
 }

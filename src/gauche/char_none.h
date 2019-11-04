@@ -61,10 +61,10 @@
 #define SCM_CHAR_PUT(cp, ch)  (*(cp) = (ch))
 
 #define SCM_CHAR_BACKWARD(cp, start, result)    \
-    do {                                        \
-        if ((cp) > (start)) (result) = (cp)-1;  \
-        else (result) = NULL;                   \
-    } while (0)
+	do {                                        \
+		if ((cp) > (start)) (result) = (cp)-1;  \
+		else (result) = NULL;                   \
+	} while (0)
 
 /* C is an ScmChar > 0x80.  Returns true if C is a whitespace character. */
 #define SCM_CHAR_EXTRA_WHITESPACE(c)  ((c) == 0xa0) /* nbws */
@@ -80,43 +80,43 @@
 /* Array of character encoding names, recognizable by iconv, that are
    compatible with this native encoding. */
 static const char *supportedCharacterEncodings[] = {
-    "NONE",
-    "ASCII",
-    "US-ASCII",
-    "ISO-8859-1",
-    "ISO_8859-1",
-    "ISO_8859-1:1987",
-    "ISO-8859-2",
-    "ISO_8859-2",
-    "ISO_8859-2:1987",
-    "ISO-8859-3",
-    "ISO_8859-3",
-    "ISO_8859-3:1988",
-    "ISO-8859-4",
-    "ISO_8859-4",
-    "ISO_8859-4:1988",
-    "ISO-8859-5",
-    "ISO_8859-5",
-    "ISO_8859-5:1988",
-    "ISO-8859-6",
-    "ISO_8859-6",
-    "ISO_8859-7:1987",
-    "ISO-8859-7",
-    "ISO_8859-7",
-    "ISO_8859-7:1987",
-    "ISO-8859-8",
-    "ISO_8859-8",
-    "ISO_8859-8:1988",
-    "ISO-8859-9",
-    "ISO_8859-9",
-    "ISO_8859-9:1989",
-    "ISO-8859-10",
-    "ISO_8859-10",
-    "ISO_8859-10:1993",
-    "ISO-8859-14",
-    "ISO_8859-14",
-    "ISO_8859-14:1998",
-    NULL
+	"NONE",
+	"ASCII",
+	"US-ASCII",
+	"ISO-8859-1",
+	"ISO_8859-1",
+	"ISO_8859-1:1987",
+	"ISO-8859-2",
+	"ISO_8859-2",
+	"ISO_8859-2:1987",
+	"ISO-8859-3",
+	"ISO_8859-3",
+	"ISO_8859-3:1988",
+	"ISO-8859-4",
+	"ISO_8859-4",
+	"ISO_8859-4:1988",
+	"ISO-8859-5",
+	"ISO_8859-5",
+	"ISO_8859-5:1988",
+	"ISO-8859-6",
+	"ISO_8859-6",
+	"ISO_8859-7:1987",
+	"ISO-8859-7",
+	"ISO_8859-7",
+	"ISO_8859-7:1987",
+	"ISO-8859-8",
+	"ISO_8859-8",
+	"ISO_8859-8:1988",
+	"ISO-8859-9",
+	"ISO_8859-9",
+	"ISO_8859-9:1989",
+	"ISO-8859-10",
+	"ISO_8859-10",
+	"ISO_8859-10:1993",
+	"ISO-8859-14",
+	"ISO_8859-14",
+	"ISO_8859-14:1998",
+	NULL
 };
 
 /*
@@ -125,8 +125,8 @@ static const char *supportedCharacterEncodings[] = {
  */
 static inline unsigned char Scm__LookupCharCategory(ScmChar ch)
 {
-    if (ch == SCM_CHAR_INVALID || ch > 0xff) return SCM_CHAR_CATEGORY_Cn;
-    return ucs_general_category_00000[ch];
+	if (ch == SCM_CHAR_INVALID || ch > 0xff) return SCM_CHAR_CATEGORY_Cn;
+	return ucs_general_category_00000[ch];
 }
 
 #endif /* !SCM_CHAR_ENCODING_BODY */

@@ -48,16 +48,16 @@ void Scm__SetupPortsForWindows(int has_console);
 #endif /*defined(GAUCHE_WINDOWS)*/
 
 #define PORT_WALKER_P(port) \
-    (SCM_PORTP(port) && (SCM_PORT(port)->flags & SCM_PORT_WALKING))
+	(SCM_PORTP(port) && (SCM_PORT(port)->flags & SCM_PORT_WALKING))
 
 #define PORT_WRITESS_P(port) \
-    (SCM_PORTP(port) && (SCM_PORT(port)->flags & SCM_PORT_WRITESS))
+	(SCM_PORTP(port) && (SCM_PORT(port)->flags & SCM_PORT_WRITESS))
 
 #define PORT_RECURSIVE_P(port) \
-    ((port)->writeState != NULL)
+	((port)->writeState != NULL)
 
 #define PORT_LOCK_OWNER_P(port, vm) \
-    ((port)->lockOwner == (vm))
+	((port)->lockOwner == (vm))
 
 /*================================================================
  * Locking the ports
@@ -98,34 +98,34 @@ void Scm__SetupPortsForWindows(int has_console);
 
 /* Lock a port P.  Can perform recursive lock. */
 #define PORT_LOCK(p, vm)                                        \
-    do {                                                        \
-      if (p->lockOwner != vm) {                                 \
-          for (;;) {                                            \
-              ScmVM* owner__;                                   \
-              (void)SCM_INTERNAL_FASTLOCK_LOCK(p->lock);        \
-              owner__ = p->lockOwner;                           \
-              if (owner__ == NULL                               \
-                  || (owner__->state == SCM_VM_TERMINATED)) {   \
-                  p->lockOwner = vm;                            \
-                  p->lockCount = 1;                             \
-              }                                                 \
-              (void)SCM_INTERNAL_FASTLOCK_UNLOCK(p->lock);      \
-              if (p->lockOwner == vm) break;                    \
-              Scm_YieldCPU();                                   \
-          }                                                     \
-      } else {                                                  \
-          p->lockCount++;                                       \
-      }                                                         \
-    } while (0)
+	do {                                                        \
+		if (p->lockOwner != vm) {                                 \
+			for (;;) {                                            \
+				ScmVM* owner__;                                   \
+				(void)SCM_INTERNAL_FASTLOCK_LOCK(p->lock);        \
+				owner__ = p->lockOwner;                           \
+				if (owner__ == NULL                               \
+				    || (owner__->state == SCM_VM_TERMINATED)) {   \
+					p->lockOwner = vm;                            \
+					p->lockCount = 1;                             \
+				}                                                 \
+				(void)SCM_INTERNAL_FASTLOCK_UNLOCK(p->lock);      \
+				if (p->lockOwner == vm) break;                    \
+				Scm_YieldCPU();                                   \
+			}                                                     \
+		} else {                                                  \
+			p->lockCount++;                                       \
+		}                                                         \
+	} while (0)
 
 /* Unlock a port P.  Assumes the calling thread has the lock */
 #define PORT_UNLOCK(p)                                  \
-    do {                                                \
-        if (--p->lockCount <= 0) {                      \
-            SCM_INTERNAL_SYNC();                        \
-            p->lockOwner = NULL;                        \
-        } \
-    } while (0)
+	do {                                                \
+		if (--p->lockCount <= 0) {                      \
+			SCM_INTERNAL_SYNC();                        \
+			p->lockOwner = NULL;                        \
+		} \
+	} while (0)
 
 /* Should be used while P is locked by calling thread.
    Evaluate C statement CALL, making sure the port is unlocked in case
@@ -134,16 +134,16 @@ void Scm__SetupPortsForWindows(int has_console);
    TODO: we may be able to utilize SCM_PORT_PRIVATE flag to avoid
    SCM_UNWIND_PROTECT overhead. */
 #define PORT_SAFE_CALL(p, call, cleanup)        \
-    do {                                        \
-       SCM_UNWIND_PROTECT {                     \
-           call;                                \
-           cleanup;                             \
-       } SCM_WHEN_ERROR {                       \
-           cleanup;                             \
-           PORT_UNLOCK(p);                      \
-           SCM_NEXT_HANDLER;                    \
-       } SCM_END_PROTECT;                       \
-    } while (0)
+	do {                                        \
+		SCM_UNWIND_PROTECT {                     \
+			call;                                \
+			cleanup;                             \
+		} SCM_WHEN_ERROR {                       \
+			cleanup;                             \
+			PORT_UNLOCK(p);                      \
+			SCM_NEXT_HANDLER;                    \
+		} SCM_END_PROTECT;                       \
+	} while (0)
 
 #define PORT_LOCKED(p, vm) (((p)->lockOwner == (vm)))
 
@@ -152,10 +152,10 @@ void Scm__SetupPortsForWindows(int has_console);
    the vm. */
 
 #define PORT_PRELOCK(p, vm)                     \
-   do {                                         \
-     p->lockOwner = vm;                         \
-     p->lockCount = 1;                          \
-   } while (0)
+	do {                                         \
+		p->lockOwner = vm;                         \
+		p->lockCount = 1;                          \
+	} while (0)
 
 
 #endif /*GAUCHE_PRIV_PORTP_H*/

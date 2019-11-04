@@ -43,10 +43,10 @@
 
 /* The beginning of this structure must match ScmDictEntry. */
 typedef struct EntryRec {
-    intptr_t key;
-    intptr_t value;
-    struct EntryRec *next;
-    u_long   hashval;
+	intptr_t key;
+	intptr_t value;
+	struct EntryRec *next;
+	u_long hashval;
 } Entry;
 
 #define BUCKETS(hc)   ((Entry**)hc->buckets)
@@ -61,7 +61,7 @@ typedef struct EntryRec {
 /* For other hash values, we limit it in the fixnum range. */
 #define HASHMASK SCM_SMALL_INT_MAX
 
-typedef Entry *SearchProc(ScmHashCore *core, intptr_t key, ScmDictOp op);
+typedef Entry *SearchProc (ScmHashCore *core, intptr_t key, ScmDictOp op);
 
 static u_int round2up(unsigned int val);
 
@@ -76,19 +76,19 @@ static u_int round2up(unsigned int val);
    Internally we use parameter slot to keep the hash salt value, but
    we provide dedicated C API to access it to avoid overhead of parameter
    mechanism.
-*/
+ */
 
 static ScmPrimitiveParameter *hash_salt; /* initialized by Scm__InitHash() */
 
 ScmSmallInt Scm_HashSaltRef()
 {
-    return SCM_INT_VALUE(Scm_PrimitiveParameterRef(Scm_VM(), hash_salt));
+	return SCM_INT_VALUE(Scm_PrimitiveParameterRef(Scm_VM(), hash_salt));
 }
 
 ScmSmallInt Scm_HashSaltSet(ScmSmallInt newval) /* returns old value */
 {
-    return SCM_INT_VALUE(Scm_PrimitiveParameterSet(Scm_VM(), hash_salt,
-                                                   SCM_MAKE_INT(newval)));
+	return SCM_INT_VALUE(Scm_PrimitiveParameterSet(Scm_VM(), hash_salt,
+	                                               SCM_MAKE_INT(newval)));
 }
 
 /*============================================================
@@ -106,17 +106,17 @@ ScmSmallInt Scm_HashSaltSet(ScmSmallInt newval) /* returns old value */
    is done by HASH2INDEX macro  */
 
 #define SMALL_INT_HASH(result, val) \
-    (result) = ((val)*2654435761UL)
+	(result) = ((val)*2654435761UL)
 
 #define ADDRESS_HASH(result, val) \
-    (result) = (u_long)((SCM_WORD(val) >> 3)*2654435761UL)
+	(result) = (u_long)((SCM_WORD(val) >> 3)*2654435761UL)
 
 /* HASH2INDEX
    Map a hash value to bucket number.
    We fix the word length to 32bits, since the multiplication
    constant above is fixed. */
 #define HASH2INDEX(tabsiz, bits, hashval) \
-    (((hashval)+((hashval)>>(32-(bits)))) & ((tabsiz) - 1))
+	(((hashval)+((hashval)>>(32-(bits)))) & ((tabsiz) - 1))
 
 /* Combining two hash values. */
 #define COMBINE(hv1, hv2)   ((hv1)*5+(hv2))
@@ -132,308 +132,308 @@ ScmSmallInt Scm_HashSaltSet(ScmSmallInt newval) /* returns old value */
 
 u_long Scm_EqHash(ScmObj obj)
 {
-    u_long hashval;
-    ADDRESS_HASH(hashval, obj);
-    return hashval&HASHMASK;
+	u_long hashval;
+	ADDRESS_HASH(hashval, obj);
+	return hashval&HASHMASK;
 }
 
 static u_long number_hash(ScmObj obj, u_long salt, int portable);
 
 static u_long flonum_hash(double d, u_long salt, int portable)
 {
-    int exp, sign;
-    ScmObj mantissa = Scm_DecodeFlonum(d, &exp, &sign);
-    u_long xh;
-    SMALL_INT_HASH(xh, exp*sign);
-    if (SCM_NUMBERP(mantissa)) {
-        return COMBINE(number_hash(mantissa, salt, portable), xh);
-    } else {
-        /* d is not finite.  we just map +inf.0, -inf.0 and nan.0 to 0. */
-        return 0;
-    }
+	int exp, sign;
+	ScmObj mantissa = Scm_DecodeFlonum(d, &exp, &sign);
+	u_long xh;
+	SMALL_INT_HASH(xh, exp*sign);
+	if (SCM_NUMBERP(mantissa)) {
+		return COMBINE(number_hash(mantissa, salt, portable), xh);
+	} else {
+		/* d is not finite.  we just map +inf.0, -inf.0 and nan.0 to 0. */
+		return 0;
+	}
 }
 
 static u_long number_hash(ScmObj obj, u_long salt, int portable)
 {
-    u_long hashval;
-    if (SCM_INTP(obj)) {
-        /* On 64bit platform, if we have fixnum that is beyond the range
-           of 32bit fixnum, we have to calculate the hash value the same
-           way as 32bit bignum would do. */
-        long u = SCM_INT_VALUE(obj);
-        if (portable) {
-            if (u < 0) u = -u;  /* safe, for u is in fixnum range */
+	u_long hashval;
+	if (SCM_INTP(obj)) {
+		/* On 64bit platform, if we have fixnum that is beyond the range
+		   of 32bit fixnum, we have to calculate the hash value the same
+		   way as 32bit bignum would do. */
+		long u = SCM_INT_VALUE(obj);
+		if (portable) {
+			if (u < 0) u = -u; /* safe, for u is in fixnum range */
 #if SIZEOF_LONG == 8
-            u = ((u & ((1UL<<32) - 1)) + (u >> 32)) & ((1UL<<32)-1);
+			u = ((u & ((1UL<<32) - 1)) + (u >> 32)) & ((1UL<<32)-1);
 #endif
-        }
-        SMALL_INT_HASH(hashval, u);
-    } else if (SCM_BIGNUMP(obj)) {
-        if (portable) {
-            u_int i;
-            u_long u = 0;
-            for (i=0; i<SCM_BIGNUM_SIZE(obj); i++) {
+		}
+		SMALL_INT_HASH(hashval, u);
+	} else if (SCM_BIGNUMP(obj)) {
+		if (portable) {
+			u_int i;
+			u_long u = 0;
+			for (i=0; i<SCM_BIGNUM_SIZE(obj); i++) {
 #if SIZEOF_LONG == 4
-                u += SCM_BIGNUM(obj)->values[i];
+				u += SCM_BIGNUM(obj)->values[i];
 #elif SIZEOF_LONG == 8
-                u += (SCM_BIGNUM(obj)->values[i] & ((1UL<<32) - 1))
-                    + (SCM_BIGNUM(obj)->values[i] >> 32);
+				u += (SCM_BIGNUM(obj)->values[i] & ((1UL<<32) - 1))
+				     + (SCM_BIGNUM(obj)->values[i] >> 32);
 #else
 #error "sizeof(long) > 8 platform unsupported"
 #endif
-            }
-            SMALL_INT_HASH(hashval, u);
-        } else {
-            u_int i;
-            u_long u = 0;
-            for (i=0; i<SCM_BIGNUM_SIZE(obj); i++) {
-                u += SCM_BIGNUM(obj)->values[i];
-            }
-            SMALL_INT_HASH(hashval, u);
-        }
-    } else if (SCM_FLONUMP(obj)) {
-        hashval = flonum_hash(SCM_FLONUM_VALUE(obj), salt, portable);
-    } else if (SCM_RATNUMP(obj)) {
-        /* Ratnum must already be normalized, so we can simply combine
-           hashvals of numerator and denominator. */
-        u_long h1 = number_hash(SCM_RATNUM_NUMER(obj), salt, portable);
-        u_long h2 = number_hash(SCM_RATNUM_DENOM(obj), salt, portable);
-        hashval = COMBINE(h1, h2);
-    } else {
-        SCM_ASSERT(SCM_COMPNUMP(obj));
-        hashval = COMBINE(flonum_hash(SCM_COMPNUM_REAL(obj), salt, portable),
-                          flonum_hash(SCM_COMPNUM_IMAG(obj), salt, portable));
-    }
-    return hashval & (portable ? PORTABLE_HASHMASK : HASHMASK);
+			}
+			SMALL_INT_HASH(hashval, u);
+		} else {
+			u_int i;
+			u_long u = 0;
+			for (i=0; i<SCM_BIGNUM_SIZE(obj); i++) {
+				u += SCM_BIGNUM(obj)->values[i];
+			}
+			SMALL_INT_HASH(hashval, u);
+		}
+	} else if (SCM_FLONUMP(obj)) {
+		hashval = flonum_hash(SCM_FLONUM_VALUE(obj), salt, portable);
+	} else if (SCM_RATNUMP(obj)) {
+		/* Ratnum must already be normalized, so we can simply combine
+		   hashvals of numerator and denominator. */
+		u_long h1 = number_hash(SCM_RATNUM_NUMER(obj), salt, portable);
+		u_long h2 = number_hash(SCM_RATNUM_DENOM(obj), salt, portable);
+		hashval = COMBINE(h1, h2);
+	} else {
+		SCM_ASSERT(SCM_COMPNUMP(obj));
+		hashval = COMBINE(flonum_hash(SCM_COMPNUM_REAL(obj), salt, portable),
+		                  flonum_hash(SCM_COMPNUM_IMAG(obj), salt, portable));
+	}
+	return hashval & (portable ? PORTABLE_HASHMASK : HASHMASK);
 }
 
 u_long Scm_EqvHash(ScmObj obj)
 {
-    u_long hashval;
-    if (SCM_NUMBERP(obj)) {
-        hashval = number_hash(obj, 0, FALSE);
-    } else {
-        ADDRESS_HASH(hashval, obj);
-    }
-    return hashval&HASHMASK;
+	u_long hashval;
+	if (SCM_NUMBERP(obj)) {
+		hashval = number_hash(obj, 0, FALSE);
+	} else {
+		ADDRESS_HASH(hashval, obj);
+	}
+	return hashval&HASHMASK;
 }
 
 static u_long internal_string_hash(ScmString *str, u_long salt, int portable)
 {
-    const ScmStringBody *b = SCM_STRING_BODY(str);
-    if (portable) {
-        return (u_long)Scm__DwSipPortableHash((uint8_t*)b->start, b->size,
-                                              salt, salt);
-    } else {
-        return Scm__DwSipDefaultHash((uint8_t*)b->start, b->size,
-                                     salt, salt);
-    }
+	const ScmStringBody *b = SCM_STRING_BODY(str);
+	if (portable) {
+		return (u_long)Scm__DwSipPortableHash((uint8_t*)b->start, b->size,
+		                                      salt, salt);
+	} else {
+		return Scm__DwSipDefaultHash((uint8_t*)b->start, b->size,
+		                             salt, salt);
+	}
 }
 
 static u_long internal_uvector_hash(ScmUVector *u, u_long salt, int portable)
 {
-    if (portable) {
-        ScmUVectorType uvtype = Scm_UVectorType(Scm_ClassOf(SCM_OBJ(u)));
-        u_long r, seed;
-        size_t s = SCM_UVECTOR_SIZE(u);
+	if (portable) {
+		ScmUVectorType uvtype = Scm_UVectorType(Scm_ClassOf(SCM_OBJ(u)));
+		u_long r, seed;
+		size_t s = SCM_UVECTOR_SIZE(u);
 
-        switch (uvtype) {
-            /* We can use siphash if u is u8vector or s8vector. */ 
-        case SCM_UVECTOR_S8:
-        case SCM_UVECTOR_U8:
-            return Scm__DwSipPortableHash((uint8_t*)SCM_UVECTOR_ELEMENTS(u),
-                                          (uint32_t)Scm_UVectorSizeInBytes(u),
-                                          salt, salt^uvtype);
-            /* We need to avoid depending on endianness of multibyte numbers.
-               Using siphash after canonicalizing byte order can be expensive,
-               for we need to allocate a buffer.
-               (Unless we directly access siphash setup/round function
-               and feed one word at a time--which is tedious.)
-               The current code may not be ideal, but just as good as our 
-               other primitive portable hash functions. */
+		switch (uvtype) {
+		/* We can use siphash if u is u8vector or s8vector. */
+		case SCM_UVECTOR_S8:
+		case SCM_UVECTOR_U8:
+			return Scm__DwSipPortableHash((uint8_t*)SCM_UVECTOR_ELEMENTS(u),
+			                              (uint32_t)Scm_UVectorSizeInBytes(u),
+			                              salt, salt^uvtype);
+			/* We need to avoid depending on endianness of multibyte numbers.
+			   Using siphash after canonicalizing byte order can be expensive,
+			   for we need to allocate a buffer.
+			   (Unless we directly access siphash setup/round function
+			   and feed one word at a time--which is tedious.)
+			   The current code may not be ideal, but just as good as our
+			   other primitive portable hash functions. */
 
-            /* Initial hash value.  The seed value for each uvector type
-               is just a random value I generated. */
+			/* Initial hash value.  The seed value for each uvector type
+			   is just a random value I generated. */
 #define INIT_R(r, seed) SMALL_INT_HASH(r, seed^salt)
-                                                         
-        case SCM_UVECTOR_S16:
-            seed = 3499211612ul;
-            goto do16;
-        case SCM_UVECTOR_U16:
-            seed = 3890346734ul;
-            goto do16;
-        case SCM_UVECTOR_F16:
-            seed = 545404204ul;
-            do16:
-            {
-                INIT_R(r, seed);
-                for (size_t i=0; i<s; i++) {
-                    u_long e = SCM_U16VECTOR_ELEMENT(u, i);
-                    SMALL_INT_HASH(e, e);
-                    r = COMBINE(r, e);
-                }
-                return r;
-            }
-        case SCM_UVECTOR_S32:
-            seed = 4161255391ul;
-            goto do32;
-        case SCM_UVECTOR_U32:
-            seed = 3922919429ul;
-            goto do32;
-        case SCM_UVECTOR_F32:
-            seed = 949333985ul;
-            do32:
-            {
-                INIT_R(r, seed);
-                for (size_t i=0; i<s; i++) {
-                    u_long e = SCM_U32VECTOR_ELEMENT(u, i);
-                    SMALL_INT_HASH(e, e);
-                    r = COMBINE(r, e);
-                }
-                return r;
-            }
-        case SCM_UVECTOR_S64:
-            seed = 2715962298ul;
-            goto do64;
-        case SCM_UVECTOR_U64:
-            seed = 1323567403ul;
-            do64: 
-            {
-                INIT_R(r, seed);
-                for (size_t i=0; i<s; i++) {
-                    uint64_t e = SCM_U64VECTOR_ELEMENT(u, i);
-                    u_long z = (e >> 32) ^ e;
-                    SMALL_INT_HASH(z, z);
-                    r = COMBINE(r, z);
-                }
-                return r;
-            }
-        case SCM_UVECTOR_F64: {
-            /* We can't reinterpret f64 as u64, since ARM mixed-endian would
-               yield nonportable result. */
-            seed = 2350294565ul;
-            INIT_R(r, seed);
-            for (size_t i=0; i<s; i++) {
-                double e = SCM_F64VECTOR_ELEMENT(u, i);
-                r = COMBINE(r, flonum_hash(e, salt, TRUE));
-            }
-            return r;
-        }
-#undef INIT_R            
-        case SCM_UVECTOR_RESERVED1:
-        case SCM_UVECTOR_C32:
-        case SCM_UVECTOR_C64:
-        case SCM_UVECTOR_C128:
-        case SCM_UVECTOR_RESERVED2:
-        case SCM_UVECTOR_INVALID:
-            Scm_Panic("invalid uvector class.");
-        }
-        return 0;           /* dummy */
-    } else {
-        return Scm__DwSipDefaultHash((uint8_t*)SCM_UVECTOR_ELEMENTS(u),
-                                     (uint32_t)Scm_UVectorSizeInBytes(u),
-                                     salt, salt);
-    }
+
+		case SCM_UVECTOR_S16:
+			seed = 3499211612ul;
+			goto do16;
+		case SCM_UVECTOR_U16:
+			seed = 3890346734ul;
+			goto do16;
+		case SCM_UVECTOR_F16:
+			seed = 545404204ul;
+do16:
+			{
+				INIT_R(r, seed);
+				for (size_t i=0; i<s; i++) {
+					u_long e = SCM_U16VECTOR_ELEMENT(u, i);
+					SMALL_INT_HASH(e, e);
+					r = COMBINE(r, e);
+				}
+				return r;
+			}
+		case SCM_UVECTOR_S32:
+			seed = 4161255391ul;
+			goto do32;
+		case SCM_UVECTOR_U32:
+			seed = 3922919429ul;
+			goto do32;
+		case SCM_UVECTOR_F32:
+			seed = 949333985ul;
+do32:
+			{
+				INIT_R(r, seed);
+				for (size_t i=0; i<s; i++) {
+					u_long e = SCM_U32VECTOR_ELEMENT(u, i);
+					SMALL_INT_HASH(e, e);
+					r = COMBINE(r, e);
+				}
+				return r;
+			}
+		case SCM_UVECTOR_S64:
+			seed = 2715962298ul;
+			goto do64;
+		case SCM_UVECTOR_U64:
+			seed = 1323567403ul;
+do64:
+			{
+				INIT_R(r, seed);
+				for (size_t i=0; i<s; i++) {
+					uint64_t e = SCM_U64VECTOR_ELEMENT(u, i);
+					u_long z = (e >> 32) ^ e;
+					SMALL_INT_HASH(z, z);
+					r = COMBINE(r, z);
+				}
+				return r;
+			}
+		case SCM_UVECTOR_F64: {
+			/* We can't reinterpret f64 as u64, since ARM mixed-endian would
+			   yield nonportable result. */
+			seed = 2350294565ul;
+			INIT_R(r, seed);
+			for (size_t i=0; i<s; i++) {
+				double e = SCM_F64VECTOR_ELEMENT(u, i);
+				r = COMBINE(r, flonum_hash(e, salt, TRUE));
+			}
+			return r;
+		}
+#undef INIT_R
+		case SCM_UVECTOR_RESERVED1:
+		case SCM_UVECTOR_C32:
+		case SCM_UVECTOR_C64:
+		case SCM_UVECTOR_C128:
+		case SCM_UVECTOR_RESERVED2:
+		case SCM_UVECTOR_INVALID:
+			Scm_Panic("invalid uvector class.");
+		}
+		return 0;   /* dummy */
+	} else {
+		return Scm__DwSipDefaultHash((uint8_t*)SCM_UVECTOR_ELEMENTS(u),
+		                             (uint32_t)Scm_UVectorSizeInBytes(u),
+		                             salt, salt);
+	}
 }
 
 /* equal-hash, which satisfies
      forall x, y: equal(x,y) => hash(x) = hash(y)
-  
+
    Both default-hash and portable-hash have this property but their
    requirements are slightly different, so here's the common part.
-*/
+ */
 static u_long equal_hash_common(ScmObj obj, u_long salt, int portable)
 {
-    if (SCM_NUMBERP(obj)) {
-        return number_hash(obj, salt, portable);
-    } else if (!SCM_PTRP(obj)) {
-        u_long hashval;
-        SMALL_INT_HASH(hashval, (u_long)SCM_WORD(obj));
-        return hashval&PORTABLE_HASHMASK;
-    } else if (SCM_STRINGP(obj)) {
-        return internal_string_hash(SCM_STRING(obj), salt, portable);
-    } else if (SCM_PAIRP(obj)) {
-        u_long h = 0, h2;
-        ScmObj cp;
-        SCM_FOR_EACH(cp, obj) {
-            h2 = equal_hash_common(SCM_CAR(cp), salt, portable);
-            h = COMBINE(h, h2);
-        }
-        h2 = equal_hash_common(cp, salt, portable);
-        return COMBINE(h, h2);
-    } else if (SCM_VECTORP(obj)) {
-        int siz = SCM_VECTOR_SIZE(obj);
-        u_long h = 0, h2;
-        for (int i=0; i<siz; i++) {
-            h2 = equal_hash_common(SCM_VECTOR_ELEMENT(obj, i), salt, portable);
-            h = COMBINE(h, h2);
-        }
-        return h;
-    /* uvector hash support */
-    } else if (SCM_UVECTORP(obj)) {
-        return internal_uvector_hash(SCM_UVECTOR(obj), salt, portable);
+	if (SCM_NUMBERP(obj)) {
+		return number_hash(obj, salt, portable);
+	} else if (!SCM_PTRP(obj)) {
+		u_long hashval;
+		SMALL_INT_HASH(hashval, (u_long)SCM_WORD(obj));
+		return hashval&PORTABLE_HASHMASK;
+	} else if (SCM_STRINGP(obj)) {
+		return internal_string_hash(SCM_STRING(obj), salt, portable);
+	} else if (SCM_PAIRP(obj)) {
+		u_long h = 0, h2;
+		ScmObj cp;
+		SCM_FOR_EACH(cp, obj) {
+			h2 = equal_hash_common(SCM_CAR(cp), salt, portable);
+			h = COMBINE(h, h2);
+		}
+		h2 = equal_hash_common(cp, salt, portable);
+		return COMBINE(h, h2);
+	} else if (SCM_VECTORP(obj)) {
+		int siz = SCM_VECTOR_SIZE(obj);
+		u_long h = 0, h2;
+		for (int i=0; i<siz; i++) {
+			h2 = equal_hash_common(SCM_VECTOR_ELEMENT(obj, i), salt, portable);
+			h = COMBINE(h, h2);
+		}
+		return h;
+		/* uvector hash support */
+	} else if (SCM_UVECTORP(obj)) {
+		return internal_uvector_hash(SCM_UVECTOR(obj), salt, portable);
 #if GAUCHE_KEEP_DISJOINT_KEYWORD_OPTION
-    } else if (SCM_KEYWORDP(obj)) {
-        if (portable) {
-            if (SCM_SYMBOLP(obj)) {
-                /* GAUCHE_KEYWORD_IS_SYMBOL mode */
-                return internal_string_hash(SCM_KEYWORD_NAME(obj), salt, TRUE);
-            } else {
-                /* GAUCHE_KEYWORD_IS_DISJOINT mode.  SCM_KEYWORD_NAME does
-                   not include prefix ':'.  We should append it so that
-                   the hash value stays the same.  Appending string incurs
-                   allocation, but we expect this branch isn't taken often
-                   and eventually fade away. */
-                static ScmString *prefix = NULL;
-                if (prefix == NULL) {
-                    /* idempotent.  no MT hazard. */
-                    prefix = SCM_STRING(Scm_MakeString(":", 1, 1, 0));
-                }
-                ScmObj name = Scm_StringAppend2(prefix, SCM_KEYWORD_NAME(obj));
-                return internal_string_hash(SCM_STRING(name), salt, TRUE);
-            }
-        } else {
-            u_long hashval;
-            ADDRESS_HASH(hashval, obj);
-            return hashval;
-        }
+	} else if (SCM_KEYWORDP(obj)) {
+		if (portable) {
+			if (SCM_SYMBOLP(obj)) {
+				/* GAUCHE_KEYWORD_IS_SYMBOL mode */
+				return internal_string_hash(SCM_KEYWORD_NAME(obj), salt, TRUE);
+			} else {
+				/* GAUCHE_KEYWORD_IS_DISJOINT mode.  SCM_KEYWORD_NAME does
+				   not include prefix ':'.  We should append it so that
+				   the hash value stays the same.  Appending string incurs
+				   allocation, but we expect this branch isn't taken often
+				   and eventually fade away. */
+				static ScmString *prefix = NULL;
+				if (prefix == NULL) {
+					/* idempotent.  no MT hazard. */
+					prefix = SCM_STRING(Scm_MakeString(":", 1, 1, 0));
+				}
+				ScmObj name = Scm_StringAppend2(prefix, SCM_KEYWORD_NAME(obj));
+				return internal_string_hash(SCM_STRING(name), salt, TRUE);
+			}
+		} else {
+			u_long hashval;
+			ADDRESS_HASH(hashval, obj);
+			return hashval;
+		}
 #endif /*GAUCHE_KEEP_DISJOINT_KEYWORD_OPTION*/
-    } else if (SCM_SYMBOLP(obj)) {
-        if (portable) {
-            return internal_string_hash(SCM_SYMBOL_NAME(obj), salt, TRUE);
-        } else {
-            u_long hashval;
-            ADDRESS_HASH(hashval, obj);
-            return hashval;
-        }
-    } else {
-        /* Call specialized object-hash method
-           We need some trick; See libomega.scm for the details. */
-        static ScmObj call_object_hash_proc = SCM_UNDEFINED;
-        static ScmObj portable_hash_proc = SCM_UNDEFINED;
-        static ScmObj default_hash_proc = SCM_UNDEFINED;
-        SCM_BIND_PROC(call_object_hash_proc, "%call-object-hash",
-                      Scm_GaucheInternalModule());
-        SCM_BIND_PROC(portable_hash_proc, "portable-hash", Scm_GaucheModule());
-        SCM_BIND_PROC(default_hash_proc, "default-hash", Scm_GaucheModule());
-        ScmObj r = Scm_ApplyRec3(call_object_hash_proc, obj,
-                                 (portable
-                                  ? portable_hash_proc
-                                  : default_hash_proc),
-                                 (portable
-                                  ? Scm_MakeIntegerU(salt)
-                                  : SCM_FALSE));
-        if (SCM_INTP(r)) {
-            return (u_long)SCM_INT_VALUE(r);
-        }
-        if (SCM_BIGNUMP(r)) {
-            /* NB: Scm_GetUInteger clamps the result to [0, ULONG_MAX],
-               so taking the LSW would give better distribution. */
-            return SCM_BIGNUM(r)->values[0];
-        }
-        Scm_Error("object-hash returned non-integer: %S", r);
-        return 0;               /* dummy */
-    }
+	} else if (SCM_SYMBOLP(obj)) {
+		if (portable) {
+			return internal_string_hash(SCM_SYMBOL_NAME(obj), salt, TRUE);
+		} else {
+			u_long hashval;
+			ADDRESS_HASH(hashval, obj);
+			return hashval;
+		}
+	} else {
+		/* Call specialized object-hash method
+		   We need some trick; See libomega.scm for the details. */
+		static ScmObj call_object_hash_proc = SCM_UNDEFINED;
+		static ScmObj portable_hash_proc = SCM_UNDEFINED;
+		static ScmObj default_hash_proc = SCM_UNDEFINED;
+		SCM_BIND_PROC(call_object_hash_proc, "%call-object-hash",
+		              Scm_GaucheInternalModule());
+		SCM_BIND_PROC(portable_hash_proc, "portable-hash", Scm_GaucheModule());
+		SCM_BIND_PROC(default_hash_proc, "default-hash", Scm_GaucheModule());
+		ScmObj r = Scm_ApplyRec3(call_object_hash_proc, obj,
+		                         (portable
+		                          ? portable_hash_proc
+		                          : default_hash_proc),
+		                         (portable
+		                          ? Scm_MakeIntegerU(salt)
+		                          : SCM_FALSE));
+		if (SCM_INTP(r)) {
+			return (u_long)SCM_INT_VALUE(r);
+		}
+		if (SCM_BIGNUMP(r)) {
+			/* NB: Scm_GetUInteger clamps the result to [0, ULONG_MAX],
+			   so taking the LSW would give better distribution. */
+			return SCM_BIGNUM(r)->values[0];
+		}
+		Scm_Error("object-hash returned non-integer: %S", r);
+		return 0;       /* dummy */
+	}
 }
 
 /* For recursive call to the current hash function - see call-object-hash
@@ -442,15 +442,15 @@ static ScmPrimitiveParameter *current_recursive_hash;
 
 ScmObj Scm_CurrentRecursiveHash(ScmObj newval)
 {
-    if (newval == SCM_UNBOUND) {
-        return Scm_PrimitiveParameterRef(Scm_VM(), current_recursive_hash);
-    } else {
-        return Scm_PrimitiveParameterSet(Scm_VM(), current_recursive_hash, newval);
-    }
+	if (newval == SCM_UNBOUND) {
+		return Scm_PrimitiveParameterRef(Scm_VM(), current_recursive_hash);
+	} else {
+		return Scm_PrimitiveParameterSet(Scm_VM(), current_recursive_hash, newval);
+	}
 }
 
 /* 'Portable' general hash function.
-   
+
    It is guaranteed that the hash value won't change for the same objects
    (roughly, indistinguishable in their external representation)
    across the runs of the program, and among different platforms.
@@ -458,33 +458,33 @@ ScmObj Scm_CurrentRecursiveHash(ScmObj newval)
  */
 u_long Scm_PortableHash(ScmObj obj, u_long salt)
 {
-    return equal_hash_common(obj, salt, TRUE) & PORTABLE_HASHMASK;
+	return equal_hash_common(obj, salt, TRUE) & PORTABLE_HASHMASK;
 }
 
 /* 'Default' general hash function. */
 ScmSmallInt Scm_DefaultHash(ScmObj obj)
 {
-    return equal_hash_common(obj, Scm_HashSaltRef(), FALSE) & HASHMASK;
+	return equal_hash_common(obj, Scm_HashSaltRef(), FALSE) & HASHMASK;
 }
 
 /* This is to expose string hash function.  Modulo is for the compatibility
    of srfi-13; just give 0 as modulo if you don't need it.  */
 u_long Scm_HashString(ScmString *str, u_long modulo)
 {
-    u_long hashval = internal_string_hash(str, Scm_HashSaltRef(), FALSE);
-    if (modulo == 0) return hashval&HASHMASK;
-    else return (hashval % modulo);
+	u_long hashval = internal_string_hash(str, Scm_HashSaltRef(), FALSE);
+	if (modulo == 0) return hashval&HASHMASK;
+	else return (hashval % modulo);
 }
 
 /* Expose COMBINE. */
 u_long Scm_CombineHashValue(u_long a, u_long b)
 {
-    u_long c = COMBINE(a, b);
+	u_long c = COMBINE(a, b);
 #if SIZEOF_LONG == 8
-    /* we limit portable hash value to 32bit. */
-    c &= 0xffffffff;
+	/* we limit portable hash value to 32bit. */
+	c &= 0xffffffff;
 #endif /**/
-    return c;
+	return c;
 }
 
 /*------------------------------------------------------------
@@ -521,42 +521,42 @@ u_long Scm_CombineHashValue(u_long a, u_long b)
  */
 static Entry *insert_entry(ScmHashCore *table,
                            intptr_t key,
-                           u_long   hashval,
+                           u_long hashval,
                            int index)
 {
-    Entry *e = SCM_NEW(Entry);
-    Entry **buckets = BUCKETS(table);
-    e->key = key;
-    e->value = 0;
-    e->next = buckets[index];
-    e->hashval = hashval;
-    buckets[index] = e;
-    table->numEntries++;
+	Entry *e = SCM_NEW(Entry);
+	Entry **buckets = BUCKETS(table);
+	e->key = key;
+	e->value = 0;
+	e->next = buckets[index];
+	e->hashval = hashval;
+	buckets[index] = e;
+	table->numEntries++;
 
-    if (table->numEntries > table->numBuckets*MAX_AVG_CHAIN_LIMITS) {
-        /* Extend the table */
-        int newsize = (table->numBuckets << EXTEND_BITS);
-        int newbits = table->numBucketsLog2 + EXTEND_BITS;
+	if (table->numEntries > table->numBuckets*MAX_AVG_CHAIN_LIMITS) {
+		/* Extend the table */
+		int newsize = (table->numBuckets << EXTEND_BITS);
+		int newbits = table->numBucketsLog2 + EXTEND_BITS;
 
-        Entry **newb = SCM_NEW_ARRAY(Entry*, newsize);
-        for (int i=0; i<newsize; i++) newb[i] = NULL;
+		Entry **newb = SCM_NEW_ARRAY(Entry*, newsize);
+		for (int i=0; i<newsize; i++) newb[i] = NULL;
 
-        ScmHashIter iter;
-        Entry *f;
-        Scm_HashIterInit(&iter, table);
-        while ((f = (Entry*)Scm_HashIterNext(&iter)) != NULL) {
-            index = HASH2INDEX(newsize, newbits, f->hashval);
-            f->next = newb[index];
-            newb[index] = f;
-        }
-        /* gc friendliness */
-        for (int i=0; i<table->numBuckets; i++) table->buckets[i] = NULL;
+		ScmHashIter iter;
+		Entry *f;
+		Scm_HashIterInit(&iter, table);
+		while ((f = (Entry*)Scm_HashIterNext(&iter)) != NULL) {
+			index = HASH2INDEX(newsize, newbits, f->hashval);
+			f->next = newb[index];
+			newb[index] = f;
+		}
+		/* gc friendliness */
+		for (int i=0; i<table->numBuckets; i++) table->buckets[i] = NULL;
 
-        table->numBuckets = newsize;
-        table->numBucketsLog2 = newbits;
-        table->buckets = (void**)newb;
-    }
-    return e;
+		table->numBuckets = newsize;
+		table->numBucketsLog2 = newbits;
+		table->buckets = (void**)newb;
+	}
+	return e;
 }
 
 /* NB: Deleting entry E doesn't modify E's key and value, but cut
@@ -568,33 +568,33 @@ static Entry *delete_entry(ScmHashCore *table,
                            Entry *entry, Entry *prev,
                            int index)
 {
-    if (prev) prev->next = entry->next;
-    else table->buckets[index] = (void*)entry->next;
-    table->numEntries--;
-    SCM_ASSERT(table->numEntries >= 0);
-    entry->next = NULL;         /* GC friendliness */
-    return entry;
+	if (prev) prev->next = entry->next;
+	else table->buckets[index] = (void*)entry->next;
+	table->numEntries--;
+	SCM_ASSERT(table->numEntries >= 0);
+	entry->next = NULL;     /* GC friendliness */
+	return entry;
 }
 
 #define FOUND(table, op, e, p, index)                   \
-    do {                                                \
-        switch (op) {                                   \
-        case SCM_DICT_GET:;                             \
-        case SCM_DICT_CREATE:;                          \
-            return e;                                   \
-        case SCM_DICT_DELETE:;                          \
-            return delete_entry(table, e, p, index);    \
-        }                                               \
-    } while (0)
+	do {                                                \
+		switch (op) {                                   \
+		case SCM_DICT_GET:;                             \
+		case SCM_DICT_CREATE:;                          \
+			return e;                                   \
+		case SCM_DICT_DELETE:;                          \
+			return delete_entry(table, e, p, index);    \
+		}                                               \
+	} while (0)
 
 #define NOTFOUND(table, op, key, hashval, index)                \
-    do {                                                        \
-        if (op == SCM_DICT_CREATE) {                            \
-           return insert_entry(table, key, hashval, index);     \
-        } else {                                                \
-           return NULL;                                         \
-        }                                                       \
-    } while (0)
+	do {                                                        \
+		if (op == SCM_DICT_CREATE) {                            \
+			return insert_entry(table, key, hashval, index);     \
+		} else {                                                \
+			return NULL;                                         \
+		}                                                       \
+	} while (0)
 
 /*
  * Accessor function for address.   Used for EQ-type hash.
@@ -603,29 +603,29 @@ static Entry *address_access(ScmHashCore *table,
                              intptr_t key,
                              ScmDictOp op)
 {
-    u_long hashval, index;
-    Entry **buckets = (Entry**)table->buckets;
+	u_long hashval, index;
+	Entry **buckets = (Entry**)table->buckets;
 
-    ADDRESS_HASH(hashval, key);
-    index = HASH2INDEX(table->numBuckets, table->numBucketsLog2, hashval);
+	ADDRESS_HASH(hashval, key);
+	index = HASH2INDEX(table->numBuckets, table->numBucketsLog2, hashval);
 
-    for (Entry *e = buckets[index], *p = NULL; e; p = e, e = e->next) {
-        if (e->key == key) FOUND(table, op, e, p, index);
-    }
-    NOTFOUND(table, op, key, hashval, index);
+	for (Entry *e = buckets[index], *p = NULL; e; p = e, e = e->next) {
+		if (e->key == key) FOUND(table, op, e, p, index);
+	}
+	NOTFOUND(table, op, key, hashval, index);
 }
 
 static u_long address_hash(const ScmHashCore *ht SCM_UNUSED, intptr_t obj)
 {
-    u_long hashval;
-    ADDRESS_HASH(hashval, obj);
-    return hashval;
+	u_long hashval;
+	ADDRESS_HASH(hashval, obj);
+	return hashval;
 }
 
-static int address_cmp(const ScmHashCore *ht SCM_UNUSED, 
+static int address_cmp(const ScmHashCore *ht SCM_UNUSED,
                        intptr_t key, intptr_t k2)
 {
-    return (key == k2);
+	return (key == k2);
 }
 
 /*
@@ -634,22 +634,22 @@ static int address_cmp(const ScmHashCore *ht SCM_UNUSED,
  */
 static u_long eqv_hash(const ScmHashCore *ht SCM_UNUSED, intptr_t key)
 {
-    return Scm_EqvHash(SCM_OBJ(key));
+	return Scm_EqvHash(SCM_OBJ(key));
 }
 
 static int eqv_cmp(const ScmHashCore *ht SCM_UNUSED, intptr_t key, intptr_t k2)
 {
-    return Scm_EqvP(SCM_OBJ(key), SCM_OBJ(k2));
+	return Scm_EqvP(SCM_OBJ(key), SCM_OBJ(k2));
 }
 
 static u_long equal_hash(const ScmHashCore *ht SCM_UNUSED, intptr_t key)
 {
-    return Scm_DefaultHash(SCM_OBJ(key));
+	return Scm_DefaultHash(SCM_OBJ(key));
 }
 
 static int equal_cmp(const ScmHashCore *ht SCM_UNUSED, intptr_t key, intptr_t k2)
 {
-    return Scm_EqualP(SCM_OBJ(key), SCM_OBJ(k2));
+	return Scm_EqualP(SCM_OBJ(key), SCM_OBJ(k2));
 }
 
 
@@ -658,43 +658,43 @@ static int equal_cmp(const ScmHashCore *ht SCM_UNUSED, intptr_t key, intptr_t k2
  */
 static Entry *string_access(ScmHashCore *table, intptr_t k, ScmDictOp op)
 {
-    ScmObj key = SCM_OBJ(k);
+	ScmObj key = SCM_OBJ(k);
 
-    if (!SCM_STRINGP(key)) {
-        Scm_Error("Got non-string key %S to the string hashtable.", key);
-    }
-    u_long hashval = Scm_HashString(SCM_STRING(key), 0);
-    u_long index = HASH2INDEX(table->numBuckets, table->numBucketsLog2, hashval);
-    Entry **buckets = (Entry**)table->buckets;
+	if (!SCM_STRINGP(key)) {
+		Scm_Error("Got non-string key %S to the string hashtable.", key);
+	}
+	u_long hashval = Scm_HashString(SCM_STRING(key), 0);
+	u_long index = HASH2INDEX(table->numBuckets, table->numBucketsLog2, hashval);
+	Entry **buckets = (Entry**)table->buckets;
 
-    const ScmStringBody *keyb = SCM_STRING_BODY(key);
-    long size = SCM_STRING_BODY_SIZE(keyb);
-    for (Entry *e = buckets[index], *p = NULL; e; p = e, e = e->next) {
-        ScmObj ee = SCM_OBJ(e->key);
-        const ScmStringBody *eeb = SCM_STRING_BODY(ee);
-        int eesize = SCM_STRING_BODY_SIZE(eeb);
-        if (size == eesize
-            && memcmp(SCM_STRING_BODY_START(keyb),
-                      SCM_STRING_BODY_START(eeb), eesize) == 0){
-            FOUND(table, op, e, p, index);
-        }
-    }
-    NOTFOUND(table, op, k, hashval, index);
+	const ScmStringBody *keyb = SCM_STRING_BODY(key);
+	long size = SCM_STRING_BODY_SIZE(keyb);
+	for (Entry *e = buckets[index], *p = NULL; e; p = e, e = e->next) {
+		ScmObj ee = SCM_OBJ(e->key);
+		const ScmStringBody *eeb = SCM_STRING_BODY(ee);
+		int eesize = SCM_STRING_BODY_SIZE(eeb);
+		if (size == eesize
+		    && memcmp(SCM_STRING_BODY_START(keyb),
+		              SCM_STRING_BODY_START(eeb), eesize) == 0) {
+			FOUND(table, op, e, p, index);
+		}
+	}
+	NOTFOUND(table, op, k, hashval, index);
 }
 
 static u_long string_hash(const ScmHashCore *ht SCM_UNUSED, intptr_t key)
 {
-    return Scm_HashString(SCM_STRING(key), 0);
+	return Scm_HashString(SCM_STRING(key), 0);
 }
 
 static int string_cmp(const ScmHashCore *ht SCM_UNUSED, intptr_t k1, intptr_t k2)
 {
-    const ScmStringBody *b1 = SCM_STRING_BODY(k1);
-    const ScmStringBody *b2 = SCM_STRING_BODY(k2);
-    return ((SCM_STRING_BODY_SIZE(b1) == SCM_STRING_BODY_SIZE(b2))
-            && (memcmp(SCM_STRING_BODY_START(b1),
-                       SCM_STRING_BODY_START(b2),
-                       SCM_STRING_BODY_SIZE(b1)) == 0));
+	const ScmStringBody *b1 = SCM_STRING_BODY(k1);
+	const ScmStringBody *b2 = SCM_STRING_BODY(k2);
+	return ((SCM_STRING_BODY_SIZE(b1) == SCM_STRING_BODY_SIZE(b2))
+	        && (memcmp(SCM_STRING_BODY_START(b1),
+	                   SCM_STRING_BODY_START(b2),
+	                   SCM_STRING_BODY_SIZE(b1)) == 0));
 }
 
 /*
@@ -704,32 +704,32 @@ static int string_cmp(const ScmHashCore *ht SCM_UNUSED, intptr_t k1, intptr_t k2
 #if 0                           /* not used yet */
 static u_long multiword_hash(const ScmHashCore *table, intptr_t key)
 {
-    ScmWord keysize = (ScmWord)table->data;
-    ScmWord *keyarray = (ScmWord*)key;
-    u_long h = 0, h1;
-    for (int i=0; i<keysize; i++) {
-        ADDRESS_HASH(h1, keyarray[i]);
-        h = COMBINE(h, h1);
-    }
-    return h;
+	ScmWord keysize = (ScmWord)table->data;
+	ScmWord *keyarray = (ScmWord*)key;
+	u_long h = 0, h1;
+	for (int i=0; i<keysize; i++) {
+		ADDRESS_HASH(h1, keyarray[i]);
+		h = COMBINE(h, h1);
+	}
+	return h;
 }
 #endif
 
 #if 0
 static Entry *multiword_access(ScmHashCore *table, intptr_t k, ScmDictOp op)
 {
-    u_long hashval, index;
-    ScmWord keysize = (ScmWord)table->data;
+	u_long hashval, index;
+	ScmWord keysize = (ScmWord)table->data;
 
-    hashval = multiword_hash(table, k);
-    index = HASH2INDEX(table->numBuckets, table->numBucketsLog2, hashval);
-    Entry **buckets = (Entry**)table->buckets;
+	hashval = multiword_hash(table, k);
+	index = HASH2INDEX(table->numBuckets, table->numBucketsLog2, hashval);
+	Entry **buckets = (Entry**)table->buckets;
 
-    for (Entry *e = buckets[index], *p = NULL; e; p = e, e = e->next) {
-        if (memcmp((void*)k, (void*)e->key, keysize*sizeof(ScmWord)) == 0)
-            FOUND(table, op, e, p, index);
-    }
-    NOTFOUND(table, op, k, hashval, index);
+	for (Entry *e = buckets[index], *p = NULL; e; p = e, e = e->next) {
+		if (memcmp((void*)k, (void*)e->key, keysize*sizeof(ScmWord)) == 0)
+			FOUND(table, op, e, p, index);
+	}
+	NOTFOUND(table, op, k, hashval, index);
 }
 #endif
 
@@ -740,16 +740,16 @@ static Entry *multiword_access(ScmHashCore *table, intptr_t k, ScmDictOp op)
  */
 static Entry *general_access(ScmHashCore *table, intptr_t key, ScmDictOp op)
 {
-    u_long hashval, index;
+	u_long hashval, index;
 
-    hashval = table->hashfn(table, key);
-    index = HASH2INDEX(table->numBuckets, table->numBucketsLog2, hashval);
-    Entry **buckets = (Entry**)table->buckets;
+	hashval = table->hashfn(table, key);
+	index = HASH2INDEX(table->numBuckets, table->numBucketsLog2, hashval);
+	Entry **buckets = (Entry**)table->buckets;
 
-    for (Entry *e = buckets[index], *p = NULL; e; p = e, e = e->next) {
-        if (table->cmpfn(table, key, e->key)) FOUND(table, op, e, p, index);
-    }
-    NOTFOUND(table, op, key, hashval, index);
+	for (Entry *e = buckets[index], *p = NULL; e; p = e, e = e->next) {
+		if (table->cmpfn(table, key, e->key)) FOUND(table, op, e, p, index);
+	}
+	NOTFOUND(table, op, key, hashval, index);
 }
 
 /*============================================================
@@ -763,22 +763,22 @@ static void hash_core_init(ScmHashCore *table,
                            unsigned int initSize,
                            void *data)
 {
-    if (initSize != 0) initSize = round2up(initSize);
-    else initSize = DEFAULT_NUM_BUCKETS;
+	if (initSize != 0) initSize = round2up(initSize);
+	else initSize = DEFAULT_NUM_BUCKETS;
 
-    Entry **b = SCM_NEW_ARRAY(Entry*, initSize);
-    table->buckets = (void**)b;
-    table->numBuckets = initSize;
-    table->numEntries = 0;
-    table->accessfn = (void*)accessfn;
-    table->hashfn = hashfn;
-    table->cmpfn = cmpfn;
-    table->data = data;
-    table->numBucketsLog2 = 0;
-    for (u_int i=initSize; i > 1; i /= 2) {
-        table->numBucketsLog2++;
-    }
-    for (u_int i=0; i<initSize; i++) table->buckets[i] = NULL;
+	Entry **b = SCM_NEW_ARRAY(Entry*, initSize);
+	table->buckets = (void**)b;
+	table->numBuckets = initSize;
+	table->numEntries = 0;
+	table->accessfn = (void*)accessfn;
+	table->hashfn = hashfn;
+	table->cmpfn = cmpfn;
+	table->data = data;
+	table->numBucketsLog2 = 0;
+	for (u_int i=initSize; i > 1; i /= 2) {
+		table->numBucketsLog2++;
+	}
+	for (u_int i=0; i<initSize; i++) table->buckets[i] = NULL;
 }
 
 /* choose appropriate procedures for predefined hash types. */
@@ -787,31 +787,31 @@ int  hash_core_predef_procs(ScmHashType type,
                             ScmHashProc **hashfn,
                             ScmHashCompareProc **cmpfn)
 {
-    switch (type) {
-    case SCM_HASH_EQ:
-    case SCM_HASH_WORD:
-        *accessfn = address_access;
-        *hashfn = address_hash;
-        *cmpfn  = address_cmp;
-        return TRUE;
-    case SCM_HASH_EQV:
-        *accessfn = general_access;
-        *hashfn = eqv_hash;
-        *cmpfn  = eqv_cmp;
-        return TRUE;
-    case SCM_HASH_EQUAL:
-        *accessfn = general_access;
-        *hashfn = equal_hash;
-        *cmpfn  = equal_cmp;
-        return TRUE;
-    case SCM_HASH_STRING:
-        *accessfn = string_access;
-        *hashfn = string_hash;
-        *cmpfn  = string_cmp;
-        return TRUE;
-    default:
-        return FALSE;
-    }
+	switch (type) {
+	case SCM_HASH_EQ:
+	case SCM_HASH_WORD:
+		*accessfn = address_access;
+		*hashfn = address_hash;
+		*cmpfn  = address_cmp;
+		return TRUE;
+	case SCM_HASH_EQV:
+		*accessfn = general_access;
+		*hashfn = eqv_hash;
+		*cmpfn  = eqv_cmp;
+		return TRUE;
+	case SCM_HASH_EQUAL:
+		*accessfn = general_access;
+		*hashfn = equal_hash;
+		*cmpfn  = equal_cmp;
+		return TRUE;
+	case SCM_HASH_STRING:
+		*accessfn = string_access;
+		*hashfn = string_hash;
+		*cmpfn  = string_cmp;
+		return TRUE;
+	default:
+		return FALSE;
+	}
 }
 
 void Scm_HashCoreInitSimple(ScmHashCore *core,
@@ -819,14 +819,14 @@ void Scm_HashCoreInitSimple(ScmHashCore *core,
                             unsigned int initSize,
                             void *data)
 {
-    SearchProc  *accessfn = NULL;
-    ScmHashProc *hashfn = NULL;
-    ScmHashCompareProc *cmpfn = NULL;
+	SearchProc  *accessfn = NULL;
+	ScmHashProc *hashfn = NULL;
+	ScmHashCompareProc *cmpfn = NULL;
 
-    if (hash_core_predef_procs(type, &accessfn, &hashfn, &cmpfn) == FALSE) {
-        Scm_Error("[internal error]: wrong TYPE argument passed to Scm_HashCoreInitSimple: %d", type);
-    }
-    hash_core_init(core, accessfn, hashfn, cmpfn, initSize, data);
+	if (hash_core_predef_procs(type, &accessfn, &hashfn, &cmpfn) == FALSE) {
+		Scm_Error("[internal error]: wrong TYPE argument passed to Scm_HashCoreInitSimple: %d", type);
+	}
+	hash_core_init(core, accessfn, hashfn, cmpfn, initSize, data);
 }
 
 void Scm_HashCoreInitGeneral(ScmHashCore *core,
@@ -835,70 +835,70 @@ void Scm_HashCoreInitGeneral(ScmHashCore *core,
                              unsigned int initSize,
                              void *data)
 {
-    hash_core_init(core, general_access, hashfn,
-                   cmpfn, initSize, data);
+	hash_core_init(core, general_access, hashfn,
+	               cmpfn, initSize, data);
 }
 
 int Scm_HashCoreTypeToProcs(ScmHashType type,
                             ScmHashProc **hashfn,
                             ScmHashCompareProc **cmpfn)
 {
-    SearchProc *accessfn;       /* dummy */
-    return hash_core_predef_procs(type, &accessfn, hashfn, cmpfn);
+	SearchProc *accessfn;   /* dummy */
+	return hash_core_predef_procs(type, &accessfn, hashfn, cmpfn);
 }
 
 void Scm_HashCoreCopy(ScmHashCore *dst, const ScmHashCore *src)
 {
-    Entry **b = SCM_NEW_ARRAY(Entry*, src->numBuckets);
+	Entry **b = SCM_NEW_ARRAY(Entry*, src->numBuckets);
 
-    for (int i=0; i<src->numBuckets; i++) {
-        Entry *p = NULL;
-        Entry *s = (Entry*)src->buckets[i];
-        b[i] = NULL;
-        while (s) {
-            Entry *e = SCM_NEW(Entry);
-            e->key = s->key;
-            e->value = s->value;
-            e->next = NULL;
-            e->hashval = s->hashval;
-            if (p) p->next = e;
-            else   b[i] = e;
-            p = e;
-            s = s->next;
-        }
-    }
+	for (int i=0; i<src->numBuckets; i++) {
+		Entry *p = NULL;
+		Entry *s = (Entry*)src->buckets[i];
+		b[i] = NULL;
+		while (s) {
+			Entry *e = SCM_NEW(Entry);
+			e->key = s->key;
+			e->value = s->value;
+			e->next = NULL;
+			e->hashval = s->hashval;
+			if (p) p->next = e;
+			else b[i] = e;
+			p = e;
+			s = s->next;
+		}
+	}
 
-    /* A little trick to avoid hazard in careless race condition */
-    dst->numBuckets = dst->numEntries = 0;
+	/* A little trick to avoid hazard in careless race condition */
+	dst->numBuckets = dst->numEntries = 0;
 
-    dst->buckets = (void**)b;
-    dst->hashfn   = src->hashfn;
-    dst->cmpfn    = src->cmpfn;
-    dst->accessfn = src->accessfn;
-    dst->data     = src->data;
-    dst->numEntries = src->numEntries;
-    dst->numBucketsLog2 = src->numBucketsLog2;
-    dst->numBuckets = src->numBuckets;
+	dst->buckets = (void**)b;
+	dst->hashfn   = src->hashfn;
+	dst->cmpfn    = src->cmpfn;
+	dst->accessfn = src->accessfn;
+	dst->data     = src->data;
+	dst->numEntries = src->numEntries;
+	dst->numBucketsLog2 = src->numBucketsLog2;
+	dst->numBuckets = src->numBuckets;
 }
 
 void Scm_HashCoreClear(ScmHashCore *table)
 {
-    for (int i=0; i<table->numBuckets; i++) {
-        table->buckets[i] = NULL;
-    }
-    table->numEntries = 0;
+	for (int i=0; i<table->numBuckets; i++) {
+		table->buckets[i] = NULL;
+	}
+	table->numEntries = 0;
 }
 
 ScmDictEntry *Scm_HashCoreSearch(ScmHashCore *table, intptr_t key,
                                  ScmDictOp op)
 {
-    SearchProc *p = (SearchProc*)table->accessfn;
-    return (ScmDictEntry*)p(table, key, op);
+	SearchProc *p = (SearchProc*)table->accessfn;
+	return (ScmDictEntry*)p(table, key, op);
 }
 
 int Scm_HashCoreNumEntries(ScmHashCore *table)
 {
-    return table->numEntries;
+	return table->numEntries;
 }
 
 /*
@@ -908,35 +908,35 @@ int Scm_HashCoreNumEntries(ScmHashCore *table)
  */
 void Scm_HashIterInit(ScmHashIter *iter, ScmHashCore *table)
 {
-    iter->core = table;
-    for (int i=0; i<table->numBuckets; i++) {
-        if (table->buckets[i]) {
-            iter->bucket = i;
-            iter->next = table->buckets[i];
-            return;
-        }
-    }
-    iter->next = NULL;
+	iter->core = table;
+	for (int i=0; i<table->numBuckets; i++) {
+		if (table->buckets[i]) {
+			iter->bucket = i;
+			iter->next = table->buckets[i];
+			return;
+		}
+	}
+	iter->next = NULL;
 }
 
 ScmDictEntry *Scm_HashIterNext(ScmHashIter *iter)
 {
-    Entry *e = (Entry*)iter->next;
-    if (e != NULL) {
-        if (e->next) iter->next = e->next;
-        else {
-            int i = iter->bucket + 1;
-            for (; i < iter->core->numBuckets; i++) {
-                if (iter->core->buckets[i]) {
-                    iter->bucket = i;
-                    iter->next = iter->core->buckets[i];
-                    return (ScmDictEntry*)e;
-                }
-            }
-            iter->next = NULL;
-        }
-    }
-    return (ScmDictEntry*)e;
+	Entry *e = (Entry*)iter->next;
+	if (e != NULL) {
+		if (e->next) iter->next = e->next;
+		else {
+			int i = iter->bucket + 1;
+			for (; i < iter->core->numBuckets; i++) {
+				if (iter->core->buckets[i]) {
+					iter->bucket = i;
+					iter->next = iter->core->buckets[i];
+					return (ScmDictEntry*)e;
+				}
+			}
+			iter->next = NULL;
+		}
+	}
+	return (ScmDictEntry*)e;
 }
 
 /*============================================================
@@ -951,122 +951,122 @@ SCM_DEFINE_BUILTIN_CLASS(Scm_HashTableClass, hash_print, Scm_ObjectCompare,
 
 ScmObj Scm_MakeHashTableSimple(ScmHashType type, unsigned int initSize)
 {
-    /* We only allow ScmObj in <hash-table> */
-    if (type > SCM_HASH_GENERAL) {
-        Scm_Error("Scm_MakeHashTableSimple: wrong type arg: %d", type);
-    }
-    ScmHashTable *z = SCM_NEW(ScmHashTable);
-    SCM_SET_CLASS(z, SCM_CLASS_HASH_TABLE);
-    Scm_HashCoreInitSimple(&z->core, type, initSize, NULL);
-    z->type = type;
-    return SCM_OBJ(z);
+	/* We only allow ScmObj in <hash-table> */
+	if (type > SCM_HASH_GENERAL) {
+		Scm_Error("Scm_MakeHashTableSimple: wrong type arg: %d", type);
+	}
+	ScmHashTable *z = SCM_NEW(ScmHashTable);
+	SCM_SET_CLASS(z, SCM_CLASS_HASH_TABLE);
+	Scm_HashCoreInitSimple(&z->core, type, initSize, NULL);
+	z->type = type;
+	return SCM_OBJ(z);
 }
 
 ScmObj Scm_MakeHashTableFull(ScmHashProc hashfn,
                              ScmHashCompareProc cmpfn,
                              unsigned int initSize, void *data)
 {
-    ScmHashTable *z = SCM_NEW(ScmHashTable);
-    SCM_SET_CLASS(z, SCM_CLASS_HASH_TABLE);
-    z->type = SCM_HASH_GENERAL;
-    Scm_HashCoreInitGeneral(&z->core, hashfn, cmpfn, initSize, data);
-    return SCM_OBJ(z);
+	ScmHashTable *z = SCM_NEW(ScmHashTable);
+	SCM_SET_CLASS(z, SCM_CLASS_HASH_TABLE);
+	z->type = SCM_HASH_GENERAL;
+	Scm_HashCoreInitGeneral(&z->core, hashfn, cmpfn, initSize, data);
+	return SCM_OBJ(z);
 }
 
 ScmObj Scm_HashTableCopy(ScmHashTable *src)
 {
-    ScmHashTable *dst = SCM_NEW(ScmHashTable);
-    SCM_SET_CLASS(dst, SCM_CLASS_HASH_TABLE);
-    Scm_HashCoreCopy(SCM_HASH_TABLE_CORE(dst), SCM_HASH_TABLE_CORE(src));
-    dst->type = src->type;
-    return SCM_OBJ(dst);
+	ScmHashTable *dst = SCM_NEW(ScmHashTable);
+	SCM_SET_CLASS(dst, SCM_CLASS_HASH_TABLE);
+	Scm_HashCoreCopy(SCM_HASH_TABLE_CORE(dst), SCM_HASH_TABLE_CORE(src));
+	dst->type = src->type;
+	return SCM_OBJ(dst);
 }
 
 ScmHashType Scm_HashTableType(ScmHashTable *ht)
 {
-    return ht->type;
+	return ht->type;
 }
 
 ScmObj Scm_HashTableRef(ScmHashTable *ht, ScmObj key, ScmObj fallback)
 {
-    ScmDictEntry *e = Scm_HashCoreSearch(SCM_HASH_TABLE_CORE(ht),
-                                         (intptr_t)key, SCM_DICT_GET);
-    if (!e) return fallback;
-    else    return SCM_DICT_VALUE(e);
+	ScmDictEntry *e = Scm_HashCoreSearch(SCM_HASH_TABLE_CORE(ht),
+	                                     (intptr_t)key, SCM_DICT_GET);
+	if (!e) return fallback;
+	else return SCM_DICT_VALUE(e);
 }
 
 /* Returns previous value; can return SCM_UNBOUND when the association hasn't
    been there.  Be careful not to let SCM_UNBOUND leak out to Scheme! */
 ScmObj Scm_HashTableSet(ScmHashTable *ht, ScmObj key, ScmObj value, int flags)
 {
-    ScmDictEntry *e;
+	ScmDictEntry *e;
 
-    e = Scm_HashCoreSearch(SCM_HASH_TABLE_CORE(ht),
-                           (intptr_t)key,
-                           (flags&SCM_DICT_NO_CREATE)?SCM_DICT_GET: SCM_DICT_CREATE);
-    if (!e) return SCM_UNBOUND;
-    ScmObj oldval = e->value? SCM_DICT_VALUE(e) : SCM_UNBOUND;
-    if (!(flags&SCM_DICT_NO_OVERWRITE) || SCM_UNBOUNDP(oldval)) {
-        return SCM_DICT_SET_VALUE(e, value);
-    }
-    return oldval;
+	e = Scm_HashCoreSearch(SCM_HASH_TABLE_CORE(ht),
+	                       (intptr_t)key,
+	                       (flags&SCM_DICT_NO_CREATE) ? SCM_DICT_GET : SCM_DICT_CREATE);
+	if (!e) return SCM_UNBOUND;
+	ScmObj oldval = e->value ? SCM_DICT_VALUE(e) : SCM_UNBOUND;
+	if (!(flags&SCM_DICT_NO_OVERWRITE) || SCM_UNBOUNDP(oldval)) {
+		return SCM_DICT_SET_VALUE(e, value);
+	}
+	return oldval;
 }
 
 ScmObj Scm_HashTableDelete(ScmHashTable *ht, ScmObj key)
 {
-    ScmDictEntry *e = Scm_HashCoreSearch(SCM_HASH_TABLE_CORE(ht),
-                                         (intptr_t)key, SCM_DICT_DELETE);
-    if (e && e->value) return SCM_DICT_VALUE(e);
-    else               return SCM_UNBOUND;
+	ScmDictEntry *e = Scm_HashCoreSearch(SCM_HASH_TABLE_CORE(ht),
+	                                     (intptr_t)key, SCM_DICT_DELETE);
+	if (e && e->value) return SCM_DICT_VALUE(e);
+	else return SCM_UNBOUND;
 }
 
 ScmObj Scm_HashTableKeys(ScmHashTable *table)
 {
-    ScmHashIter iter;
-    ScmDictEntry *e;
-    ScmObj h = SCM_NIL, t = SCM_NIL;
-    Scm_HashIterInit(&iter, SCM_HASH_TABLE_CORE(table));
-    while ((e = Scm_HashIterNext(&iter)) != NULL) {
-        SCM_APPEND1(h, t, SCM_DICT_KEY(e));
-    }
-    return h;
+	ScmHashIter iter;
+	ScmDictEntry *e;
+	ScmObj h = SCM_NIL, t = SCM_NIL;
+	Scm_HashIterInit(&iter, SCM_HASH_TABLE_CORE(table));
+	while ((e = Scm_HashIterNext(&iter)) != NULL) {
+		SCM_APPEND1(h, t, SCM_DICT_KEY(e));
+	}
+	return h;
 }
 
 ScmObj Scm_HashTableValues(ScmHashTable *table)
 {
-    ScmHashIter iter;
-    ScmDictEntry *e;
-    ScmObj h = SCM_NIL, t = SCM_NIL;
-    Scm_HashIterInit(&iter, SCM_HASH_TABLE_CORE(table));
-    while ((e = Scm_HashIterNext(&iter)) != NULL) {
-        SCM_APPEND1(h, t, SCM_DICT_VALUE(e));
-    }
-    return h;
+	ScmHashIter iter;
+	ScmDictEntry *e;
+	ScmObj h = SCM_NIL, t = SCM_NIL;
+	Scm_HashIterInit(&iter, SCM_HASH_TABLE_CORE(table));
+	while ((e = Scm_HashIterNext(&iter)) != NULL) {
+		SCM_APPEND1(h, t, SCM_DICT_VALUE(e));
+	}
+	return h;
 }
 
 ScmObj Scm_HashTableStat(ScmHashTable *table)
 {
-    ScmObj h = SCM_NIL, t = SCM_NIL;
-    ScmHashCore *c = SCM_HASH_TABLE_CORE(table);
-    SCM_APPEND1(h, t, SCM_MAKE_KEYWORD("num-entries"));
-    SCM_APPEND1(h, t, Scm_MakeInteger(c->numEntries));
-    SCM_APPEND1(h, t, SCM_MAKE_KEYWORD("num-buckets"));
-    SCM_APPEND1(h, t, Scm_MakeInteger(c->numBuckets));
-    SCM_APPEND1(h, t, SCM_MAKE_KEYWORD("num-buckets-log2"));
-    SCM_APPEND1(h, t, Scm_MakeInteger(c->numBucketsLog2));
+	ScmObj h = SCM_NIL, t = SCM_NIL;
+	ScmHashCore *c = SCM_HASH_TABLE_CORE(table);
+	SCM_APPEND1(h, t, SCM_MAKE_KEYWORD("num-entries"));
+	SCM_APPEND1(h, t, Scm_MakeInteger(c->numEntries));
+	SCM_APPEND1(h, t, SCM_MAKE_KEYWORD("num-buckets"));
+	SCM_APPEND1(h, t, Scm_MakeInteger(c->numBuckets));
+	SCM_APPEND1(h, t, SCM_MAKE_KEYWORD("num-buckets-log2"));
+	SCM_APPEND1(h, t, Scm_MakeInteger(c->numBucketsLog2));
 
-    Entry** b = BUCKETS(c);
-    ScmVector *v = SCM_VECTOR(Scm_MakeVector(c->numBuckets, SCM_NIL));
-    ScmObj *vp = SCM_VECTOR_ELEMENTS(v);
-    for (int i = 0; i<c->numBuckets; i++, vp++) {
-        Entry *e = b[i];
-        for (; e; e = e->next) {
-            *vp = Scm_Acons(SCM_DICT_KEY(e), SCM_DICT_VALUE(e), *vp);
-        }
-    }
-    SCM_APPEND1(h, t, SCM_MAKE_KEYWORD("contents"));
-    SCM_APPEND1(h, t, SCM_OBJ(v));
-    return h;
+	Entry** b = BUCKETS(c);
+	ScmVector *v = SCM_VECTOR(Scm_MakeVector(c->numBuckets, SCM_NIL));
+	ScmObj *vp = SCM_VECTOR_ELEMENTS(v);
+	for (int i = 0; i<c->numBuckets; i++, vp++) {
+		Entry *e = b[i];
+		for (; e; e = e->next) {
+			*vp = Scm_Acons(SCM_DICT_KEY(e), SCM_DICT_VALUE(e), *vp);
+		}
+	}
+	SCM_APPEND1(h, t, SCM_MAKE_KEYWORD("contents"));
+	SCM_APPEND1(h, t, SCM_OBJ(v));
+	return h;
 }
 
 
@@ -1078,45 +1078,45 @@ ScmObj Scm_HashTableStat(ScmHashTable *table)
  * Printer
  */
 
-static void hash_print(ScmObj obj, ScmPort *port, 
+static void hash_print(ScmObj obj, ScmPort *port,
                        ScmWriteContext *ctx SCM_UNUSED)
 {
-    ScmHashTable *ht = (ScmHashTable*)obj;
-    char *str = "";
+	ScmHashTable *ht = (ScmHashTable*)obj;
+	char *str = "";
 
-    switch (ht->type) {
-    case SCM_HASH_EQ:      str = "eq?"; break;
-    case SCM_HASH_EQV:     str = "eqv?"; break;
-    case SCM_HASH_EQUAL:   str = "equal?"; break;
-    case SCM_HASH_STRING:  str = "string=?"; break;
-    case SCM_HASH_GENERAL: str = "general"; break;
-    default: Scm_Panic("something wrong with a hash table");
-    }
+	switch (ht->type) {
+	case SCM_HASH_EQ:      str = "eq?"; break;
+	case SCM_HASH_EQV:     str = "eqv?"; break;
+	case SCM_HASH_EQUAL:   str = "equal?"; break;
+	case SCM_HASH_STRING:  str = "string=?"; break;
+	case SCM_HASH_GENERAL: str = "general"; break;
+	default: Scm_Panic("something wrong with a hash table");
+	}
 
 #if 0
-    /* Use read-time constructor so that table can be read back
-       --- is it necessary?  I'm not sure yet. */
-    Scm_Printf(port, "#,(<hash-table> %s", str);
-    if (ht->numEntries > 0) {
-        Scm_HashIterInit(&iter, ht);
-        while ((e = Scm_HashIterNext(&iter)) != NULL) {
-            Scm_Printf(port, " %S %S", e->key, e->value);
-        }
-    }
-    SCM_PUTZ(")", -1, port);
+	/* Use read-time constructor so that table can be read back
+	   --- is it necessary?  I'm not sure yet. */
+	Scm_Printf(port, "#,(<hash-table> %s", str);
+	if (ht->numEntries > 0) {
+		Scm_HashIterInit(&iter, ht);
+		while ((e = Scm_HashIterNext(&iter)) != NULL) {
+			Scm_Printf(port, " %S %S", e->key, e->value);
+		}
+	}
+	SCM_PUTZ(")", -1, port);
 #else
-    Scm_Printf(port, "#<hash-table %s %p>", str, ht);
+	Scm_Printf(port, "#<hash-table %s %p>", str, ht);
 #endif
 }
 
 static unsigned int round2up(unsigned int val)
 {
-    unsigned int n = 1;
-    while (n < val) {
-        n <<= 1;
-        SCM_ASSERT(n > 1);      /* check overflow */
-    }
-    return n;
+	unsigned int n = 1;
+	while (n < val) {
+		n <<= 1;
+		SCM_ASSERT(n > 1); /* check overflow */
+	}
+	return n;
 }
 
 /*====================================================================
@@ -1125,23 +1125,23 @@ static unsigned int round2up(unsigned int val)
 
 void Scm__InitHash()
 {
-    struct timeval t;
-    if (gettimeofday(&t, NULL) < 0) {
-        Scm_Panic("gettimeofday failed");
-    }
-    u_long salt = ((u_long)getpid() * ((u_long)t.tv_sec^(u_long)t.tv_usec));
-    ADDRESS_HASH(salt, salt);
-    salt &= SCM_SMALL_INT_MAX;
-    /* 
-     * We can't use Scm_BindPrimitiveParameter here, since symbol table
-     * is not initialized yet (symbol table uses hashtable!)
-     */
-    hash_salt = 
-        Scm_MakePrimitiveParameter(SCM_CLASS_PRIMITIVE_PARAMETER, SCM_FALSE, 
-                                   Scm_MakeIntegerU(salt), 0);
-    current_recursive_hash = 
-        Scm_MakePrimitiveParameter(SCM_CLASS_PRIMITIVE_PARAMETER, SCM_FALSE, 
-                                   SCM_FALSE, 0);
+	struct timeval t;
+	if (gettimeofday(&t, NULL) < 0) {
+		Scm_Panic("gettimeofday failed");
+	}
+	u_long salt = ((u_long)getpid() * ((u_long)t.tv_sec^(u_long)t.tv_usec));
+	ADDRESS_HASH(salt, salt);
+	salt &= SCM_SMALL_INT_MAX;
+	/*
+	 * We can't use Scm_BindPrimitiveParameter here, since symbol table
+	 * is not initialized yet (symbol table uses hashtable!)
+	 */
+	hash_salt =
+		Scm_MakePrimitiveParameter(SCM_CLASS_PRIMITIVE_PARAMETER, SCM_FALSE,
+		                           Scm_MakeIntegerU(salt), 0);
+	current_recursive_hash =
+		Scm_MakePrimitiveParameter(SCM_CLASS_PRIMITIVE_PARAMETER, SCM_FALSE,
+		                           SCM_FALSE, 0);
 }
 
 /*====================================================================
@@ -1155,57 +1155,57 @@ void Scm__InitHash()
    the new API is recommended. */
 ScmHashEntry *Scm_HashTableGet(ScmHashTable *ht, ScmObj key)
 {
-    if (sizeof(intptr_t) != sizeof(void*)) {
-        Scm_Error("[internal] Scm_HashTableGet is obsoleted on this platform.  You should use the new hashtable API.");
-    }
-    return (ScmHashEntry*)Scm_HashCoreSearch(SCM_HASH_TABLE_CORE(ht),
-                                             (intptr_t)key,
-                                             SCM_DICT_GET);
+	if (sizeof(intptr_t) != sizeof(void*)) {
+		Scm_Error("[internal] Scm_HashTableGet is obsoleted on this platform.  You should use the new hashtable API.");
+	}
+	return (ScmHashEntry*)Scm_HashCoreSearch(SCM_HASH_TABLE_CORE(ht),
+	                                         (intptr_t)key,
+	                                         SCM_DICT_GET);
 }
 
 ScmHashEntry *Scm_HashTableAdd(ScmHashTable *ht, ScmObj key, ScmObj value)
 {
-    ScmDictEntry *e = Scm_HashCoreSearch(SCM_HASH_TABLE_CORE(ht),
-                                         (intptr_t)key, SCM_DICT_CREATE);
-    if (sizeof(intptr_t) != sizeof(void*)) {
-        Scm_Error("[internal] Scm_HashTableAdd is obsoleted on this platform.  You should use the new hashtable API.");
-    }
-    if (!e->value) (void)SCM_DICT_SET_VALUE(e, value);
-    return (ScmHashEntry*)e;
+	ScmDictEntry *e = Scm_HashCoreSearch(SCM_HASH_TABLE_CORE(ht),
+	                                     (intptr_t)key, SCM_DICT_CREATE);
+	if (sizeof(intptr_t) != sizeof(void*)) {
+		Scm_Error("[internal] Scm_HashTableAdd is obsoleted on this platform.  You should use the new hashtable API.");
+	}
+	if (!e->value) (void)SCM_DICT_SET_VALUE(e, value);
+	return (ScmHashEntry*)e;
 }
 
 ScmHashEntry *Scm_HashTablePut(ScmHashTable *ht, ScmObj key, ScmObj value)
 {
-    ScmDictEntry *e = Scm_HashCoreSearch(SCM_HASH_TABLE_CORE(ht),
-                                         (intptr_t)key, SCM_DICT_CREATE);
-    if (sizeof(intptr_t) != sizeof(void*)) {
-        Scm_Error("[internal] Scm_HashTablePut is obsoleted on this platform.  You should use the new hashtable API.");
-    }
-    (void)SCM_DICT_SET_VALUE(e, value);
-    return (ScmHashEntry*)e;
+	ScmDictEntry *e = Scm_HashCoreSearch(SCM_HASH_TABLE_CORE(ht),
+	                                     (intptr_t)key, SCM_DICT_CREATE);
+	if (sizeof(intptr_t) != sizeof(void*)) {
+		Scm_Error("[internal] Scm_HashTablePut is obsoleted on this platform.  You should use the new hashtable API.");
+	}
+	(void)SCM_DICT_SET_VALUE(e, value);
+	return (ScmHashEntry*)e;
 }
 
 /* TRANSIENT: Pre-0.9 Compatibility routine.  Kept for the binary compatibility.
    Will be removed on 1.0 */
 void Scm__HashIterInitCompat(ScmHashTable *table, ScmHashIter *iter)
 {
-    Scm_HashIterInit(iter, SCM_HASH_TABLE_CORE(table));
+	Scm_HashIterInit(iter, SCM_HASH_TABLE_CORE(table));
 }
 
 /* TRANSIENT: Pre-0.9 Compatibility routine.  Kept for the binary compatibility.
    Will be removed on 1.0 */
 ScmHashEntry *Scm__HashIterNextCompat(ScmHashIter *iter)
 {
-    ScmDictEntry *e = Scm_HashIterNext(iter);
-    return (ScmHashEntry*)e;
+	ScmDictEntry *e = Scm_HashIterNext(iter);
+	return (ScmHashEntry*)e;
 }
 
 #if 0
 ScmObj Scm_MakeHashTableMultiWord(int keysize, int initsize)
 {
-    return make_hash_table(SCM_CLASS_HASH_TABLE, SCM_HASH_MULTIWORD,
-                           multiword_access, multiword_hash,
-                           NULL, initsize, (void*)SCM_WORD(keysize));
+	return make_hash_table(SCM_CLASS_HASH_TABLE, SCM_HASH_MULTIWORD,
+	                       multiword_access, multiword_hash,
+	                       NULL, initsize, (void*)SCM_WORD(keysize));
 }
 #endif
 
@@ -1214,22 +1214,22 @@ ScmObj Scm_MakeHashTable(ScmHashProc *hashfn,
                          ScmHashCompareProc *cmpfn SCM_UNUSED,
                          unsigned int initSize)
 {
-    if (hashfn == (ScmHashProc*)SCM_HASH_EQ) {
-        return Scm_MakeHashTableSimple(SCM_HASH_EQ, initSize);
-    } else if (hashfn == (ScmHashProc*)SCM_HASH_EQV) {
-        return Scm_MakeHashTableSimple(SCM_HASH_EQV, initSize);
-    } else if (hashfn == (ScmHashProc*)SCM_HASH_EQUAL) {
-        return Scm_MakeHashTableSimple(SCM_HASH_EQUAL, initSize);
-    } else if (hashfn == (ScmHashProc*)SCM_HASH_STRING) {
-        return Scm_MakeHashTableSimple(SCM_HASH_STRING, initSize);
-    }
+	if (hashfn == (ScmHashProc*)SCM_HASH_EQ) {
+		return Scm_MakeHashTableSimple(SCM_HASH_EQ, initSize);
+	} else if (hashfn == (ScmHashProc*)SCM_HASH_EQV) {
+		return Scm_MakeHashTableSimple(SCM_HASH_EQV, initSize);
+	} else if (hashfn == (ScmHashProc*)SCM_HASH_EQUAL) {
+		return Scm_MakeHashTableSimple(SCM_HASH_EQUAL, initSize);
+	} else if (hashfn == (ScmHashProc*)SCM_HASH_STRING) {
+		return Scm_MakeHashTableSimple(SCM_HASH_STRING, initSize);
+	}
 #if 0
-    else {
-        return Scm_MakeHashTableFull(SCM_CLASS_HASH_TABLE, SCM_HASH_GENERAL,
-                                     hashfn, cmpfn, initSize, NULL);
-    }
+	else {
+		return Scm_MakeHashTableFull(SCM_CLASS_HASH_TABLE, SCM_HASH_GENERAL,
+		                             hashfn, cmpfn, initSize, NULL);
+	}
 #else
-    return SCM_UNDEFINED;
+	return SCM_UNDEFINED;
 #endif
 }
 
@@ -1256,114 +1256,114 @@ static u_long legacy_string_hash(ScmString *str);
 
 u_long Scm_Hash(ScmObj obj)
 {
-    if (!SCM_PTRP(obj)) {
-        u_long hashval;
-        SMALL_INT_HASH(hashval, (u_long)SCM_WORD(obj));
-        return hashval&PORTABLE_HASHMASK;
-    } else if (SCM_NUMBERP(obj)) {
-        return legacy_number_hash(obj);
-    } else if (SCM_STRINGP(obj)) {
-        goto string_hash;
-    } else if (SCM_PAIRP(obj)) {
-        u_long h = 0, h2;
-        ScmObj cp;
-        SCM_FOR_EACH(cp, obj) {
-            h2 = Scm_Hash(SCM_CAR(cp));
-            h = COMBINE(h, h2);
-        }
-        h2 = Scm_Hash(cp);
-        h = COMBINE(h, h2);
-        return h&PORTABLE_HASHMASK;
-    } else if (SCM_VECTORP(obj)) {
-        int siz = SCM_VECTOR_SIZE(obj);
-        u_long h = 0, h2;
-        for (int i=0; i<siz; i++) {
-            h2 = Scm_Hash(SCM_VECTOR_ELEMENT(obj, i));
-            h = COMBINE(h, h2);
-        }
-        return h&PORTABLE_HASHMASK;
-    } else if (SCM_KEYWORDP(obj)) {
-        /* If we have keyword and symbol unified, KEYWORD_NAME includes
-           ':'.  Legacy hash didn't consider it. */
+	if (!SCM_PTRP(obj)) {
+		u_long hashval;
+		SMALL_INT_HASH(hashval, (u_long)SCM_WORD(obj));
+		return hashval&PORTABLE_HASHMASK;
+	} else if (SCM_NUMBERP(obj)) {
+		return legacy_number_hash(obj);
+	} else if (SCM_STRINGP(obj)) {
+		goto string_hash;
+	} else if (SCM_PAIRP(obj)) {
+		u_long h = 0, h2;
+		ScmObj cp;
+		SCM_FOR_EACH(cp, obj) {
+			h2 = Scm_Hash(SCM_CAR(cp));
+			h = COMBINE(h, h2);
+		}
+		h2 = Scm_Hash(cp);
+		h = COMBINE(h, h2);
+		return h&PORTABLE_HASHMASK;
+	} else if (SCM_VECTORP(obj)) {
+		int siz = SCM_VECTOR_SIZE(obj);
+		u_long h = 0, h2;
+		for (int i=0; i<siz; i++) {
+			h2 = Scm_Hash(SCM_VECTOR_ELEMENT(obj, i));
+			h = COMBINE(h, h2);
+		}
+		return h&PORTABLE_HASHMASK;
+	} else if (SCM_KEYWORDP(obj)) {
+		/* If we have keyword and symbol unified, KEYWORD_NAME includes
+		   ':'.  Legacy hash didn't consider it. */
 #if GAUCHE_KEEP_DISJOINT_KEYWORD_OPTION
-        if (SCM_SYMBOLP(obj)) {
-            obj = Scm_Substring(SCM_KEYWORD_NAME(obj), 1, -1, FALSE);
-        } else {
-            obj = SCM_OBJ(SCM_KEYWORD_NAME(obj));
-        }
+		if (SCM_SYMBOLP(obj)) {
+			obj = Scm_Substring(SCM_KEYWORD_NAME(obj), 1, -1, FALSE);
+		} else {
+			obj = SCM_OBJ(SCM_KEYWORD_NAME(obj));
+		}
 #else  /*!GAUCHE_KEEP_DISJOINT_KEYWORD_OPTION*/
-        obj = Scm_Substring(SCM_KEYWORD_NAME(obj), 1, -1, FALSE);
+		obj = Scm_Substring(SCM_KEYWORD_NAME(obj), 1, -1, FALSE);
 #endif /*!GAUCHE_KEEP_DISJOINT_KEYWORD_OPTION*/
-        goto string_hash;
-    } else if (SCM_SYMBOLP(obj)) {
-        obj = SCM_OBJ(SCM_SYMBOL_NAME(obj));
-        goto string_hash;
-    } else {
-        /* Call specialized object-hash method */
-        ScmObj r = Scm_ApplyRec(SCM_OBJ(&Scm_GenericObjectHash),
-                                SCM_LIST1(obj));
-        if (SCM_INTP(r)) {
-            return ((u_long)SCM_INT_VALUE(r))&PORTABLE_HASHMASK;
-        }
-        if (SCM_BIGNUMP(r)) {
-            /* NB: Scm_GetUInteger clamps the result to [0, ULONG_MAX],
-               but taking the LSW would give better distribution. */
-            return (SCM_BIGNUM(r)->values[0])&PORTABLE_HASHMASK;
-        }
-        Scm_Error("object-hash returned non-integer: %S", r);
-        return 0;               /* dummy */
-    }
-  string_hash:
-    return legacy_string_hash(SCM_STRING(obj));
+		goto string_hash;
+	} else if (SCM_SYMBOLP(obj)) {
+		obj = SCM_OBJ(SCM_SYMBOL_NAME(obj));
+		goto string_hash;
+	} else {
+		/* Call specialized object-hash method */
+		ScmObj r = Scm_ApplyRec(SCM_OBJ(&Scm_GenericObjectHash),
+		                        SCM_LIST1(obj));
+		if (SCM_INTP(r)) {
+			return ((u_long)SCM_INT_VALUE(r))&PORTABLE_HASHMASK;
+		}
+		if (SCM_BIGNUMP(r)) {
+			/* NB: Scm_GetUInteger clamps the result to [0, ULONG_MAX],
+			   but taking the LSW would give better distribution. */
+			return (SCM_BIGNUM(r)->values[0])&PORTABLE_HASHMASK;
+		}
+		Scm_Error("object-hash returned non-integer: %S", r);
+		return 0;       /* dummy */
+	}
+string_hash:
+	return legacy_string_hash(SCM_STRING(obj));
 }
 
 static u_long legacy_flonum_hash(double f)
 {
-    /* Originally the code was just (u_long)(f * 2654435761UL), but that's
-       UB when the multiplication yields out of range of u_long.  I don't
-       even remember why I adopted that for the hash function in the
-       first place, but we have to stick to existing hash values recorded
-       elsewhere.
+	/* Originally the code was just (u_long)(f * 2654435761UL), but that's
+	   UB when the multiplication yields out of range of u_long.  I don't
+	   even remember why I adopted that for the hash function in the
+	   first place, but we have to stick to existing hash values recorded
+	   elsewhere.
 
-       On x86 with 8087-compatible FPU, (u_long)(d) behaves as follows.
-       If -2^63 < d < 2^63, the modulo of 2^32 is taken.  Otherwise
-       it yields 0.
+	   On x86 with 8087-compatible FPU, (u_long)(d) behaves as follows.
+	   If -2^63 < d < 2^63, the modulo of 2^32 is taken.  Otherwise
+	   it yields 0.
 
-       On x86 with SSE, the out-of-range value yields #x8000_0000.
+	   On x86 with SSE, the out-of-range value yields #x8000_0000.
 
-       On x86_64, if -2^63 < d < 2^64, the modulo of 2^32 is taken.
-       Otherwise it yields #x8000_0000_0000_0000.
+	   On x86_64, if -2^63 < d < 2^64, the modulo of 2^32 is taken.
+	   Otherwise it yields #x8000_0000_0000_0000.
 
-       To achieve maximum compatibility with historical data, we
-       take the range of 8087, and the calculation is adjusted for
-       x86_64 behavior.  There can be a slight discrepancy from the
-       result of 8087 because of its internal 80bit calculation---for
-       example, 3.767278962604362e-10 * 2654435761 is just tiny little
-       bit less than 1.0 but with 64bit calculation it is rounded up
-       to 1.0.  With 80 bit and integer truncation the result is 0 but
-       with 64bit we get 1.
-     */
-    volatile double d = f * 2654435761UL;
-    static double two_pow_63 = 0.0;
-    static double minus_two_pow_63 = 0.0;
-    static double two_pow_32 = 0.0;
-    static int initialized = FALSE;
+	   To achieve maximum compatibility with historical data, we
+	   take the range of 8087, and the calculation is adjusted for
+	   x86_64 behavior.  There can be a slight discrepancy from the
+	   result of 8087 because of its internal 80bit calculation---for
+	   example, 3.767278962604362e-10 * 2654435761 is just tiny little
+	   bit less than 1.0 but with 64bit calculation it is rounded up
+	   to 1.0.  With 80 bit and integer truncation the result is 0 but
+	   with 64bit we get 1.
+	 */
+	volatile double d = f * 2654435761UL;
+	static double two_pow_63 = 0.0;
+	static double minus_two_pow_63 = 0.0;
+	static double two_pow_32 = 0.0;
+	static int initialized = FALSE;
 
-    if (!initialized) {
-        /* This is idempotent - no need to lock */
-        two_pow_63 = ldexp(1.0, 63);
-        minus_two_pow_63 = -ldexp(1.0, 63);
-        two_pow_32 = ldexp(1.0, 32);
-        AO_nop_full();
-        initialized = TRUE;
-    }
-    /* This condition eliminates NaN as well. */
-    if (!(minus_two_pow_63 < d && d < two_pow_63)) return 0;
-    if (-0.5 < d && d < 0.5) return 0;
-                                 
-    double dm = trunc(fmod(d, two_pow_32));
-    if (dm < 0) dm += two_pow_32;
-    return (u_long)trunc(dm);
+	if (!initialized) {
+		/* This is idempotent - no need to lock */
+		two_pow_63 = ldexp(1.0, 63);
+		minus_two_pow_63 = -ldexp(1.0, 63);
+		two_pow_32 = ldexp(1.0, 32);
+		AO_nop_full();
+		initialized = TRUE;
+	}
+	/* This condition eliminates NaN as well. */
+	if (!(minus_two_pow_63 < d && d < two_pow_63)) return 0;
+	if (-0.5 < d && d < 0.5) return 0;
+
+	double dm = trunc(fmod(d, two_pow_32));
+	if (dm < 0) dm += two_pow_32;
+	return (u_long)trunc(dm);
 }
 
 /* Old hash function for numeric objects.  This is terrible for flonums,
@@ -1371,49 +1371,49 @@ static u_long legacy_flonum_hash(double f)
    by legacy hash function. */
 static u_long legacy_number_hash(ScmObj obj)
 {
-    u_long hashval;
-    SCM_ASSERT(SCM_NUMBERP(obj));
-    if (SCM_INTP(obj)) {
-        SMALL_INT_HASH(hashval, SCM_INT_VALUE(obj));
-    } else if (SCM_BIGNUMP(obj)) {
-        u_int i;
-        u_long u = 0;
-        for (i=0; i<SCM_BIGNUM_SIZE(obj); i++) {
+	u_long hashval;
+	SCM_ASSERT(SCM_NUMBERP(obj));
+	if (SCM_INTP(obj)) {
+		SMALL_INT_HASH(hashval, SCM_INT_VALUE(obj));
+	} else if (SCM_BIGNUMP(obj)) {
+		u_int i;
+		u_long u = 0;
+		for (i=0; i<SCM_BIGNUM_SIZE(obj); i++) {
 #if SIZEOF_LONG == 4
-            u += SCM_BIGNUM(obj)->values[i];
+			u += SCM_BIGNUM(obj)->values[i];
 #elif SIZEOF_LONG == 8
-            u += (SCM_BIGNUM(obj)->values[i] & ((1UL<<32) - 1))
-                + (SCM_BIGNUM(obj)->values[i] >> 32);
+			u += (SCM_BIGNUM(obj)->values[i] & ((1UL<<32) - 1))
+			     + (SCM_BIGNUM(obj)->values[i] >> 32);
 #else
 #error "sizeof(long) > 8 platform unsupported"
 #endif
-        }
-        SMALL_INT_HASH(hashval, u);
-    } else if (SCM_FLONUMP(obj)) {
-        hashval = legacy_flonum_hash(SCM_FLONUM_VALUE(obj));
-    } else if (SCM_RATNUMP(obj)) {
-        /* Ratnum must already be normalized, so we can simply combine
-           hashvals of numerator and denominator. */
-        u_long h1 = legacy_number_hash(SCM_RATNUM_NUMER(obj));
-        u_long h2 = legacy_number_hash(SCM_RATNUM_DENOM(obj));
-        hashval = COMBINE(h1, h2);
-    } else {
-        hashval =
-            legacy_flonum_hash(SCM_COMPNUM_REAL(obj)+SCM_COMPNUM_IMAG(obj));
-    }
-    return hashval&PORTABLE_HASHMASK;
+		}
+		SMALL_INT_HASH(hashval, u);
+	} else if (SCM_FLONUMP(obj)) {
+		hashval = legacy_flonum_hash(SCM_FLONUM_VALUE(obj));
+	} else if (SCM_RATNUMP(obj)) {
+		/* Ratnum must already be normalized, so we can simply combine
+		   hashvals of numerator and denominator. */
+		u_long h1 = legacy_number_hash(SCM_RATNUM_NUMER(obj));
+		u_long h2 = legacy_number_hash(SCM_RATNUM_DENOM(obj));
+		hashval = COMBINE(h1, h2);
+	} else {
+		hashval =
+			legacy_flonum_hash(SCM_COMPNUM_REAL(obj)+SCM_COMPNUM_IMAG(obj));
+	}
+	return hashval&PORTABLE_HASHMASK;
 }
 
 /* Legacy hash function for strings.  This isn't very good hash function
    either, and it's difficult to adopt salting. */
 static u_long legacy_string_hash(ScmString *str)
 {
-    const ScmStringBody *b = SCM_STRING_BODY(str);
-    const char *p = SCM_STRING_BODY_START(b);
-    long k = SCM_STRING_BODY_SIZE(b);
-    u_long hv = 0;
-    while (k-- > 0) {
-        hv = (hv<<5) - (hv) + ((unsigned char)*p++);
-    }
-    return hv&PORTABLE_HASHMASK;
+	const ScmStringBody *b = SCM_STRING_BODY(str);
+	const char *p = SCM_STRING_BODY_START(b);
+	long k = SCM_STRING_BODY_SIZE(b);
+	u_long hv = 0;
+	while (k-- > 0) {
+		hv = (hv<<5) - (hv) + ((unsigned char)*p++);
+	}
+	return hv&PORTABLE_HASHMASK;
 }

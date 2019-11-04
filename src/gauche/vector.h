@@ -39,9 +39,9 @@
  */
 
 struct ScmVectorRec {
-    SCM_HEADER;
-    ScmWord size;
-    ScmObj elements[1];
+	SCM_HEADER;
+	ScmWord size;
+	ScmObj elements[1];
 };
 
 #define SCM_VECTOR(obj)          ((ScmVector*)(obj))
@@ -77,10 +77,10 @@ SCM_EXTERN ScmObj Scm_VectorCopy(ScmVector *vec,
 /* Common uniform vector structure */
 
 typedef struct ScmUVectorRec {
-    SCM_HEADER;
-    ScmWord size_flags;         /* (len<<1)|immutable */
-    void *owner;
-    void *elements;
+	SCM_HEADER;
+	ScmWord size_flags;     /* (len<<1)|immutable */
+	void *owner;
+	void *elements;
 } ScmUVector;
 
 SCM_CLASS_DECL(Scm_UVectorClass);
@@ -93,46 +93,46 @@ SCM_CLASS_DECL(Scm_UVectorClass);
 #define SCM_UVECTOR_SIZE(obj)     (SCM_UVECTOR(obj)->size_flags >> 1)
 #define SCM_UVECTOR_IMMUTABLE_P(obj) (SCM_UVECTOR(obj)->size_flags & 1)
 #define SCM_UVECTOR_IMMUTABLE_SET(obj, flag)    \
-    ((flag)                                     \
-     ? (SCM_UVECTOR(obj)->size_flags |= 1)      \
-     : (SCM_UVECTOR(obj)->size_flags &= ~1))
+	((flag)                                     \
+	 ? (SCM_UVECTOR(obj)->size_flags |= 1)      \
+	 : (SCM_UVECTOR(obj)->size_flags &= ~1))
 #define SCM_UVECTOR_INITIALIZER(klass, size, elements, immutable, owner) \
-    { { SCM_CLASS_STATIC_TAG(klass) }, (((size)<<1)|(immutable?1:0)),    \
-      (owner), (elements) }
+	{ { SCM_CLASS_STATIC_TAG(klass) }, (((size)<<1)|(immutable ? 1 : 0)),    \
+		(owner), (elements) }
 
 #define SCM_UVECTOR_CHECK_MUTABLE(obj)                 \
-  do { if (SCM_UVECTOR_IMMUTABLE_P(obj)) {             \
-    Scm_Error("uniform vector is immutable: %S", obj); \
-  }} while (0)
+	do { if (SCM_UVECTOR_IMMUTABLE_P(obj)) {             \
+		     Scm_Error("uniform vector is immutable: %S", obj); \
+	     }} while (0)
 
 /* A convenient enum to dispatch by specific uvector subclasses
    within a generic uvector API.
    NB: The value of those enums can be embedded in precompiled files,
    and also used in Scm_Compare to order between different uvectors.
    So the order shouldn't be changed.
-*/
+ */
 typedef enum {
-    SCM_UVECTOR_S8,
-    SCM_UVECTOR_U8,
-    SCM_UVECTOR_S16,
-    SCM_UVECTOR_U16,
-    SCM_UVECTOR_S32,
-    SCM_UVECTOR_U32,
-    SCM_UVECTOR_S64,
-    SCM_UVECTOR_U64,
-    SCM_UVECTOR_F16,
-    SCM_UVECTOR_F32,
-    SCM_UVECTOR_F64,
-    SCM_UVECTOR_RESERVED1,      /* reserved for f128*/
-    SCM_UVECTOR_C32,
-    SCM_UVECTOR_C64,
-    SCM_UVECTOR_C128,
-    SCM_UVECTOR_RESERVED2,      /* reserved for c256 */
-    SCM_UVECTOR_INVALID = -1
+	SCM_UVECTOR_S8,
+	SCM_UVECTOR_U8,
+	SCM_UVECTOR_S16,
+	SCM_UVECTOR_U16,
+	SCM_UVECTOR_S32,
+	SCM_UVECTOR_U32,
+	SCM_UVECTOR_S64,
+	SCM_UVECTOR_U64,
+	SCM_UVECTOR_F16,
+	SCM_UVECTOR_F32,
+	SCM_UVECTOR_F64,
+	SCM_UVECTOR_RESERVED1,  /* reserved for f128*/
+	SCM_UVECTOR_C32,
+	SCM_UVECTOR_C64,
+	SCM_UVECTOR_C128,
+	SCM_UVECTOR_RESERVED2,  /* reserved for c256 */
+	SCM_UVECTOR_INVALID = -1
 } ScmUVectorType;
 
 #define SCM_UVECTOR_SUBTYPE_P(obj, type) \
-    (SCM_UVECTORP(obj)&&Scm_UVectorType(SCM_CLASS_OF(obj))==(type))
+	(SCM_UVECTORP(obj)&&Scm_UVectorType(SCM_CLASS_OF(obj))==(type))
 
 SCM_EXTERN ScmUVectorType Scm_UVectorType(ScmClass *klass);
 SCM_EXTERN const char *Scm_UVectorTypeName(int type);
@@ -332,9 +332,9 @@ SCM_CLASS_DECL(Scm_C128VectorClass);
 #define SCM_C128VECTOR_ELEMENT(obj,k) SCM_C128VECTOR_ELEMENTS(obj)[k]
 SCM_EXTERN ScmObj Scm_MakeC128Vector(ScmSmallInt size, complex double fill);
 SCM_EXTERN ScmObj Scm_MakeC128VectorFromArray(ScmSmallInt size,
-                                             const complex double array[]);
+                                              const complex double array[]);
 SCM_EXTERN ScmObj Scm_MakeC128VectorFromArrayShared(ScmSmallInt size,
-                                                   complex double array[]);
+                                                    complex double array[]);
 
 
 /* For the backward compatibility */
@@ -350,7 +350,7 @@ typedef ScmUVector ScmF16Vector;
 typedef ScmUVector ScmF32Vector;
 typedef ScmUVector ScmF64Vector;
 
-/* 
+/*
  * String/uvector common utility
  */
 

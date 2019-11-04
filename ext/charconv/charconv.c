@@ -43,23 +43,23 @@
 #define MINIMUM_CONVERSION_BUFFER_SIZE 16
 
 typedef struct conv_guess_rec {
-    const char *codeName;
-    ScmCodeGuessingProc proc;
-    void *data;
-    struct conv_guess_rec *next;
+	const char *codeName;
+	ScmCodeGuessingProc proc;
+	void *data;
+	struct conv_guess_rec *next;
 } conv_guess;
 
 /* anchor of the chain of conversion guessing procedures */
 static struct {
-    conv_guess *procs;
-    ScmInternalMutex mutex;
+	conv_guess *procs;
+	ScmInternalMutex mutex;
 } guess;
 
 /* anchor of the conversion context used for UCS -> internal char routine */
 static struct {
-    ScmConvInfo *ucs2char;
-    ScmConvInfo *char2ucs;
-    ScmInternalMutex mutex;
+	ScmConvInfo *ucs2char;
+	ScmConvInfo *char2ucs;
+	ScmInternalMutex mutex;
 } ucsconv;
 
 /*------------------------------------------------------------
@@ -69,73 +69,73 @@ static struct {
 /* Auxiliary function */
 const char* Scm_GetCESName(ScmObj code, const char *argname)
 {
-    const char *c = NULL;
-    if (SCM_UNBOUNDP(code) || SCM_FALSEP(code)) {
-        c = Scm_SupportedCharacterEncodings()[0];
-    } else if (SCM_STRINGP(code)) {
-        c = Scm_GetStringConst(SCM_STRING(code));
-    } else if (SCM_SYMBOLP(code)) {
-        c = Scm_GetStringConst(SCM_SYMBOL_NAME(code));
-    } else {
-        Scm_Error("string, symbol or #f is required for %s, but got %S",
-                  argname, code);
-    }
-    return c;
+	const char *c = NULL;
+	if (SCM_UNBOUNDP(code) || SCM_FALSEP(code)) {
+		c = Scm_SupportedCharacterEncodings()[0];
+	} else if (SCM_STRINGP(code)) {
+		c = Scm_GetStringConst(SCM_STRING(code));
+	} else if (SCM_SYMBOLP(code)) {
+		c = Scm_GetStringConst(SCM_SYMBOL_NAME(code));
+	} else {
+		Scm_Error("string, symbol or #f is required for %s, but got %S",
+		          argname, code);
+	}
+	return c;
 }
 
 int Scm_ConversionSupportedP(const char *from, const char *to)
 {
-    ScmConvInfo *info = jconv_open(to, from);
-    if (info == NULL) return FALSE;
-    jconv_close(info);
-    return TRUE;
+	ScmConvInfo *info = jconv_open(to, from);
+	if (info == NULL) return FALSE;
+	jconv_close(info);
+	return TRUE;
 }
 
 void Scm_RegisterCodeGuessingProc(const char *code,
                                   ScmCodeGuessingProc proc,
                                   void *data)
 {
-    conv_guess *rec = SCM_NEW(conv_guess);
-    rec->codeName = code;
-    rec->proc = proc;
-    rec->data = data;
-    (void)SCM_INTERNAL_MUTEX_LOCK(guess.mutex);
-    rec->next = guess.procs;
-    guess.procs = rec;
-    (void)SCM_INTERNAL_MUTEX_UNLOCK(guess.mutex);
+	conv_guess *rec = SCM_NEW(conv_guess);
+	rec->codeName = code;
+	rec->proc = proc;
+	rec->data = data;
+	(void)SCM_INTERNAL_MUTEX_LOCK(guess.mutex);
+	rec->next = guess.procs;
+	guess.procs = rec;
+	(void)SCM_INTERNAL_MUTEX_UNLOCK(guess.mutex);
 }
 
 static conv_guess *findGuessingProc(const char *code)
 {
-    conv_guess *rec;
-    (void)SCM_INTERNAL_MUTEX_LOCK(guess.mutex);
-    for (rec = guess.procs; rec; rec = rec->next) {
-        if (strcasecmp(rec->codeName, code) == 0) break;
-    }
-    (void)SCM_INTERNAL_MUTEX_UNLOCK(guess.mutex);
-    return rec;
+	conv_guess *rec;
+	(void)SCM_INTERNAL_MUTEX_LOCK(guess.mutex);
+	for (rec = guess.procs; rec; rec = rec->next) {
+		if (strcasecmp(rec->codeName, code) == 0) break;
+	}
+	(void)SCM_INTERNAL_MUTEX_UNLOCK(guess.mutex);
+	return rec;
 }
 
 static int conv_fileno(ScmPort *port)
 {
-    ScmConvInfo *info = (ScmConvInfo*)port->src.buf.data;
-    return Scm_PortFileNo(info->remote);
+	ScmConvInfo *info = (ScmConvInfo*)port->src.buf.data;
+	return Scm_PortFileNo(info->remote);
 }
 
 static int conv_ready(ScmPort *port)
 {
-    ScmConvInfo *info = (ScmConvInfo*)port->src.buf.data;
-    /* This isn't accurate, but for now ... */
-    return Scm_CharReady(info->remote);
+	ScmConvInfo *info = (ScmConvInfo*)port->src.buf.data;
+	/* This isn't accurate, but for now ... */
+	return Scm_CharReady(info->remote);
 }
 
 static ScmObj conv_name(int dir, ScmPort *remote, const char *from, const char *to)
 {
-    ScmObj out = Scm_MakeOutputStringPort(TRUE);
-    Scm_Printf(SCM_PORT(out), "[conv(%s->%s) %s %S]",
-               from, to, (dir == SCM_PORT_INPUT? "from" : "to"),
-               Scm_PortName(remote));
-    return Scm_GetOutputStringUnsafe(SCM_PORT(out), 0);
+	ScmObj out = Scm_MakeOutputStringPort(TRUE);
+	Scm_Printf(SCM_PORT(out), "[conv(%s->%s) %s %S]",
+	           from, to, (dir == SCM_PORT_INPUT ? "from" : "to"),
+	           Scm_PortName(remote));
+	return Scm_GetOutputStringUnsafe(SCM_PORT(out), 0);
 }
 
 /*------------------------------------------------------------
@@ -146,95 +146,95 @@ static ScmObj conv_name(int dir, ScmPort *remote, const char *from, const char *
 
 static ScmSize conv_input_filler(ScmPort *port, ScmSize mincnt SCM_UNUSED)
 {
-    ScmConvInfo *info = (ScmConvInfo*)port->src.buf.data;
-    const char *inbuf = info->buf;
-    char *outbuf = port->src.buf.end;
+	ScmConvInfo *info = (ScmConvInfo*)port->src.buf.data;
+	const char *inbuf = info->buf;
+	char *outbuf = port->src.buf.end;
 
-    if (info->remoteClosed) return 0;
+	if (info->remoteClosed) return 0;
 
-    /* Fill the input buffer.  There may be some remaining bytes in the
-       inbuf from the last conversion (insize), so we try to fill the
-       rest. */
-    ScmSize insize = info->ptr - info->buf;
-    ScmSize nread = Scm_Getz(info->ptr, info->bufsiz - insize, info->remote);
-    if (nread <= 0) {
-        /* input reached EOF.  finish the output state */
-        if (insize == 0) {
-            ScmSize outroom = SCM_PORT_BUFFER_ROOM(port);
-            ScmSize result = jconv_reset(info, outbuf, outroom);
-            if (result == OUTPUT_NOT_ENOUGH) {
-                /* The port buffer doesn't have enough space to contain the
-                   finishing sequence.  Its unusual, for the port buffer
-                   must be almost empty at this time, and the finishing
-                   sequence is usually just a few bytes.
-                   We signal an error. */
-                Scm_Error("couldn't flush the ending escape sequence in the character encoding conversion port (%s -> %s).  possibly an implementation error",
-                          info->fromCode, info->toCode);
-                }
-            if (info->ownerp) {
-                Scm_ClosePort(info->remote);
-                info->remoteClosed = TRUE;
-            }
+	/* Fill the input buffer.  There may be some remaining bytes in the
+	   inbuf from the last conversion (insize), so we try to fill the
+	   rest. */
+	ScmSize insize = info->ptr - info->buf;
+	ScmSize nread = Scm_Getz(info->ptr, info->bufsiz - insize, info->remote);
+	if (nread <= 0) {
+		/* input reached EOF.  finish the output state */
+		if (insize == 0) {
+			ScmSize outroom = SCM_PORT_BUFFER_ROOM(port);
+			ScmSize result = jconv_reset(info, outbuf, outroom);
+			if (result == OUTPUT_NOT_ENOUGH) {
+				/* The port buffer doesn't have enough space to contain the
+				   finishing sequence.  Its unusual, for the port buffer
+				   must be almost empty at this time, and the finishing
+				   sequence is usually just a few bytes.
+				   We signal an error. */
+				Scm_Error("couldn't flush the ending escape sequence in the character encoding conversion port (%s -> %s).  possibly an implementation error",
+				          info->fromCode, info->toCode);
+			}
+			if (info->ownerp) {
+				Scm_ClosePort(info->remote);
+				info->remoteClosed = TRUE;
+			}
 #ifdef JCONV_DEBUG
-            fprintf(stderr, "<= r=%d (reset), out(%p)%d\n",
-                    result, outbuf, outroom);
+			fprintf(stderr, "<= r=%d (reset), out(%p)%d\n",
+			        result, outbuf, outroom);
 #endif
-            return (ScmSize)result;
-        }
-    } else {
-        insize += nread;
-    }
+			return (ScmSize)result;
+		}
+	} else {
+		insize += nread;
+	}
 
-    /* Conversion. */
-    ScmSize inroom = insize;
-    ScmSize outroom = SCM_PORT_BUFFER_ROOM(port);
+	/* Conversion. */
+	ScmSize inroom = insize;
+	ScmSize outroom = SCM_PORT_BUFFER_ROOM(port);
 
 #ifdef JCONV_DEBUG
-    fprintf(stderr, "=> in(%p)%d out(%p)%d\n", inbuf, insize, outbuf, outroom);
+	fprintf(stderr, "=> in(%p)%d out(%p)%d\n", inbuf, insize, outbuf, outroom);
 #endif
-    ScmSize result = jconv(info, &inbuf, &inroom, &outbuf, &outroom);
+	ScmSize result = jconv(info, &inbuf, &inroom, &outbuf, &outroom);
 #ifdef JCONV_DEBUG
-    fprintf(stderr, "<= r=%d, in(%p)%d out(%p)%d\n",
-            result, inbuf, inroom, outbuf, outroom);
+	fprintf(stderr, "<= r=%d, in(%p)%d out(%p)%d\n",
+	        result, inbuf, inroom, outbuf, outroom);
 #endif
-    /* we've got an error. */
-    if (result == INPUT_NOT_ENOUGH || result == OUTPUT_NOT_ENOUGH) {
-        /* Conversion stopped due to an incomplete character at the
-           end of the input buffer, or the output buffer is full.
-           We shift the unconverted bytes to the beginning of input
-           buffer. */
-        memmove(info->buf, info->buf+insize-inroom, inroom);
-        info->ptr = info->buf + inroom;
-        return info->bufsiz - (ScmSize)outroom;
-    } else if (result == ILLEGAL_SEQUENCE) {
-        /* it's likely that the input contains invalid sequence. */
-        ScmSize cnt = inroom >= 6 ? 6 : (ScmSize)inroom;
-        ScmObj s = Scm_MakeString(info->buf+insize-inroom, cnt, cnt,
-                                  SCM_STRING_COPYING|SCM_STRING_INCOMPLETE);
-        Scm_Error("invalid character sequence in the input stream: %S ...", s);
-    }
+	/* we've got an error. */
+	if (result == INPUT_NOT_ENOUGH || result == OUTPUT_NOT_ENOUGH) {
+		/* Conversion stopped due to an incomplete character at the
+		   end of the input buffer, or the output buffer is full.
+		   We shift the unconverted bytes to the beginning of input
+		   buffer. */
+		memmove(info->buf, info->buf+insize-inroom, inroom);
+		info->ptr = info->buf + inroom;
+		return info->bufsiz - (ScmSize)outroom;
+	} else if (result == ILLEGAL_SEQUENCE) {
+		/* it's likely that the input contains invalid sequence. */
+		ScmSize cnt = inroom >= 6 ? 6 : (ScmSize)inroom;
+		ScmObj s = Scm_MakeString(info->buf+insize-inroom, cnt, cnt,
+		                          SCM_STRING_COPYING|SCM_STRING_INCOMPLETE);
+		Scm_Error("invalid character sequence in the input stream: %S ...", s);
+	}
 
-    /* Conversion is done completely. */
-    /* NB: There are cases that some bytes are left in the input buffer
-       even iconv returns positive value.  We need to shift those bytes. */
-    if (inroom > 0) {
-        memmove(info->buf, info->buf+insize-inroom, inroom);
-        info->ptr = info->buf + inroom;
-        return info->bufsiz - (ScmSize)outroom;
-    } else {
-        info->ptr = info->buf;
-        return info->bufsiz - (ScmSize)outroom;
-    }
+	/* Conversion is done completely. */
+	/* NB: There are cases that some bytes are left in the input buffer
+	   even iconv returns positive value.  We need to shift those bytes. */
+	if (inroom > 0) {
+		memmove(info->buf, info->buf+insize-inroom, inroom);
+		info->ptr = info->buf + inroom;
+		return info->bufsiz - (ScmSize)outroom;
+	} else {
+		info->ptr = info->buf;
+		return info->bufsiz - (ScmSize)outroom;
+	}
 }
 
 static void conv_input_closer(ScmPort *p)
 {
-    ScmConvInfo *info = (ScmConvInfo*)p->src.buf.data;
-    jconv_close(info);
-    if (info->ownerp) {
-        Scm_ClosePort(info->remote);
-        info->remoteClosed = TRUE;
-    }
+	ScmConvInfo *info = (ScmConvInfo*)p->src.buf.data;
+	jconv_close(info);
+	if (info->ownerp) {
+		Scm_ClosePort(info->remote);
+		info->remoteClosed = TRUE;
+	}
 }
 
 ScmObj Scm_MakeInputConversionPort(ScmPort *fromPort,
@@ -244,65 +244,65 @@ ScmObj Scm_MakeInputConversionPort(ScmPort *fromPort,
                                    ScmSize bufsiz,
                                    int ownerp)
 {
-    char *inbuf = NULL;
-    ScmSize preread = 0;
+	char *inbuf = NULL;
+	ScmSize preread = 0;
 
-    if (!SCM_IPORTP(fromPort))
-        Scm_Error("input port required, but got %S", fromPort);
+	if (!SCM_IPORTP(fromPort))
+		Scm_Error("input port required, but got %S", fromPort);
 
-    if (bufsiz <= 0) bufsiz = DEFAULT_CONVERSION_BUFFER_SIZE;
-    if (bufsiz <= MINIMUM_CONVERSION_BUFFER_SIZE) {
-        bufsiz = MINIMUM_CONVERSION_BUFFER_SIZE;
-    }
-    conv_guess *guess = findGuessingProc(fromCode);
-    if (guess) {
-        const char *guessed;
+	if (bufsiz <= 0) bufsiz = DEFAULT_CONVERSION_BUFFER_SIZE;
+	if (bufsiz <= MINIMUM_CONVERSION_BUFFER_SIZE) {
+		bufsiz = MINIMUM_CONVERSION_BUFFER_SIZE;
+	}
+	conv_guess *guess = findGuessingProc(fromCode);
+	if (guess) {
+		const char *guessed;
 
-        inbuf = SCM_NEW_ATOMIC2(char *, bufsiz);
-        preread = Scm_Getz(inbuf, bufsiz, fromPort);
-        if (preread <= 0) {
-            /* Input buffer is already empty or unreadable.
-               Determining character code is not necessary.
-               We just return a dummy empty port. */
-            return Scm_MakeInputStringPort(SCM_STRING(SCM_MAKE_STR("")), FALSE);
-        }
-        guessed = guess->proc(inbuf, preread, guess->data);
-        if (guessed == NULL)
-            Scm_Error("%s: failed to guess input encoding", fromCode);
-        fromCode = guessed;
-    }
+		inbuf = SCM_NEW_ATOMIC2(char *, bufsiz);
+		preread = Scm_Getz(inbuf, bufsiz, fromPort);
+		if (preread <= 0) {
+			/* Input buffer is already empty or unreadable.
+			   Determining character code is not necessary.
+			   We just return a dummy empty port. */
+			return Scm_MakeInputStringPort(SCM_STRING(SCM_MAKE_STR("")), FALSE);
+		}
+		guessed = guess->proc(inbuf, preread, guess->data);
+		if (guessed == NULL)
+			Scm_Error("%s: failed to guess input encoding", fromCode);
+		fromCode = guessed;
+	}
 
-    ScmConvInfo *cinfo = jconv_open(toCode, fromCode);
-    if (cinfo == NULL) {
-        Scm_Error("conversion from code %s to code %s is not supported",
-                  fromCode, toCode);
-    }
-    cinfo->remote = fromPort;
-    cinfo->ownerp = ownerp;
-    cinfo->bufsiz = bufsiz;
-    cinfo->remoteClosed = FALSE;
-    if (preread > 0) {
-        cinfo->buf = inbuf;
-        cinfo->ptr = inbuf + preread;
-    } else {
-        cinfo->buf = SCM_NEW_ATOMIC2(char *, cinfo->bufsiz);
-        cinfo->ptr = cinfo->buf;
-    }
+	ScmConvInfo *cinfo = jconv_open(toCode, fromCode);
+	if (cinfo == NULL) {
+		Scm_Error("conversion from code %s to code %s is not supported",
+		          fromCode, toCode);
+	}
+	cinfo->remote = fromPort;
+	cinfo->ownerp = ownerp;
+	cinfo->bufsiz = bufsiz;
+	cinfo->remoteClosed = FALSE;
+	if (preread > 0) {
+		cinfo->buf = inbuf;
+		cinfo->ptr = inbuf + preread;
+	} else {
+		cinfo->buf = SCM_NEW_ATOMIC2(char *, cinfo->bufsiz);
+		cinfo->ptr = cinfo->buf;
+	}
 
-    ScmPortBuffer bufrec;
-    memset(&bufrec, 0, sizeof(bufrec));
-    bufrec.size = cinfo->bufsiz;
-    bufrec.buffer = SCM_NEW_ATOMIC2(char *, cinfo->bufsiz);
-    bufrec.mode = SCM_PORT_BUFFER_FULL;
-    bufrec.filler = conv_input_filler;
-    bufrec.flusher = NULL;
-    bufrec.closer = conv_input_closer;
-    bufrec.ready = conv_ready;
-    bufrec.filenum = conv_fileno;
-    bufrec.data = (void*)cinfo;
+	ScmPortBuffer bufrec;
+	memset(&bufrec, 0, sizeof(bufrec));
+	bufrec.size = cinfo->bufsiz;
+	bufrec.buffer = SCM_NEW_ATOMIC2(char *, cinfo->bufsiz);
+	bufrec.mode = SCM_PORT_BUFFER_FULL;
+	bufrec.filler = conv_input_filler;
+	bufrec.flusher = NULL;
+	bufrec.closer = conv_input_closer;
+	bufrec.ready = conv_ready;
+	bufrec.filenum = conv_fileno;
+	bufrec.data = (void*)cinfo;
 
-    ScmObj name = conv_name(SCM_PORT_INPUT, fromPort, fromCode, toCode);
-    return Scm_MakeBufferedPort(SCM_CLASS_PORT, name, SCM_PORT_INPUT, TRUE, &bufrec);
+	ScmObj name = conv_name(SCM_PORT_INPUT, fromPort, fromCode, toCode);
+	return Scm_MakeBufferedPort(SCM_CLASS_PORT, name, SCM_PORT_INPUT, TRUE, &bufrec);
 }
 
 /* a special case of input conversion port --- coding-aware port coversion.
@@ -311,11 +311,11 @@ ScmObj Scm_MakeInputConversionPort(ScmPort *fromPort,
 
 static ScmPort *coding_aware_conv(ScmPort *src, const char *encoding)
 {
-    return SCM_PORT(Scm_MakeInputConversionPort(src,
-                                                encoding,
-                                                Scm_SupportedCharacterEncodings()[0],
-                                                SCM_FALSE,
-                                                0, TRUE));
+	return SCM_PORT(Scm_MakeInputConversionPort(src,
+	                                            encoding,
+	                                            Scm_SupportedCharacterEncodings()[0],
+	                                            SCM_FALSE,
+	                                            0, TRUE));
 }
 
 /*------------------------------------------------------------
@@ -341,95 +341,95 @@ static ScmPort *coding_aware_conv(ScmPort *src, const char *encoding)
 
 static void conv_output_closer(ScmPort *port)
 {
-    ScmConvInfo *info = (ScmConvInfo*)port->src.buf.data;
+	ScmConvInfo *info = (ScmConvInfo*)port->src.buf.data;
 
-    /* if there's remaining bytes in buf, send them to the remote port. */
-    if (info->ptr > info->buf) {
-        Scm_Putz(info->buf, (int)(info->ptr - info->buf), info->remote);
-        info->ptr = info->buf;
-    }
-    /* sends out the closing sequence, if any */
-    ScmSize r = jconv_reset(info, info->buf, info->bufsiz);
+	/* if there's remaining bytes in buf, send them to the remote port. */
+	if (info->ptr > info->buf) {
+		Scm_Putz(info->buf, (int)(info->ptr - info->buf), info->remote);
+		info->ptr = info->buf;
+	}
+	/* sends out the closing sequence, if any */
+	ScmSize r = jconv_reset(info, info->buf, info->bufsiz);
 #ifdef JCONV_DEBUG
-    fprintf(stderr, "<= r=%d(reset), buf(%p)\n",
-            r, info->buf);
+	fprintf(stderr, "<= r=%d(reset), buf(%p)\n",
+	        r, info->buf);
 #endif
-    if (r < 0) {
-        Scm_Error("something wrong in resetting output character encoding conversion (%s -> %s).  possibly an implementation error.",
-                  info->fromCode, info->toCode);
-    }
-    if (r > 0) {
-        Scm_Putz(info->buf, (ScmSize)r, info->remote);
-    }
-    /* flush remove port */
-    Scm_Flush(info->remote);
-    if (info->ownerp) {
-        Scm_ClosePort(info->remote);
-        info->remoteClosed = TRUE;
-    }
-    jconv_close(info);
+	if (r < 0) {
+		Scm_Error("something wrong in resetting output character encoding conversion (%s -> %s).  possibly an implementation error.",
+		          info->fromCode, info->toCode);
+	}
+	if (r > 0) {
+		Scm_Putz(info->buf, (ScmSize)r, info->remote);
+	}
+	/* flush remove port */
+	Scm_Flush(info->remote);
+	if (info->ownerp) {
+		Scm_ClosePort(info->remote);
+		info->remoteClosed = TRUE;
+	}
+	jconv_close(info);
 }
 
 static ScmSize conv_output_flusher(ScmPort *port, ScmSize cnt, int forcep)
 {
-    ScmConvInfo *info = (ScmConvInfo*)port->src.buf.data;
-    ScmSize inroom = SCM_PORT_BUFFER_AVAIL(port);
-    ScmSize len = inroom;
-    const char *inbuf = port->src.buf.buffer;
+	ScmConvInfo *info = (ScmConvInfo*)port->src.buf.data;
+	ScmSize inroom = SCM_PORT_BUFFER_AVAIL(port);
+	ScmSize len = inroom;
+	const char *inbuf = port->src.buf.buffer;
 
-    for (;;) {
-        /* Conversion. */
-        char *outbuf = info->ptr;
-        ScmSize outroom = info->bufsiz - (info->ptr - info->buf);
+	for (;;) {
+		/* Conversion. */
+		char *outbuf = info->ptr;
+		ScmSize outroom = info->bufsiz - (info->ptr - info->buf);
 #ifdef JCONV_DEBUG
-        fprintf(stderr, "=> in(%p,%p)%d out(%p,%p)%d\n",
-                inbuf, len, inroom,
-                info->buf, info->ptr, outroom);
+		fprintf(stderr, "=> in(%p,%p)%d out(%p,%p)%d\n",
+		        inbuf, len, inroom,
+		        info->buf, info->ptr, outroom);
 #endif
-        ScmSize result = jconv(info, &inbuf, &inroom, &outbuf, &outroom);
+		ScmSize result = jconv(info, &inbuf, &inroom, &outbuf, &outroom);
 #ifdef JCONV_DEBUG
-        fprintf(stderr, "<= r=%d, in(%p)%d out(%p)%d\n",
-                result, inbuf, inroom, outbuf, outroom);
+		fprintf(stderr, "<= r=%d, in(%p)%d out(%p)%d\n",
+		        result, inbuf, inroom, outbuf, outroom);
 #endif
-        if (result == INPUT_NOT_ENOUGH) {
+		if (result == INPUT_NOT_ENOUGH) {
 #ifndef GLIBC_2_1_ICONV_BUG
-            /* Conversion stopped due to an incomplete character at the
-               end of the input buffer.  We just return # of bytes
-               flushed.  (Shifting unconverted characters is done by
-               buffered port routine) */
-            info->ptr = outbuf;
+			/* Conversion stopped due to an incomplete character at the
+			   end of the input buffer.  We just return # of bytes
+			   flushed.  (Shifting unconverted characters is done by
+			   buffered port routine) */
+			info->ptr = outbuf;
 #else
-            /* See the above notes.  We always flush the output buffer
-               here, so that we can avoid output buffer overrun. */
-            Scm_Putz(info->buf, (ScmSize)(outbuf - info->buf), info->remote);
-            info->ptr = info->buf;
+			/* See the above notes.  We always flush the output buffer
+			   here, so that we can avoid output buffer overrun. */
+			Scm_Putz(info->buf, (ScmSize)(outbuf - info->buf), info->remote);
+			info->ptr = info->buf;
 #endif
-            return (ScmSize)(len - inroom);
-        } else if (result == OUTPUT_NOT_ENOUGH) {
-            /* Output buffer got full.  Flush it, and continue
-               conversion. */
-            Scm_Putz(info->buf, (ScmSize)(outbuf - info->buf), info->remote);
-            info->ptr = info->buf;
-            continue;
-        } else if (result == ILLEGAL_SEQUENCE) {
-            /* it's likely that input contains invalid sequence.
-               TODO: we should handle this case gracefully. */
-            Scm_Error("invalid character sequence in the input stream");
-            return 0;           /* dummy */
-        } else {
+			return (ScmSize)(len - inroom);
+		} else if (result == OUTPUT_NOT_ENOUGH) {
+			/* Output buffer got full.  Flush it, and continue
+			   conversion. */
+			Scm_Putz(info->buf, (ScmSize)(outbuf - info->buf), info->remote);
+			info->ptr = info->buf;
+			continue;
+		} else if (result == ILLEGAL_SEQUENCE) {
+			/* it's likely that input contains invalid sequence.
+			   TODO: we should handle this case gracefully. */
+			Scm_Error("invalid character sequence in the input stream");
+			return 0; /* dummy */
+		} else {
 #ifndef GLIBC_2_1_ICONV_BUG
-            /* Conversion is done completely.  Update outptr. */
-            info->ptr = outbuf;
+			/* Conversion is done completely.  Update outptr. */
+			info->ptr = outbuf;
 #else
-            /* See the above notes.  We always flush the output buffer here,
-               so that we can avoid output buffer overrun. */
-            Scm_Putz(info->buf, (ScmSize)(outbuf - info->buf), info->remote);
-            info->ptr = info->buf;
+			/* See the above notes.  We always flush the output buffer here,
+			   so that we can avoid output buffer overrun. */
+			Scm_Putz(info->buf, (ScmSize)(outbuf - info->buf), info->remote);
+			info->ptr = info->buf;
 #endif
-            if (forcep && len - inroom != cnt) continue;
-            return len - inroom;
-        }
-    }
+			if (forcep && len - inroom != cnt) continue;
+			return len - inroom;
+		}
+	}
 }
 
 ScmObj Scm_MakeOutputConversionPort(ScmPort *toPort,
@@ -437,40 +437,40 @@ ScmObj Scm_MakeOutputConversionPort(ScmPort *toPort,
                                     const char *fromCode,
                                     ScmSize bufsiz, int ownerp)
 {
-    if (!SCM_OPORTP(toPort))
-        Scm_Error("output port required, but got %S", toPort);
+	if (!SCM_OPORTP(toPort))
+		Scm_Error("output port required, but got %S", toPort);
 
-    if (bufsiz <= 0) bufsiz = DEFAULT_CONVERSION_BUFFER_SIZE;
-    if (bufsiz <= MINIMUM_CONVERSION_BUFFER_SIZE) {
-        bufsiz = MINIMUM_CONVERSION_BUFFER_SIZE;
-    }
+	if (bufsiz <= 0) bufsiz = DEFAULT_CONVERSION_BUFFER_SIZE;
+	if (bufsiz <= MINIMUM_CONVERSION_BUFFER_SIZE) {
+		bufsiz = MINIMUM_CONVERSION_BUFFER_SIZE;
+	}
 
-    ScmConvInfo *cinfo = jconv_open(toCode, fromCode);
-    if (cinfo == NULL) {
-        Scm_Error("conversion from code %s to code %s is not supported",
-                  fromCode, toCode);
-    }
-    cinfo->remote = toPort;
-    cinfo->ownerp = ownerp;
-    cinfo->bufsiz = (bufsiz > 0)? bufsiz : DEFAULT_CONVERSION_BUFFER_SIZE;
-    cinfo->remoteClosed = FALSE;
-    cinfo->buf = SCM_NEW_ATOMIC2(char *, cinfo->bufsiz);
-    cinfo->ptr = cinfo->buf;
+	ScmConvInfo *cinfo = jconv_open(toCode, fromCode);
+	if (cinfo == NULL) {
+		Scm_Error("conversion from code %s to code %s is not supported",
+		          fromCode, toCode);
+	}
+	cinfo->remote = toPort;
+	cinfo->ownerp = ownerp;
+	cinfo->bufsiz = (bufsiz > 0) ? bufsiz : DEFAULT_CONVERSION_BUFFER_SIZE;
+	cinfo->remoteClosed = FALSE;
+	cinfo->buf = SCM_NEW_ATOMIC2(char *, cinfo->bufsiz);
+	cinfo->ptr = cinfo->buf;
 
-    ScmPortBuffer bufrec;
-    memset(&bufrec, 0, sizeof(bufrec));
-    bufrec.size = cinfo->bufsiz;
-    bufrec.buffer = SCM_NEW_ATOMIC2(char *, cinfo->bufsiz);
-    bufrec.mode = SCM_PORT_BUFFER_FULL;
-    bufrec.filler = NULL;
-    bufrec.flusher = conv_output_flusher;
-    bufrec.closer = conv_output_closer;
-    bufrec.ready = conv_ready;
-    bufrec.filenum = conv_fileno;
-    bufrec.data = (void*)cinfo;
+	ScmPortBuffer bufrec;
+	memset(&bufrec, 0, sizeof(bufrec));
+	bufrec.size = cinfo->bufsiz;
+	bufrec.buffer = SCM_NEW_ATOMIC2(char *, cinfo->bufsiz);
+	bufrec.mode = SCM_PORT_BUFFER_FULL;
+	bufrec.filler = NULL;
+	bufrec.flusher = conv_output_flusher;
+	bufrec.closer = conv_output_closer;
+	bufrec.ready = conv_ready;
+	bufrec.filenum = conv_fileno;
+	bufrec.data = (void*)cinfo;
 
-    ScmObj name = conv_name(SCM_PORT_OUTPUT, toPort, fromCode, toCode);
-    return Scm_MakeBufferedPort(SCM_CLASS_PORT, name, SCM_PORT_OUTPUT, TRUE, &bufrec);
+	ScmObj name = conv_name(SCM_PORT_OUTPUT, toPort, fromCode, toCode);
+	return Scm_MakeBufferedPort(SCM_CLASS_PORT, name, SCM_PORT_OUTPUT, TRUE, &bufrec);
 }
 
 /*------------------------------------------------------------
@@ -478,10 +478,10 @@ ScmObj Scm_MakeOutputConversionPort(ScmPort *toPort,
  */
 const char *Scm_GuessCES(const char *code, const char *buf, ScmSize buflen)
 {
-    conv_guess *guess = findGuessingProc(code);
-    if (guess == NULL)
-        Scm_Error("unknown code guessing scheme: %s", code);
-    return guess->proc(buf, buflen, guess->data);
+	conv_guess *guess = findGuessingProc(code);
+	if (guess == NULL)
+		Scm_Error("unknown code guessing scheme: %s", code);
+	return guess->proc(buf, buflen, guess->data);
 }
 
 /*------------------------------------------------------------
@@ -498,89 +498,89 @@ const char *Scm_GuessCES(const char *code, const char *buf, ScmSize buflen)
 static ScmChar ucstochar(int ucs4)
 {
 #if defined(GAUCHE_CHAR_ENCODING_UTF_8)
-    return (ScmChar)ucs4;
+	return (ScmChar)ucs4;
 #else  /*!GAUCHE_CHAR_ENCODING_UTF_8*/
-    char inbuf[6], outbuf[6];
-    const char *inb = inbuf;
-    char *outb = outbuf;
+	char inbuf[6], outbuf[6];
+	const char *inb = inbuf;
+	char *outb = outbuf;
 
-    if (ucsconv.ucs2char == NULL) return SCM_CHAR_INVALID;
-    ScmSize inroom = UCS2UTF_NBYTES(ucs4);
-    ScmSize outroom = 6;
-    jconv_ucs4_to_utf8(ucs4, inbuf);
-    (void)SCM_INTERNAL_MUTEX_LOCK(ucsconv.mutex);
-    ScmSize r = jconv(ucsconv.ucs2char, &inb, &inroom, &outb, &outroom);
-    (void)SCM_INTERNAL_MUTEX_UNLOCK(ucsconv.mutex);
-    if (r == INPUT_NOT_ENOUGH || r == OUTPUT_NOT_ENOUGH) {
-        Scm_Error("can't convert UCS4 code %d to a character: implementation problem?", ucs4);
-    }
-    if (r == ILLEGAL_SEQUENCE) {
-        return SCM_CHAR_INVALID;
-    } else {
-        ScmChar out;
-        SCM_CHAR_GET(outbuf, out);
-        return out;
-    }
+	if (ucsconv.ucs2char == NULL) return SCM_CHAR_INVALID;
+	ScmSize inroom = UCS2UTF_NBYTES(ucs4);
+	ScmSize outroom = 6;
+	jconv_ucs4_to_utf8(ucs4, inbuf);
+	(void)SCM_INTERNAL_MUTEX_LOCK(ucsconv.mutex);
+	ScmSize r = jconv(ucsconv.ucs2char, &inb, &inroom, &outb, &outroom);
+	(void)SCM_INTERNAL_MUTEX_UNLOCK(ucsconv.mutex);
+	if (r == INPUT_NOT_ENOUGH || r == OUTPUT_NOT_ENOUGH) {
+		Scm_Error("can't convert UCS4 code %d to a character: implementation problem?", ucs4);
+	}
+	if (r == ILLEGAL_SEQUENCE) {
+		return SCM_CHAR_INVALID;
+	} else {
+		ScmChar out;
+		SCM_CHAR_GET(outbuf, out);
+		return out;
+	}
 #endif /*!GAUCHE_CHAR_ENCODING_UTF_8*/
 }
 
 static int chartoucs(ScmChar ch)
 {
 #if defined(GAUCHE_CHAR_ENCODING_UTF_8)
-    if (ch == SCM_CHAR_INVALID) return -1;
-    return (int)ch;
+	if (ch == SCM_CHAR_INVALID) return -1;
+	return (int)ch;
 #else  /*!GAUCHE_CHAR_ENCODING_UTF_8*/
-    char inbuf[6], outbuf[6];
-    const char *inb = inbuf;
-    char *outb = outbuf;
+	char inbuf[6], outbuf[6];
+	const char *inb = inbuf;
+	char *outb = outbuf;
 
-    if (ch == SCM_CHAR_INVALID) return -1;
-    if (ucsconv.char2ucs == NULL) return -1;
-    ScmSize inroom = SCM_CHAR_NBYTES(ch);
-    ScmSize outroom = 6;
-    SCM_CHAR_PUT(inbuf, ch);
-    (void)SCM_INTERNAL_MUTEX_LOCK(ucsconv.mutex);
-    ScmSize r = jconv(ucsconv.char2ucs, &inb, &inroom, &outb, &outroom);
-    (void)SCM_INTERNAL_MUTEX_UNLOCK(ucsconv.mutex);
-    if (r == INPUT_NOT_ENOUGH || r == OUTPUT_NOT_ENOUGH) {
-        Scm_Error("can't convert character %u to UCS4 code: implementation problem?", ch);
-    }
-    if (r == ILLEGAL_SEQUENCE) {
-        return -1;
-    } else {
-        unsigned char *ucp = (unsigned char*)outbuf;
-        if (ucp[0] < 0x80) return (int)ucp[0];
-        if (ucp[0] < 0xe0) {
-            return ((ucp[0]&0x1f)<<6) + (ucp[1]&0x3f);
-        }
-        if (ucp[0] < 0xf0) {
-            return ((ucp[0]&0x0f)<<12)
-                   + ((ucp[1]&0x3f)<<6)
-                   + (ucp[2]&0x3f);
-        }
-        if (ucp[0] < 0xf8) {
-            return ((ucp[0]&0x07)<<18)
-                   + ((ucp[1]&0x3f)<<12)
-                   + ((ucp[2]&0x3f)<<6)
-                   + (ucp[3]&0x3f);
-        }
-        if (ucp[0] < 0xfc) {
-            return ((ucp[0]&0x03)<<24)
-                   + ((ucp[1]&0x3f)<<18)
-                   + ((ucp[2]&0x3f)<<12)
-                   + ((ucp[3]&0x3f)<<6)
-                   + (ucp[4]&0x3f);
-        }
-        if (ucp[0] < 0xfe) {
-            return ((ucp[0]&0x01)<<30)
-                   + ((ucp[1]&0x3f)<<24)
-                   + ((ucp[2]&0x3f)<<18)
-                   + ((ucp[3]&0x3f)<<12)
-                   + ((ucp[4]&0x3f)<<6)
-                   + (ucp[5]&0x3f);
-        }
-        return -1;
-    }
+	if (ch == SCM_CHAR_INVALID) return -1;
+	if (ucsconv.char2ucs == NULL) return -1;
+	ScmSize inroom = SCM_CHAR_NBYTES(ch);
+	ScmSize outroom = 6;
+	SCM_CHAR_PUT(inbuf, ch);
+	(void)SCM_INTERNAL_MUTEX_LOCK(ucsconv.mutex);
+	ScmSize r = jconv(ucsconv.char2ucs, &inb, &inroom, &outb, &outroom);
+	(void)SCM_INTERNAL_MUTEX_UNLOCK(ucsconv.mutex);
+	if (r == INPUT_NOT_ENOUGH || r == OUTPUT_NOT_ENOUGH) {
+		Scm_Error("can't convert character %u to UCS4 code: implementation problem?", ch);
+	}
+	if (r == ILLEGAL_SEQUENCE) {
+		return -1;
+	} else {
+		unsigned char *ucp = (unsigned char*)outbuf;
+		if (ucp[0] < 0x80) return (int)ucp[0];
+		if (ucp[0] < 0xe0) {
+			return ((ucp[0]&0x1f)<<6) + (ucp[1]&0x3f);
+		}
+		if (ucp[0] < 0xf0) {
+			return ((ucp[0]&0x0f)<<12)
+			       + ((ucp[1]&0x3f)<<6)
+			       + (ucp[2]&0x3f);
+		}
+		if (ucp[0] < 0xf8) {
+			return ((ucp[0]&0x07)<<18)
+			       + ((ucp[1]&0x3f)<<12)
+			       + ((ucp[2]&0x3f)<<6)
+			       + (ucp[3]&0x3f);
+		}
+		if (ucp[0] < 0xfc) {
+			return ((ucp[0]&0x03)<<24)
+			       + ((ucp[1]&0x3f)<<18)
+			       + ((ucp[2]&0x3f)<<12)
+			       + ((ucp[3]&0x3f)<<6)
+			       + (ucp[4]&0x3f);
+		}
+		if (ucp[0] < 0xfe) {
+			return ((ucp[0]&0x01)<<30)
+			       + ((ucp[1]&0x3f)<<24)
+			       + ((ucp[2]&0x3f)<<18)
+			       + ((ucp[3]&0x3f)<<12)
+			       + ((ucp[4]&0x3f)<<6)
+			       + (ucp[5]&0x3f);
+		}
+		return -1;
+	}
 #endif /*!GAUCHE_CHAR_ENCODING_UTF_8*/
 }
 
@@ -592,23 +592,23 @@ extern void Scm_Init_convguess(void);
 
 SCM_EXTENSION_ENTRY void Scm_Init_gauche__charconv(void)
 {
-    SCM_INIT_EXTENSION(gauche__charconv);
-    guess.procs = NULL;
-    (void)SCM_INTERNAL_MUTEX_INIT(guess.mutex);
+	SCM_INIT_EXTENSION(gauche__charconv);
+	guess.procs = NULL;
+	(void)SCM_INTERNAL_MUTEX_INIT(guess.mutex);
 #if   defined(GAUCHE_CHAR_ENCODING_UTF_8)
-    ucsconv.ucs2char = ucsconv.char2ucs = NULL;
+	ucsconv.ucs2char = ucsconv.char2ucs = NULL;
 #elif defined(GAUCHE_CHAR_ENCODING_EUC_JP)
-    ucsconv.ucs2char = jconv_open("EUCJP", "UTF-8");
-    ucsconv.char2ucs = jconv_open("UTF-8", "EUCJP");
+	ucsconv.ucs2char = jconv_open("EUCJP", "UTF-8");
+	ucsconv.char2ucs = jconv_open("UTF-8", "EUCJP");
 #elif defined(GAUCHE_CHAR_ENCODING_SJIS)
-    ucsconv.ucs2char = jconv_open("SJIS", "UTF-8");
-    ucsconv.char2ucs = jconv_open("UTF-8", "SJIS");
+	ucsconv.ucs2char = jconv_open("SJIS", "UTF-8");
+	ucsconv.char2ucs = jconv_open("UTF-8", "SJIS");
 #else
-    ucsconv.ucs2char = ucsconv.char2ucs = NULL;
+	ucsconv.ucs2char = ucsconv.char2ucs = NULL;
 #endif
-    (void)SCM_INTERNAL_MUTEX_INIT(ucsconv.mutex);
-    Scm_Init_convguess();
-    Scm_Init_convaux();
-    Scm__InstallCharconvHooks(ucstochar, chartoucs);
-    Scm__InstallCodingAwarePortHook(coding_aware_conv);
+	(void)SCM_INTERNAL_MUTEX_INIT(ucsconv.mutex);
+	Scm_Init_convguess();
+	Scm_Init_convaux();
+	Scm__InstallCharconvHooks(ucstochar, chartoucs);
+	Scm__InstallCodingAwarePortHook(coding_aware_conv);
 }

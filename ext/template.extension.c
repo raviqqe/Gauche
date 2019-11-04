@@ -11,7 +11,7 @@
 
 ScmObj test_@@extname@@(void)
 {
-    return SCM_MAKE_STR("@@extname@@ is working");
+	return SCM_MAKE_STR("@@extname@@ is working");
 }
 
 /*
@@ -21,14 +21,14 @@ extern void Scm_Init_@@extname@@lib(ScmModule*);
 
 void Scm_Init_@@extname@@(void)
 {
-    ScmModule *mod;
+	ScmModule *mod;
 
-    /* Register this DSO to Gauche */
-    SCM_INIT_EXTENSION(@@extname@@);
+	/* Register this DSO to Gauche */
+	SCM_INIT_EXTENSION(@@extname@@);
 
-    /* Create the module if it doesn't exist yet. */
-    mod = SCM_MODULE(SCM_FIND_MODULE("@@modname@@", TRUE));
+	/* Create the module if it doesn't exist yet. */
+	mod = SCM_MODULE(SCM_FIND_MODULE("@@modname@@", TRUE));
 
-    /* Register stub-generated procedures */
-    Scm_Init_@@extname@@lib(mod);
+	/* Register stub-generated procedures */
+	Scm_Init_@@extname@@lib(mod);
 }

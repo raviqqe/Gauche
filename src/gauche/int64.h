@@ -43,9 +43,9 @@
 
 #include <inttypes.h>
 
-typedef int32_t  ScmInt32;
+typedef int32_t ScmInt32;
 typedef uint32_t ScmUInt32;
-typedef int64_t  ScmInt64;
+typedef int64_t ScmInt64;
 typedef uint64_t ScmUInt64;
 
 #define SCM_SET_INT64_MAX(v64)    ((v64) = INT64_MAX)

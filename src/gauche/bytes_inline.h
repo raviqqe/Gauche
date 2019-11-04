@@ -50,8 +50,8 @@
 #endif
 
 #define CHECK_ENDIAN(endian) \
-    do { if (endian == NULL) endian = SCM_SYMBOL(Scm_DefaultEndian()); \
-    } while (0)
+	do { if (endian == NULL) endian = SCM_SYMBOL(Scm_DefaultEndian()); \
+	} while (0)
 
 /*
  * Swapping macros.   They can be used both ways (native <-> external)
@@ -73,34 +73,34 @@ typedef union { char buf[8]; double val; }       swap_f64_t;
 /* In the following macros, 'v' is of type one of the suitable swap_*_t. */
 
 #define SWAP_2(v) \
-    do { char tmp; CSWAP(v.buf, tmp, 0, 1); } while (0)
+	do { char tmp; CSWAP(v.buf, tmp, 0, 1); } while (0)
 
 #define SWAP_4(v)                                               \
-    do { char tmp;                                              \
-        CSWAP(v.buf, tmp, 0, 3); CSWAP(v.buf, tmp, 1, 2);       \
-    } while (0)
+	do { char tmp;                                              \
+	     CSWAP(v.buf, tmp, 0, 3); CSWAP(v.buf, tmp, 1, 2);       \
+	} while (0)
 
 #define SWAP_8(v)                                               \
-    do { char tmp;                                              \
-        CSWAP(v.buf, tmp, 0, 7); CSWAP(v.buf, tmp, 1, 6);       \
-        CSWAP(v.buf, tmp, 2, 5); CSWAP(v.buf, tmp, 3, 4);       \
-    } while (0)
+	do { char tmp;                                              \
+	     CSWAP(v.buf, tmp, 0, 7); CSWAP(v.buf, tmp, 1, 6);       \
+	     CSWAP(v.buf, tmp, 2, 5); CSWAP(v.buf, tmp, 3, 4);       \
+	} while (0)
 
 /* Swapping for double float is a bit tricky for ARM_LE case:
      BE<->ARM : [01234567] -> [32107654]
      LE<->ARM : [01234567] -> [45670123]
-*/
+ */
 #define SWAP_ARM2BE(v)                                          \
-    do { char tmp;                                              \
-        CSWAP(v.buf, tmp, 0, 3); CSWAP(v.buf, tmp, 1, 2);       \
-        CSWAP(v.buf, tmp, 4, 7); CSWAP(v.buf, tmp, 5, 6);       \
-    } while (0)
+	do { char tmp;                                              \
+	     CSWAP(v.buf, tmp, 0, 3); CSWAP(v.buf, tmp, 1, 2);       \
+	     CSWAP(v.buf, tmp, 4, 7); CSWAP(v.buf, tmp, 5, 6);       \
+	} while (0)
 
 #define SWAP_ARM2LE(v)                                          \
-    do { char tmp;                                              \
-        CSWAP(v.buf, tmp, 0, 4); CSWAP(v.buf, tmp, 1, 5);       \
-        CSWAP(v.buf, tmp, 2, 6); CSWAP(v.buf, tmp, 3, 7);       \
-    } while (0)
+	do { char tmp;                                              \
+	     CSWAP(v.buf, tmp, 0, 4); CSWAP(v.buf, tmp, 1, 5);       \
+	     CSWAP(v.buf, tmp, 2, 6); CSWAP(v.buf, tmp, 3, 7);       \
+	} while (0)
 
 
 #endif /*GAUCHE_BYTES_INLINE_H*/

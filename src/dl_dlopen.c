@@ -37,21 +37,21 @@
 
 static void *dl_open(const char *path)
 {
-    int flags = RTLD_NOW|RTLD_GLOBAL;
-    return dlopen(path, flags);
+	int flags = RTLD_NOW|RTLD_GLOBAL;
+	return dlopen(path, flags);
 }
 
 static const char *dl_error(void)
 {
-    return dlerror();
+	return dlerror();
 }
 
 static ScmDynLoadInitFn dl_sym(void *handle, const char *name)
 {
-    return (ScmDynLoadInitFn)dlsym(handle, name);
+	return (ScmDynLoadInitFn)dlsym(handle, name);
 }
 
 static void dl_close(void *handle)
 {
-    dlclose(handle);
+	dlclose(handle);
 }

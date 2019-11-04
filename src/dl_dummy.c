@@ -35,22 +35,22 @@
 
 static void *dl_open(const char *path)
 {
-    return NULL;
+	return NULL;
 }
 
 static const char *dl_error(void)
 {
-    return "dynamic loading is not supported on this platform";
+	return "dynamic loading is not supported on this platform";
 }
 
 static void *dl_sym(void *handle, const char *name)
 {
-    return NULL;
+	return NULL;
 }
 
 static void dl_close(void *handle)
 {
-    /* nothing to do */
+	/* nothing to do */
 }
 
 

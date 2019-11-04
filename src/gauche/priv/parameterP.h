@@ -36,11 +36,11 @@
 
 /* We keep the definition private, so that we can extend it later. */
 struct ScmPrimitiveParameterRec {
-    SCM_INSTANCE_HEADER;
-    ScmObj name;                /* for debugging. #f or symbol. */
-    ScmSize index;
-    ScmObj initialValue;
-    u_long flags;
+	SCM_INSTANCE_HEADER;
+	ScmObj name;            /* for debugging. #f or symbol. */
+	ScmSize index;
+	ScmObj initialValue;
+	u_long flags;
 };
 
 /* Each VM has vector of parameter values.  vm->parameters points to this.
@@ -49,8 +49,8 @@ struct ScmPrimitiveParameterRec {
    a simple flat vector in future.
  */
 struct ScmVMParameterTableRec {
-    ScmSize size;
-    ScmObj *vector;
+	ScmSize size;
+	ScmObj *vector;
 };
 
 SCM_EXTERN ScmVMParameterTable *Scm__MakeVMParameterTable(ScmVM *base);

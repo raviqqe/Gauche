@@ -39,14 +39,14 @@ SCM_DECL_BEGIN
 
 /* srfi-114/srfi-128 comparator */
 struct ScmComparatorRec {
-    SCM_HEADER;
-    ScmObj name;                /* debugging aid */
-    ScmObj typeFn;              /* proc */
-    ScmObj eqFn;                /* proc */
-    ScmObj compareFn;           /* proc */
-    ScmObj hashFn;              /* proc */
-    ScmObj orderFn;             /* proc */
-    u_long flags;
+	SCM_HEADER;
+	ScmObj name;            /* debugging aid */
+	ScmObj typeFn;          /* proc */
+	ScmObj eqFn;            /* proc */
+	ScmObj compareFn;       /* proc */
+	ScmObj hashFn;          /* proc */
+	ScmObj orderFn;         /* proc */
+	u_long flags;
 };
 
 /* Difference between srfi-114 and srfi-128:
@@ -69,7 +69,7 @@ struct ScmComparatorRec {
       has dummy procedure)
 
    SCM_COMPARATOR_ANY_TYPE - The comparator can accept any Scheme object.
-     A small optimization to skip type tests.   
+     A small optimization to skip type tests.
 
    SCM_COMPARATOR_USE_COMPARISON - Records the fact that #t is passed
      to the equality-test in srfi-114 style constructor.  We use compareFn
@@ -77,13 +77,13 @@ struct ScmComparatorRec {
 
    SCM_COMPARATOR_SRFI_128 - Indicates this is srfi-128-style comparator,
      so using orderFn is preferred to compareFn.
-*/
+ */
 enum ScmComparatorFlags {
-    SCM_COMPARATOR_NO_ORDER = (1L<<0), /* 'compare' proc unavailable */
-    SCM_COMPARATOR_NO_HASH  = (1L<<1), /* 'hash' proc unavailable */
-    SCM_COMPARATOR_ANY_TYPE = (1L<<2), /* type-test always returns #t */
-    SCM_COMPARATOR_USE_COMPARISON = (1L<<3), /* equality use comarison */
-    SCM_COMPARATOR_SRFI_128 = (1L<<4)  /* srfi-128 style comparator */
+	SCM_COMPARATOR_NO_ORDER = (1L<<0), /* 'compare' proc unavailable */
+	SCM_COMPARATOR_NO_HASH  = (1L<<1),/* 'hash' proc unavailable */
+	SCM_COMPARATOR_ANY_TYPE = (1L<<2), /* type-test always returns #t */
+	SCM_COMPARATOR_USE_COMPARISON = (1L<<3), /* equality use comarison */
+	SCM_COMPARATOR_SRFI_128 = (1L<<4) /* srfi-128 style comparator */
 };
 
 SCM_CLASS_DECL(Scm_ComparatorClass);

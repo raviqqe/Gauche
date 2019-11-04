@@ -51,7 +51,7 @@
    procedure or hooks.  It is useful for the parameter that needs
    to be accessed from C as well.
    Scheme-level <parameter> object is built on top of this.
-*/
+ */
 typedef struct ScmPrimitiveParameterRec ScmPrimitiveParameter;
 
 SCM_CLASS_DECL(Scm_PrimitiveParameterClass);
@@ -60,17 +60,17 @@ SCM_CLASS_DECL(Scm_PrimitiveParameterClass);
 #define SCM_PRIMITIVE_PARAMETER_P(obj) SCM_ISA(obj,SCM_CLASS_PRIMITIVE_PARAMETER)
 
 enum {
-    /* value may be a promise; dereference automaticlaly forces it */
-    SCM_PARAMETER_LAZY = (1UL << 0)
+	/* value may be a promise; dereference automaticlaly forces it */
+	SCM_PARAMETER_LAZY = (1UL << 0)
 };
 
 SCM_EXTERN ScmPrimitiveParameter *Scm_MakePrimitiveParameter(ScmClass *klass,
                                                              ScmObj name,
                                                              ScmObj initval,
                                                              u_long flags);
-SCM_EXTERN ScmObj Scm_PrimitiveParameterRef(ScmVM *vm, 
+SCM_EXTERN ScmObj Scm_PrimitiveParameterRef(ScmVM *vm,
                                             const ScmPrimitiveParameter *p);
-SCM_EXTERN ScmObj Scm_PrimitiveParameterSet(ScmVM *vm, 
+SCM_EXTERN ScmObj Scm_PrimitiveParameterSet(ScmVM *vm,
                                             const ScmPrimitiveParameter *p,
                                             ScmObj val);
 
@@ -84,7 +84,7 @@ SCM_EXTERN ScmPrimitiveParameter *Scm_BindPrimitiveParameter(ScmModule *mod,
 
 /* TRANSIENT - exposed only for the backward compatibility - will be gone by 1.0 */
 typedef struct ScmParameterLocRec {
-    ScmPrimitiveParameter *p;
+	ScmPrimitiveParameter *p;
 } ScmParameterLoc;
 
 SCM_EXTERN void Scm_DefinePrimitiveParameter(ScmModule *mod,
@@ -94,7 +94,7 @@ SCM_EXTERN void Scm_DefinePrimitiveParameter(ScmModule *mod,
 SCM_EXTERN void   Scm_MakeParameterSlot(ScmVM *vm,
                                         ScmParameterLoc *location /*out*/);
 SCM_EXTERN void   Scm_InitParameterLoc(ScmVM *vm,
-                                       ScmParameterLoc *location, 
+                                       ScmParameterLoc *location,
                                        ScmObj initval);
 SCM_EXTERN ScmObj Scm_ParameterRef(ScmVM *vm, const ScmParameterLoc *location);
 SCM_EXTERN ScmObj Scm_ParameterSet(ScmVM *vm, const ScmParameterLoc *location,

@@ -36,13 +36,13 @@
 
 /* Writer control parameters */
 struct ScmWriteControlsRec {
-    SCM_HEADER;
-    int printLength;            /* -1 for no limit */
-    int printLevel;             /* -1 for no limit */
-    int printWidth;             /* -1 for no limit */
-    int printBase;              /* 2-36 */
-    int printRadix;             /* boolean, #t to print radix for all numbers */
-    int printPretty;            /* boolean, #t to use pretty printer */
+	SCM_HEADER;
+	int printLength;        /* -1 for no limit */
+	int printLevel;         /* -1 for no limit */
+	int printWidth;         /* -1 for no limit */
+	int printBase;          /* 2-36 */
+	int printRadix;         /* boolean, #t to print radix for all numbers */
+	int printPretty;        /* boolean, #t to use pretty printer */
 };
 
 SCM_CLASS_DECL(Scm_WriteControlsClass);
@@ -60,21 +60,21 @@ SCM_CLASS_DECL(Scm_WriteControlsClass);
  */
 
 struct ScmWriteContextRec {
-    short mode;                 /* print mode */
-    short flags;                /* internal */
-    int limit;                  /* used in WriteLimited */
-    const ScmWriteControls *controls;
+	short mode;             /* print mode */
+	short flags;            /* internal */
+	int limit;              /* used in WriteLimited */
+	const ScmWriteControls *controls;
 };
 
 #define SCM_WRITE_CONTEXT(obj)    ((ScmWriteContext*)(obj))
 
 struct ScmWriteStateRec {
-    SCM_HEADER;
-    ScmHashTable *sharedTable;  /* track shared structure.  can be NULL */
-    const ScmWriteControls *controls; /* saving writecontext->controls
-                                         for recursive call */
-    int sharedCounter;          /* counter to emit #n= and #n# */
-    int currentLevel;
+	SCM_HEADER;
+	ScmHashTable *sharedTable; /* track shared structure.  can be NULL */
+	const ScmWriteControls *controls; /* saving writecontext->controls
+	                                     for recursive call */
+	int sharedCounter;      /* counter to emit #n= and #n# */
+	int currentLevel;
 };
 
 SCM_CLASS_DECL(Scm_WriteStateClass);

@@ -48,13 +48,13 @@ typedef pthread_t ScmInternalThread;
 #define SCM_INTERNAL_THREAD_INITIALIZED_P(thr)  ((thr) != (pthread_t)NULL)
 #define SCM_INTERNAL_THREAD_GETCURRENT()  pthread_self()
 #define SCM_INTERNAL_THREAD_SETSPECIFIC(key, val) \
-    (pthread_setspecific((key), (val)) == 0)
+	(pthread_setspecific((key), (val)) == 0)
 #define SCM_INTERNAL_THREAD_EXIT()        pthread_exit(NULL)
 
 #define SCM_INTERNAL_THREAD_CLEANUP_PUSH(fn, data) \
-    pthread_cleanup_push(fn, data)
+	pthread_cleanup_push(fn, data)
 #define SCM_INTERNAL_THREAD_CLEANUP_POP() \
-    pthread_cleanup_pop(1)
+	pthread_cleanup_pop(1)
 
 #define SCM_INTERNAL_THREAD_PROC_RETTYPE   void*
 #define SCM_INTERNAL_THREAD_PROC_RETVAL    NULL
@@ -64,7 +64,7 @@ typedef pthread_t ScmInternalThread;
    NB: POSIX requires at least 8 realtime signals, but cygwin doesn't
    provide them (on cygwin, SIGRTMIN == SIGRTMAX).   We use SIGPWR
    instead.
-*/
+ */
 #if defined(SIGRTMIN) && !defined(GAUCHE_PTHREAD_SIGNAL)
 #  if !defined(__CYGWIN__)
 #    define GAUCHE_PTHREAD_SIGNAL (SIGRTMIN+5)
@@ -89,8 +89,8 @@ SCM_EXTERN void Scm__MutexCleanup(void *); /* in core.c */
    if pthread_cleanup_pop expands into something beginning with
    closing brace. */
 #define SCM_INTERNAL_MUTEX_SAFE_LOCK_BEGIN(mutex)               \
-    pthread_mutex_lock(&(mutex));                               \
-    pthread_cleanup_push(Scm__MutexCleanup, &(mutex))
+	pthread_mutex_lock(&(mutex));                               \
+	pthread_cleanup_push(Scm__MutexCleanup, &(mutex))
 #define SCM_INTERNAL_MUTEX_SAFE_LOCK_END() /*dummy*/; pthread_cleanup_pop(1)
 
 /* Condition variable */
@@ -100,7 +100,7 @@ typedef pthread_cond_t ScmInternalCond;
 #define SCM_INTERNAL_COND_BROADCAST(cond)   pthread_cond_broadcast(&(cond))
 #define SCM_INTERNAL_COND_WAIT(cond, mutex) pthread_cond_wait(&(cond), &(mutex))
 #define SCM_INTERNAL_COND_TIMEDWAIT(cond, mutex, ptimespec) \
-    pthread_cond_timedwait(&(cond), &(mutex), (ptimespec))
+	pthread_cond_timedwait(&(cond), &(mutex), (ptimespec))
 #define SCM_INTERNAL_COND_DESTROY(cond)     pthread_cond_destroy(&(cond))
 #define SCM_INTERNAL_COND_INITIALIZER       PTHREAD_COND_INITIALIZER
 #define SCM_INTERNAL_COND_TIMEDOUT          ETIMEDOUT
@@ -110,13 +110,13 @@ typedef pthread_cond_t ScmInternalCond;
 #ifdef HAVE_PTHREAD_SPINLOCK_T
 typedef pthread_spinlock_t ScmInternalFastlock;
 #define SCM_INTERNAL_FASTLOCK_INIT(spin) \
-    pthread_spin_init(&(spin), PTHREAD_PROCESS_PRIVATE)
+	pthread_spin_init(&(spin), PTHREAD_PROCESS_PRIVATE)
 #define SCM_INTERNAL_FASTLOCK_LOCK(spin) \
-    pthread_spin_lock(&(spin))
+	pthread_spin_lock(&(spin))
 #define SCM_INTERNAL_FASTLOCK_UNLOCK(spin) \
-    pthread_spin_unlock(&(spin))
+	pthread_spin_unlock(&(spin))
 #define SCM_INTERNAL_FASTLOCK_DESTROY(spin) \
-    pthread_spin_destroy(&(spin))
+	pthread_spin_destroy(&(spin))
 #else  /*!HAVE_PTHREAD_SPINLOCK_T*/
 typedef pthread_mutex_t ScmInternalFastlock;
 #define SCM_INTERNAL_FASTLOCK_INIT(fl)   SCM_INTERNAL_MUTEX_INIT(fl)

@@ -53,24 +53,24 @@
  * Half float support
  */
 #ifdef HAVE_UINT16_T
-typedef uint16_t        ScmHalfFloat;
+typedef uint16_t ScmHalfFloat;
 #else
-typedef unsigned short  ScmHalfFloat;
+typedef unsigned short ScmHalfFloat;
 #endif
 
 #define SCM_HALF_FLOAT_SIGN_BIT(hf)  ((hf)&0x8000U)
 #define SCM_HALF_FLOAT_EXPONENT(hf)  (((hf)&0x7c00U)>>10)
 #define SCM_HALF_FLOAT_MANTISSA(hf)  ((hf)&0x03ffU)
 #define SCM_HALF_FLOAT_IS_NAN(hf)                       \
-    ((((~(hf))&0x7c00U) == 0) && (((hf)&0x03ffU) != 0))
+	((((~(hf))&0x7c00U) == 0) && (((hf)&0x03ffU) != 0))
 #define SCM_HALF_FLOAT_CMP(op, hf1, hf2)        \
-    (!SCM_HALF_FLOAT_IS_NAN(hf1)                \
-     && !SCM_HALF_FLOAT_IS_NAN(hf2)             \
-     && ((hf1) op (hf2)))
+	(!SCM_HALF_FLOAT_IS_NAN(hf1)                \
+	 && !SCM_HALF_FLOAT_IS_NAN(hf2)             \
+	 && ((hf1) op (hf2)))
 
 typedef struct {
-    ScmHalfFloat r;
-    ScmHalfFloat i;
+	ScmHalfFloat r;
+	ScmHalfFloat i;
 } ScmHalfComplex;
 
 #define SCM_HALF_COMPLEX_REAL(hc)  ((hc).r)
@@ -81,9 +81,9 @@ typedef struct {
  */
 
 #ifdef HAVE_LONG_DOUBLE
-typedef long double     ScmLongDouble;
+typedef long double ScmLongDouble;
 #else
-typedef double          ScmLongDouble;
+typedef double ScmLongDouble;
 #endif
 
 /* NaN and Infinities.  The following works for most Unix platforms w/gcc.
@@ -150,22 +150,22 @@ extern unsigned int __cdecl _controlfp(unsigned int, unsigned int);
 #  endif /*_MCW_PC*/
 
 #define SCM_FP_ENSURE_DOUBLE_PRECISION_BEGIN()        \
-    { unsigned int old_fpc_val__ = _controlfp(0, 0);  \
-      _controlfp(_PC_53, _MCW_PC);
+	{ unsigned int old_fpc_val__ = _controlfp(0, 0);  \
+	  _controlfp(_PC_53, _MCW_PC);
 
 #define SCM_FP_ENSURE_DOUBLE_PRECISION_END() \
-      _controlfp(old_fpc_val__, _MCW_PC); }
+	_controlfp(old_fpc_val__, _MCW_PC); }
 
 #elif defined(_FPU_GETCW) && defined(_FPU_EXTENDED) /* linux x86 */
 
 #define SCM_FP_ENSURE_DOUBLE_PRECISION_BEGIN()        \
-    { fpu_control_t old_fpc_val__, new_fpc_val__;     \
-      _FPU_GETCW(old_fpc_val__);                      \
-      new_fpc_val__ = ((old_fpc_val__ & ~_FPU_EXTENDED) | _FPU_DOUBLE); \
-      _FPU_SETCW(new_fpc_val__);
+	{ fpu_control_t old_fpc_val__, new_fpc_val__;     \
+	  _FPU_GETCW(old_fpc_val__);                      \
+	  new_fpc_val__ = ((old_fpc_val__ & ~_FPU_EXTENDED) | _FPU_DOUBLE); \
+	  _FPU_SETCW(new_fpc_val__);
 
 #define SCM_FP_ENSURE_DOUBLE_PRECISION_END() \
-      _FPU_SETCW(old_fpc_val__); }
+	_FPU_SETCW(old_fpc_val__); }
 
 #elif defined(__CYGWIN__)
 
@@ -174,11 +174,11 @@ extern unsigned int __cdecl _controlfp(unsigned int, unsigned int);
  */
 
 #define SCM_FP_ENSURE_DOUBLE_PRECISION_BEGIN()  \
-    do {                                        \
-        static const u_short cw = 0x27f;        \
-        asm volatile("fldcw %0": : "m"(cw));    \
-    } while(0)
-    
+	do {                                        \
+		static const u_short cw = 0x27f;        \
+		asm volatile ("fldcw %0" : : "m" (cw));    \
+	} while(0)
+
 #define SCM_FP_ENSURE_DOUBLE_PRECISION_END()
 
 #elif defined(__NetBSD__) && defined(__i386__) && defined(HAVE_FPSETPREC)
@@ -189,9 +189,9 @@ extern unsigned int __cdecl _controlfp(unsigned int, unsigned int);
 #include <ieeefp.h>
 
 #define SCM_FP_ENSURE_DOUBLE_PRECISION_BEGIN()        \
-    { fp_prec_t old_prec__ = fpsetprec(FP_PD);
+	{ fp_prec_t old_prec__ = fpsetprec(FP_PD);
 #define SCM_FP_ENSURE_DOUBLE_PRECISION_END() \
-      fpsetprec(old_prec__); }
+	fpsetprec(old_prec__); }
 
 #else  /* fallback */
 #define SCM_FP_ENSURE_DOUBLE_PRECISION_BEGIN() /* nothing */

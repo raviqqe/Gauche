@@ -54,13 +54,13 @@ typedef unsigned long u_long;
  * (seconds, microseconds) pair since Unix Epoch.
  */
 #define SCM_FILETIME_TO_UNIXTIME(ft, secs, usecs)                       \
-  do {                                                                  \
-    const int64_t off_ = ((int64_t)27111902UL << 32) + 3577643008UL;    \
-    int64_t val_ = ((int64_t)(ft).dwHighDateTime << 32) + (ft).dwLowDateTime; \
-    val_ = (val_ - off_)/10;                                            \
-    secs  = (u_long)(val_ / 1000000);                                   \
-    usecs = (u_long)(val_ % 1000000);                                   \
-  } while (0)
+	do {                                                                  \
+		const int64_t off_ = ((int64_t)27111902UL << 32) + 3577643008UL;    \
+		int64_t val_ = ((int64_t)(ft).dwHighDateTime << 32) + (ft).dwLowDateTime; \
+		val_ = (val_ - off_)/10;                                            \
+		secs  = (u_long)(val_ / 1000000);                                   \
+		usecs = (u_long)(val_ % 1000000);                                   \
+	} while (0)
 
 /*==================================================================
  * Users and groups
@@ -75,24 +75,24 @@ typedef int uid_t;
 #endif
 
 struct passwd {
-    const char *pw_name;
-    const char *pw_passwd;
-    int         pw_uid;
-    int         pw_gid;
-    const char *pw_comment;
-    const char *pw_gecos;
-    const char *pw_dir;
-    const char *pw_shell;
+	const char *pw_name;
+	const char *pw_passwd;
+	int pw_uid;
+	int pw_gid;
+	const char *pw_comment;
+	const char *pw_gecos;
+	const char *pw_dir;
+	const char *pw_shell;
 };
 
 struct passwd *getpwuid(uid_t);
 struct passwd *getpwnam(const char *t);
 
 struct group {
-    const char  *gr_name;
-    const char  *gr_passwd;
-    gid_t        gr_gid;
-    const char  **gr_mem;
+	const char  *gr_name;
+	const char  *gr_passwd;
+	gid_t gr_gid;
+	const char  **gr_mem;
 };
 
 struct group *getgrgid(gid_t);
@@ -101,7 +101,7 @@ struct group *getgrnam(const char *t);
 /*=======================================================================
  * No sigsetjmps.  Fake it with ordinary setjmps.
  */
-typedef jmp_buf  sigjmp_buf;
+typedef jmp_buf sigjmp_buf;
 
 #define sigsetjmp(jbuf, flag)  setjmp(jbuf)
 #define siglongjmp(jbuf, val)  longjmp(jbuf, val)
@@ -145,12 +145,12 @@ typedef unsigned long sigset_t;
 #endif /*SIG_SETMASK*/
 
 struct sigaction {
-    int          sa_flags;
-    sigset_t     sa_mask;
+	int sa_flags;
+	sigset_t sa_mask;
 #if defined(__MINGW32__)
-    __p_sig_fn_t sa_handler;   /* see mingw/include/signal.h about the type */
+	__p_sig_fn_t sa_handler; /* see mingw/include/signal.h about the type */
 #else  /* MSVC */
-    void         (*sa_handler)(int);
+	void (*sa_handler)(int);
 #endif
 };
 
@@ -210,17 +210,17 @@ extern __declspec(dllimport) const char *Scm_WCS2MBS(const WCHAR *s);
 /* for MinGW32 runtime v3.X */
 #if defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR) && (__MINGW32_MAJOR_VERSION < 5)
 struct __stat64 {
-    _dev_t st_dev;
-    _ino_t st_ino;
-    unsigned short st_mode;
-    short st_nlink;
-    short st_uid;
-    short st_gid;
-    _dev_t st_rdev;
-    __int64 st_size;
-    __time64_t st_atime;
-    __time64_t st_mtime;
-    __time64_t st_ctime;
+	_dev_t st_dev;
+	_ino_t st_ino;
+	unsigned short st_mode;
+	short st_nlink;
+	short st_uid;
+	short st_gid;
+	_dev_t st_rdev;
+	__int64 st_size;
+	__time64_t st_atime;
+	__time64_t st_mtime;
+	__time64_t st_ctime;
 };
 _CRTIMP int __cdecl _stat64(const char*, struct __stat64*);
 _CRTIMP int __cdecl _wstat64(const wchar_t*, struct __stat64*);
@@ -261,7 +261,7 @@ int ftruncate(int fd, off_t len);
 #define WIFEXITED(status)   (((status)>>8)!=0xff)
 #define WEXITSTATUS(stauts) (status)
 #define WIFSIGNALED(status) (((status)>>8)==0xff)
-#define WTERMSIG(stauts)    ((status)&0xff)
+#define WTERMSIG(stauts)    ((status)& 0xff)
 #define WIFSTOPPED(status)  FALSE
 #define WSTOPSIG(status)    (status)
 
@@ -269,10 +269,10 @@ int ftruncate(int fd, off_t len);
 const char *getlogin(void);
 
 struct tms {
-    u_int tms_utime;
-    u_int tms_stime;
-    u_int tms_cutime;
-    u_int tms_cstime;
+	u_int tms_utime;
+	u_int tms_stime;
+	u_int tms_cutime;
+	u_int tms_cstime;
 };
 
 clock_t times(struct tms *buf);
@@ -281,11 +281,11 @@ clock_t times(struct tms *buf);
  * Fakes for ext/fcntl
  */
 struct flock {
-    short l_type;
-    short l_whence;
-    off_t l_start;
-    off_t l_len;
-    pid_t l_pid;
+	short l_type;
+	short l_whence;
+	off_t l_start;
+	off_t l_len;
+	pid_t l_pid;
 };
 
 #define F_DUPFD  0

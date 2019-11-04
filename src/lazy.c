@@ -73,11 +73,11 @@
  * The body of promise
  */
 typedef struct ScmPromiseContentRec {
-    int forced;                 /* TRUE if code has a thunk */
-    ScmObj code;                /* thunk or value */
-    ScmInternalMutex mutex;
-    ScmVM *owner;               /* who is working on this? */
-    int count;                  /* count for recursive lock */
+	int forced;             /* TRUE if code has a thunk */
+	ScmObj code;            /* thunk or value */
+	ScmInternalMutex mutex;
+	ScmVM *owner;           /* who is working on this? */
+	int count;              /* count for recursive lock */
 } ScmPromiseContent;
 
 /*
@@ -87,13 +87,13 @@ typedef struct ScmPromiseContentRec {
 static void promise_print(ScmObj obj, ScmPort *port,
                           ScmWriteContext *ctx SCM_UNUSED)
 {
-    ScmPromise *p = (ScmPromise*)obj;
-    const char *forced = p->content->forced? " (forced)" : "";
-    if (SCM_FALSEP(p->kind)) {
-        Scm_Printf(port, "#<promise %p%s>", p, forced);
-    } else {
-        Scm_Printf(port, "#<promise(%S) %p%s>", p->kind, p, forced);
-    }
+	ScmPromise *p = (ScmPromise*)obj;
+	const char *forced = p->content->forced ? " (forced)" : "";
+	if (SCM_FALSEP(p->kind)) {
+		Scm_Printf(port, "#<promise %p%s>", p, forced);
+	} else {
+		Scm_Printf(port, "#<promise(%S) %p%s>", p->kind, p, forced);
+	}
 }
 
 SCM_DEFINE_BUILTIN_CLASS_SIMPLE(Scm_PromiseClass, promise_print);
@@ -104,17 +104,17 @@ SCM_DEFINE_BUILTIN_CLASS_SIMPLE(Scm_PromiseClass, promise_print);
 
 ScmObj Scm_MakePromise(int forced, ScmObj code)
 {
-    ScmPromise *p = SCM_NEW(ScmPromise);
-    ScmPromiseContent *c = SCM_NEW(ScmPromiseContent);
-    SCM_SET_CLASS(p, SCM_CLASS_PROMISE);
-    SCM_INTERNAL_MUTEX_INIT(c->mutex);
-    c->owner = NULL;
-    c->count = 0;
-    c->forced = forced;
-    c->code = code;
-    p->content = c;
-    p->kind = SCM_FALSE;
-    return SCM_OBJ(p);
+	ScmPromise *p = SCM_NEW(ScmPromise);
+	ScmPromiseContent *c = SCM_NEW(ScmPromiseContent);
+	SCM_SET_CLASS(p, SCM_CLASS_PROMISE);
+	SCM_INTERNAL_MUTEX_INIT(c->mutex);
+	c->owner = NULL;
+	c->count = 0;
+	c->forced = forced;
+	c->code = code;
+	p->content = c;
+	p->kind = SCM_FALSE;
+	return SCM_OBJ(p);
 }
 
 /*
@@ -125,90 +125,90 @@ static ScmObj release_promise(ScmObj *args SCM_UNUSED,
                               int nargs SCM_UNUSED,
                               void *data)
 {
-    ScmPromise *p = SCM_PROMISE(data);
-    p->content->owner = NULL;
-    SCM_INTERNAL_MUTEX_UNLOCK(p->content->mutex);
-    return SCM_UNDEFINED;
+	ScmPromise *p = SCM_PROMISE(data);
+	p->content->owner = NULL;
+	SCM_INTERNAL_MUTEX_UNLOCK(p->content->mutex);
+	return SCM_UNDEFINED;
 }
 
 static void install_release_thunk(ScmVM *vm, ScmObj promise)
 {
-    /* TODO: the before thunk must be something that
-       prevents restarting the execution process. */
-    vm->handlers = Scm_Acons(Scm_NullProc(),
-                             Scm_MakeSubr(release_promise,
-                                          (void*)promise, 0, 0,
-                                          SCM_MAKE_STR("promise_release")),
-                             vm->handlers);
+	/* TODO: the before thunk must be something that
+	   prevents restarting the execution process. */
+	vm->handlers = Scm_Acons(Scm_NullProc(),
+	                         Scm_MakeSubr(release_promise,
+	                                      (void*)promise, 0, 0,
+	                                      SCM_MAKE_STR("promise_release")),
+	                         vm->handlers);
 }
 
 static ScmObj force_cc(ScmObj result, void **data)
 {
-    ScmPromise *p = (ScmPromise*)data[0];
-    ScmObj handlers = (ScmObj)data[1];
+	ScmPromise *p = (ScmPromise*)data[0];
+	ScmObj handlers = (ScmObj)data[1];
 
-    /* Check if the original promise is forced by evaluating
-       the delayed expr to detect recursive force situation */
-    if (!p->content->forced) {
-        if (SCM_PROMISEP(result)) {
-            /* Deal with a recursive promise introduced by lazy operation.
-               See srfi-45 for the details. */
-            p->content->forced = SCM_PROMISE(result)->content->forced;
-            p->content->code   = SCM_PROMISE(result)->content->code;
-            SCM_PROMISE(result)->content = p->content;
-        } else {
-            /* This isn't supposed to happen if 'lazy' is used properly
-               on the promise-yielding procedure, but we can't prevent
-               one from writing (lazy 3).  So play safe. */
-            p->content->forced = TRUE;
-            p->content->code = result;
-        }
-    }
-    if (--p->content->count == 0) {
-        p->content->owner = NULL;
-        SCM_INTERNAL_MUTEX_UNLOCK(p->content->mutex);
-    }
-    Scm_VM()->handlers = handlers;
-    SCM_RETURN(Scm_Force(SCM_OBJ(p)));
+	/* Check if the original promise is forced by evaluating
+	   the delayed expr to detect recursive force situation */
+	if (!p->content->forced) {
+		if (SCM_PROMISEP(result)) {
+			/* Deal with a recursive promise introduced by lazy operation.
+			   See srfi-45 for the details. */
+			p->content->forced = SCM_PROMISE(result)->content->forced;
+			p->content->code   = SCM_PROMISE(result)->content->code;
+			SCM_PROMISE(result)->content = p->content;
+		} else {
+			/* This isn't supposed to happen if 'lazy' is used properly
+			   on the promise-yielding procedure, but we can't prevent
+			   one from writing (lazy 3).  So play safe. */
+			p->content->forced = TRUE;
+			p->content->code = result;
+		}
+	}
+	if (--p->content->count == 0) {
+		p->content->owner = NULL;
+		SCM_INTERNAL_MUTEX_UNLOCK(p->content->mutex);
+	}
+	Scm_VM()->handlers = handlers;
+	SCM_RETURN(Scm_Force(SCM_OBJ(p)));
 }
 
 ScmObj Scm_Force(ScmObj obj)
 {
-    if (!SCM_PROMISEP(obj)) {
-        SCM_RETURN(obj);
-    } else {
-        ScmPromiseContent *c = SCM_PROMISE(obj)->content;
+	if (!SCM_PROMISEP(obj)) {
+		SCM_RETURN(obj);
+	} else {
+		ScmPromiseContent *c = SCM_PROMISE(obj)->content;
 
-        if (c->forced) SCM_RETURN(c->code);
-        else {
-            ScmVM *vm = Scm_VM();
-            void *data[2];
-            data[0] = obj;
-            data[1] = vm->handlers;
+		if (c->forced) SCM_RETURN(c->code);
+		else {
+			ScmVM *vm = Scm_VM();
+			void *data[2];
+			data[0] = obj;
+			data[1] = vm->handlers;
 
-            if (c->owner == vm) {
-                /* we already have the lock and evaluating this promise. */
-                c->count++;
-                Scm_VMPushCC(force_cc, data, 2);
-                SCM_RETURN(Scm_VMApply0(c->code));
-            } else {
-                /* TODO: check if the executing thread terminates
-                   prematurely */
-                SCM_INTERNAL_MUTEX_LOCK(c->mutex);
-                if (c->forced) {
-                    SCM_INTERNAL_MUTEX_UNLOCK(c->mutex);
-                    SCM_RETURN(c->code);
-                }
-                SCM_ASSERT(c->owner == NULL);
-                c->owner = vm;
-                install_release_thunk(vm, obj);
-                c->count++;
-                /* mutex is unlocked by force_cc. */
-                Scm_VMPushCC(force_cc, data, 2);
-                SCM_RETURN(Scm_VMApply0(c->code));
-            }
-        }
-    }
+			if (c->owner == vm) {
+				/* we already have the lock and evaluating this promise. */
+				c->count++;
+				Scm_VMPushCC(force_cc, data, 2);
+				SCM_RETURN(Scm_VMApply0(c->code));
+			} else {
+				/* TODO: check if the executing thread terminates
+				   prematurely */
+				SCM_INTERNAL_MUTEX_LOCK(c->mutex);
+				if (c->forced) {
+					SCM_INTERNAL_MUTEX_UNLOCK(c->mutex);
+					SCM_RETURN(c->code);
+				}
+				SCM_ASSERT(c->owner == NULL);
+				c->owner = vm;
+				install_release_thunk(vm, obj);
+				c->count++;
+				/* mutex is unlocked by force_cc. */
+				Scm_VMPushCC(force_cc, data, 2);
+				SCM_RETURN(Scm_VMApply0(c->code));
+			}
+		}
+	}
 }
 
 #if GAUCHE_LAZY_PAIR
@@ -231,191 +231,191 @@ ScmObj Scm_Force(ScmObj obj)
 
 /*
 
-  (0) Initial state
+   (0) Initial state
 
-  +---------------+
-  |  LazyPair tag |
-  +---------------+
-  |  ScmObj item  |
-  +---------------+
-  |    ScmObj     | ----> generator
-  +---------------+
-  |   (AO_t)0     |
-  +---------------+
-
-
-  (1) The first one (owner) grabs the packet, then evaluates the generator.
-  The grabbing is done by CAS to make it atomic.
-
-  +---------------+
-  |  LazyPair tag |
-  +---------------+
-  |  ScmObj item  |
-  +---------------+
-  |    ScmObj     | ----> generator
-  +---------------+
-  |  (AO_t)owner  |
-  +---------------+
+ +---------------+
+ |  LazyPair tag |
+ +---------------+
+ |  ScmObj item  |
+ +---------------+
+ |    ScmObj     | ----> generator
+ +---------------+
+ |   (AO_t)0     |
+ +---------------+
 
 
-  (2) If generator yields a non-nil value, owner first creates a
+   (1) The first one (owner) grabs the packet, then evaluates the generator.
+   The grabbing is done by CAS to make it atomic.
+
+ +---------------+
+ |  LazyPair tag |
+ +---------------+
+ |  ScmObj item  |
+ +---------------+
+ |    ScmObj     | ----> generator
+ +---------------+
+ |  (AO_t)owner  |
+ +---------------+
+
+
+   (2) If generator yields a non-nil value, owner first creates a
       new LazyPair...
 
-  +---------------+
-  |  LazyPair tag |
-  +---------------+
-  |  ScmObj item  |
-  +---------------+
-  |    ScmObj     | ------------------------+-> generator
-  +---------------+                         |
-  |  (AO_t)owner  |                         |
-  +---------------+                         |
-                                            |
-                         +---------------+  |
-                         |  LazyPair tag |  |
-                         +---------------+  |
-                         | ScmObj newitem|  |
-                         +---------------+  |
-                         |    ScmObj     | -/
-                         +---------------+
-                         |    (AO_t)0    |
-                         +---------------+
+ +---------------+
+ |  LazyPair tag |
+ +---------------+
+ |  ScmObj item  |
+ +---------------+
+ |    ScmObj     | ------------------------+-> generator
+ +---------------+                         |
+ |  (AO_t)owner  |                         |
+ +---------------+                         |
+ |
+ +---------------+  |
+ |  LazyPair tag |  |
+ +---------------+  |
+ | ScmObj newitem|  |
+ +---------------+  |
+ |    ScmObj     | -/
+ +---------------+
+ |    (AO_t)0    |
+ +---------------+
 
-  (3) then it replaces the cdr pointer with the new LazyPair, and clear
+   (3) then it replaces the cdr pointer with the new LazyPair, and clear
       the third slot.
 
-  +---------------+
-  |  LazyPair tag |
-  +---------------+
-  |     ScmObj    | -\
-  +---------------+  |
-  |      NIL      |  |
-  +---------------+  |
-  |  (AO_t)owner  |  |
-  +---------------+  |
-                     |
-                     |   +---------------+
-                     \-> |  LazyPair tag |
-                         +---------------+
-                         | ScmObj newitem|
-                         +---------------+
-                         |    ScmObj     | ---> generator
-                         +---------------+
-                         |    (AO_t)0    |
-                         +---------------+
+ +---------------+
+ |  LazyPair tag |
+ +---------------+
+ |     ScmObj    | -\
+ +---------------+  |
+ |      NIL      |  |
+ +---------------+  |
+ |  (AO_t)owner  |  |
+ +---------------+  |
+ |
+ |   +---------------+
+ \-> |  LazyPair tag |
+ +---------------+
+ | ScmObj newitem|
+ +---------------+
+ |    ScmObj     | ---> generator
+ +---------------+
+ |    (AO_t)0    |
+ +---------------+
 
 
-  (4) and replaces the car pointer with the lookahead value, which makes
+   (4) and replaces the car pointer with the lookahead value, which makes
       the original object an (extended) pair,
 
-  +---------------+
-  |  ScmObj item  |
-  +---------------+
-  |     ScmObj    | -\
-  +---------------+  |
-  |      NIL      |  |
-  +---------------+  |
-  |  (AO_t)owner  |  |
-  +---------------+  |
-                     |
-                     |   +---------------+
-                     \-> |  LazyPair tag |
-                         +---------------+
-                         | ScmObj newitem|
-                         +---------------+
-                         |    ScmObj     | ---> generator
-                         +---------------+
-                         |    (AO_t)0    |
-                         +---------------+
+ +---------------+
+ |  ScmObj item  |
+ +---------------+
+ |     ScmObj    | -\
+ +---------------+  |
+ |      NIL      |  |
+ +---------------+  |
+ |  (AO_t)owner  |  |
+ +---------------+  |
+ |
+ |   +---------------+
+ \-> |  LazyPair tag |
+ +---------------+
+ | ScmObj newitem|
+ +---------------+
+ |    ScmObj     | ---> generator
+ +---------------+
+ |    (AO_t)0    |
+ +---------------+
 
-  (5) finally set the fourth slot with 1, just not to grab the pointer
+   (5) finally set the fourth slot with 1, just not to grab the pointer
       to the owner thread so that the owner thread won't be retained
       unnecessarily.
 
-  +---------------+
-  |  ScmObj item  |
-  +---------------+
-  |     ScmObj    | -\
-  +---------------+  |
-  |      NIL      |  |
-  +---------------+  |
-  |    (AO_t)1    |  |
-  +---------------+  |
-                     |
-                     |   +---------------+
-                     \-> |  LazyPair tag |
-                         +---------------+
-                         | ScmObj newitem|
-                         +---------------+
-                         |    ScmObj     | ---> generator
-                         +---------------+
-                         |    (AO_t)0    |
-                         +---------------+
+ +---------------+
+ |  ScmObj item  |
+ +---------------+
+ |     ScmObj    | -\
+ +---------------+  |
+ |      NIL      |  |
+ +---------------+  |
+ |    (AO_t)1    |  |
+ +---------------+  |
+ |
+ |   +---------------+
+ \-> |  LazyPair tag |
+ +---------------+
+ | ScmObj newitem|
+ +---------------+
+ |    ScmObj     | ---> generator
+ +---------------+
+ |    (AO_t)0    |
+ +---------------+
 
 
-  (2') If generator yields EOF, we don't create a new lazy pair.
-  We first replace the second and third slot by NIL,
+   (2') If generator yields EOF, we don't create a new lazy pair.
+   We first replace the second and third slot by NIL,
 
-  +---------------+
-  | LazyPair tag  |
-  +---------------+
-  |      NIL      |
-  +---------------+
-  |      NIL      |
-  +---------------+
-  |  (AO_t)owner  |
-  +---------------+
+ +---------------+
+ | LazyPair tag  |
+ +---------------+
+ |      NIL      |
+ +---------------+
+ |      NIL      |
+ +---------------+
+ |  (AO_t)owner  |
+ +---------------+
 
-  (3') then replace the car part by the cached value, which turns
-  the object to an (extended) pair,
+   (3') then replace the car part by the cached value, which turns
+   the object to an (extended) pair,
 
-  +---------------+
-  |  ScmObj item  |
-  +---------------+
-  |      NIL      |
-  +---------------+
-  |      NIL      |
-  +---------------+
-  |  (AO_t)owner  |
-  +---------------+
-
-
-  (4') then clear the fourth slot to be GC-friendly.
-
-  +---------------+
-  |  ScmObj item  |
-  +---------------+
-  |      NIL      |
-  +---------------+
-  |      NIL      |
-  +---------------+
-  |    (AO_t)1    |
-  +---------------+
+ +---------------+
+ |  ScmObj item  |
+ +---------------+
+ |      NIL      |
+ +---------------+
+ |      NIL      |
+ +---------------+
+ |  (AO_t)owner  |
+ +---------------+
 
 
-  Each step of the state transitions (0)->(1)->(2)->(3)->(4)->(5) and
-  (0)->(1)->(2')->(3')->(4') are atomic, so the observer see either
-  one of those states.
+   (4') then clear the fourth slot to be GC-friendly.
+
+ +---------------+
+ |  ScmObj item  |
+ +---------------+
+ |      NIL      |
+ +---------------+
+ |      NIL      |
+ +---------------+
+ |    (AO_t)1    |
+ +---------------+
+
+
+   Each step of the state transitions (0)->(1)->(2)->(3)->(4)->(5) and
+   (0)->(1)->(2')->(3')->(4') are atomic, so the observer see either
+   one of those states.
  */
 
 SCM_DEFINE_BUILTIN_CLASS_SIMPLE(Scm_LazyPairClass, NULL);
 
 /* The order is important - must correspond to ScmExtendedPair. */
 struct ScmLazyPairRec {
-    SCM_HEADER;
-    ScmObj item;
-    ScmObj generator;
-    ScmAtomicVar owner;
+	SCM_HEADER;
+	ScmObj item;
+	ScmObj generator;
+	ScmAtomicVar owner;
 };
 
 ScmObj Scm_MakeLazyPair(ScmObj item, ScmObj generator)
 {
-    ScmLazyPair *z = SCM_NEW(ScmLazyPair);
-    z->owner = (ScmAtomicWord)0;
-    SCM_SET_CLASS(z, SCM_CLASS_LAZY_PAIR);
-    z->generator = generator;
-    z->item = item;
-    return SCM_OBJ(z);
+	ScmLazyPair *z = SCM_NEW(ScmLazyPair);
+	z->owner = (ScmAtomicWord)0;
+	SCM_SET_CLASS(z, SCM_CLASS_LAZY_PAIR);
+	z->generator = generator;
+	z->item = item;
+	return SCM_OBJ(z);
 }
 
 /* Force a lazy pair.
@@ -428,61 +428,61 @@ ScmObj Scm_MakeLazyPair(ScmObj item, ScmObj generator)
  */
 ScmObj Scm_ForceLazyPair(volatile ScmLazyPair *lp)
 {
-    static const ScmTimeSpec req = {0, 1000000};
-    ScmTimeSpec rem;
-    ScmVM *vm = Scm_VM();
-    ScmAtomicWord zero = 0;	/* Need to use C11 intrinsic */
+	static const ScmTimeSpec req = {0, 1000000};
+	ScmTimeSpec rem;
+	ScmVM *vm = Scm_VM();
+	ScmAtomicWord zero = 0; /* Need to use C11 intrinsic */
 
-    do {
-        if (AO_compare_and_swap_full(&lp->owner, zero, SCM_WORD(vm))) {
-            /* Here we own the lazy pair. */
-            ScmObj item = lp->item;
-            /* Calling generator might change VM state, so we protect
-               incomplete stack frame if there's any. */
-            int extra_frame_pushed = Scm__VMProtectStack(vm);
-            SCM_UNWIND_PROTECT {
-                ScmObj val = Scm_ApplyRec0(lp->generator);
-                ScmObj newgen = (vm->numVals == 1)? lp->generator : vm->vals[0];
-                vm->numVals = 1; /* make sure the extra val won't leak out */
+	do {
+		if (AO_compare_and_swap_full(&lp->owner, zero, SCM_WORD(vm))) {
+			/* Here we own the lazy pair. */
+			ScmObj item = lp->item;
+			/* Calling generator might change VM state, so we protect
+			   incomplete stack frame if there's any. */
+			int extra_frame_pushed = Scm__VMProtectStack(vm);
+			SCM_UNWIND_PROTECT {
+				ScmObj val = Scm_ApplyRec0(lp->generator);
+				ScmObj newgen = (vm->numVals == 1) ? lp->generator : vm->vals[0];
+				vm->numVals = 1; /* make sure the extra val won't leak out */
 
-                if (SCM_EOFP(val)) {
-                    lp->item = SCM_NIL;
-                    lp->generator = SCM_NIL;
-                } else {
-                    ScmObj newlp = Scm_MakeLazyPair(val, newgen);
-                    lp->item = newlp;
-                    lp->generator = SCM_NIL;
-                }
-                AO_nop_full();
-                SCM_SET_CAR(lp, item);
-                /* We don't need barrier here. */
-                lp->owner = (ScmAtomicWord)1;
-            } SCM_WHEN_ERROR {
-                lp->owner = (ScmAtomicWord)0; /*NB: See above about error handling*/
-                SCM_NEXT_HANDLER;
-            } SCM_END_PROTECT;
-            if (extra_frame_pushed) {
-                Scm__VMUnprotectStack(vm);
-            }
-            return SCM_OBJ(lp); /* lp is now an (extended) pair */
-        }
-        /* Check if we're already working on forcing this pair.  Unlike
-           force/delay, We don't allow recursive forcing of lazy pair.
-           Since generators are supposed to be called every time to yield
-           a new value, so it is ambiguous what value should be returned
-           if a generator calls itself recursively. */
-        if (SCM_WORD(lp->owner) == SCM_WORD(vm)) {
-            /* NB: lp->owner will be reset by the original caller of
-               the generator. */
-            Scm_Error("Attempt to recursively force a lazy pair.");
-        }
-        /* Somebody's already working on forcing.  Let's wait for it
-           to finish, or to abort. */
-        while (SCM_HTAG(lp) == 7 && lp->owner != 0) {
-            Scm_NanoSleep(&req, &rem);
-        }
-    } while (lp->owner == 0); /* we retry if the previous owner abandoned. */
-    return SCM_OBJ(lp);
+				if (SCM_EOFP(val)) {
+					lp->item = SCM_NIL;
+					lp->generator = SCM_NIL;
+				} else {
+					ScmObj newlp = Scm_MakeLazyPair(val, newgen);
+					lp->item = newlp;
+					lp->generator = SCM_NIL;
+				}
+				AO_nop_full();
+				SCM_SET_CAR(lp, item);
+				/* We don't need barrier here. */
+				lp->owner = (ScmAtomicWord)1;
+			} SCM_WHEN_ERROR {
+				lp->owner = (ScmAtomicWord)0; /*NB: See above about error handling*/
+				SCM_NEXT_HANDLER;
+			} SCM_END_PROTECT;
+			if (extra_frame_pushed) {
+				Scm__VMUnprotectStack(vm);
+			}
+			return SCM_OBJ(lp); /* lp is now an (extended) pair */
+		}
+		/* Check if we're already working on forcing this pair.  Unlike
+		   force/delay, We don't allow recursive forcing of lazy pair.
+		   Since generators are supposed to be called every time to yield
+		   a new value, so it is ambiguous what value should be returned
+		   if a generator calls itself recursively. */
+		if (SCM_WORD(lp->owner) == SCM_WORD(vm)) {
+			/* NB: lp->owner will be reset by the original caller of
+			   the generator. */
+			Scm_Error("Attempt to recursively force a lazy pair.");
+		}
+		/* Somebody's already working on forcing.  Let's wait for it
+		   to finish, or to abort. */
+		while (SCM_HTAG(lp) == 7 && lp->owner != 0) {
+			Scm_NanoSleep(&req, &rem);
+		}
+	} while (lp->owner == 0); /* we retry if the previous owner abandoned. */
+	return SCM_OBJ(lp);
 }
 
 /* Extract item and generator from lazy pair OBJ, without forcing it.
@@ -495,64 +495,64 @@ static ScmObj dummy_gen(ScmObj *args SCM_UNUSED,
                         int nargs SCM_UNUSED,
                         void *data)
 {
-    ScmObj item;
-    ScmObj generator;
-    if (Scm_DecomposeLazyPair(SCM_OBJ(data), &item, &generator)) {
-        return Scm_Values2(item, generator);
-    } else {
-        return Scm_Values2(SCM_EOF, SCM_FALSE);
-    }
+	ScmObj item;
+	ScmObj generator;
+	if (Scm_DecomposeLazyPair(SCM_OBJ(data), &item, &generator)) {
+		return Scm_Values2(item, generator);
+	} else {
+		return Scm_Values2(SCM_EOF, SCM_FALSE);
+	}
 }
 
 int Scm_DecomposeLazyPair(ScmObj obj, ScmObj *item, ScmObj *generator)
 {
-    if (SCM_LAZY_PAIR_P(obj)) {
-        volatile ScmLazyPair *lp = SCM_LAZY_PAIR(obj);
-        static const ScmTimeSpec req = {0, 1000000};
-        ScmTimeSpec rem;
-        ScmVM *vm = Scm_VM();
-        ScmAtomicWord zero = 0;	/* Need to use C11 intrinsic */
+	if (SCM_LAZY_PAIR_P(obj)) {
+		volatile ScmLazyPair *lp = SCM_LAZY_PAIR(obj);
+		static const ScmTimeSpec req = {0, 1000000};
+		ScmTimeSpec rem;
+		ScmVM *vm = Scm_VM();
+		ScmAtomicWord zero = 0; /* Need to use C11 intrinsic */
 
-        for (;;) {
-            if (AO_compare_and_swap_full(&lp->owner, zero, SCM_WORD(vm))) {
-                *item = lp->item;
-                *generator = lp->generator;
-                AO_nop_full();
-                lp->owner = 0;
-                return TRUE;
-            }
-            if (lp->owner == (ScmAtomicWord)1) {
-                /* Somebody else has forced OBJ.  In the typical cases
-                   where we call this function for co-recursive lazy
-                   algorithms, this situation rarely happens.   We fallthrough
-                   to the SCM_PAIRP check below to return appropriate
-                   values. */
-                SCM_ASSERT(SCM_HTAG(lp) != 7);
-                break;
-            }
-            Scm_NanoSleep(&req, &rem);
-        }
-        /*FALLTHROUGH*/
-    }
-    if (SCM_PAIRP(obj)) {
-        ScmObj next;
-        *item = SCM_CAR(obj);
-        next = SCM_NULLP(SCM_CDR(obj)) ? SCM_EOF : SCM_CDR(obj);
-        *generator = Scm_MakeSubr(dummy_gen, (void*)next, 0, 0, SCM_FALSE);
-        return TRUE;
-    } else {
-        return FALSE;
-    }
+		for (;;) {
+			if (AO_compare_and_swap_full(&lp->owner, zero, SCM_WORD(vm))) {
+				*item = lp->item;
+				*generator = lp->generator;
+				AO_nop_full();
+				lp->owner = 0;
+				return TRUE;
+			}
+			if (lp->owner == (ScmAtomicWord)1) {
+				/* Somebody else has forced OBJ.  In the typical cases
+				   where we call this function for co-recursive lazy
+				   algorithms, this situation rarely happens.   We fallthrough
+				   to the SCM_PAIRP check below to return appropriate
+				   values. */
+				SCM_ASSERT(SCM_HTAG(lp) != 7);
+				break;
+			}
+			Scm_NanoSleep(&req, &rem);
+		}
+		/*FALLTHROUGH*/
+	}
+	if (SCM_PAIRP(obj)) {
+		ScmObj next;
+		*item = SCM_CAR(obj);
+		next = SCM_NULLP(SCM_CDR(obj)) ? SCM_EOF : SCM_CDR(obj);
+		*generator = Scm_MakeSubr(dummy_gen, (void*)next, 0, 0, SCM_FALSE);
+		return TRUE;
+	} else {
+		return FALSE;
+	}
 }
 
 int Scm_PairP(ScmObj x)
 {
-    if (SCM_LAZY_PAIR_P(x)) {
-        Scm_ForceLazyPair(SCM_LAZY_PAIR(x));
-        return TRUE;
-    } else {
-        return FALSE;
-    }
+	if (SCM_LAZY_PAIR_P(x)) {
+		Scm_ForceLazyPair(SCM_LAZY_PAIR(x));
+		return TRUE;
+	} else {
+		return FALSE;
+	}
 }
 
 #endif /* GAUCHE_LAZY_PAIR */

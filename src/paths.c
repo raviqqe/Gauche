@@ -59,47 +59,47 @@ static const char *substitute_all(const char *input,
                                   const char *mark,
                                   const char *subst)
 {
-    size_t ilen = strlen(input);
-    size_t mlen = strlen(mark);
-    size_t slen = strlen(subst);
-        
-    int noccurs = 0;
-    const char *p = input;
-    const char *pend = p + ilen;
-    while (p < pend) {
-        const char *p1 = strstr(p, mark);
-        if (p1 == NULL) break;
-        noccurs++;
-        p = p1 + mlen;
-    }
+	size_t ilen = strlen(input);
+	size_t mlen = strlen(mark);
+	size_t slen = strlen(subst);
 
-    if (noccurs == 0) return input;
-    size_t buflen = noccurs * slen + ilen - noccurs * mlen;
-    char *buf = (char*)PATH_ALLOC(buflen+1);
-    char *q = buf;
-    for (p = input; noccurs > 0; noccurs--) {
-        const char *p1 = strstr(p, mark);
-        strncpy(q, p, p1-p);
-        q += p1-p;
-        strncpy(q, subst, slen);
-        q += slen;
-        p = p1 + mlen;
-    }
-    strncpy(q, p, pend-p);
-    buf[buflen] = '\0';
-    return buf;
+	int noccurs = 0;
+	const char *p = input;
+	const char *pend = p + ilen;
+	while (p < pend) {
+		const char *p1 = strstr(p, mark);
+		if (p1 == NULL) break;
+		noccurs++;
+		p = p1 + mlen;
+	}
+
+	if (noccurs == 0) return input;
+	size_t buflen = noccurs * slen + ilen - noccurs * mlen;
+	char *buf = (char*)PATH_ALLOC(buflen+1);
+	char *q = buf;
+	for (p = input; noccurs > 0; noccurs--) {
+		const char *p1 = strstr(p, mark);
+		strncpy(q, p, p1-p);
+		q += p1-p;
+		strncpy(q, subst, slen);
+		q += slen;
+		p = p1 + mlen;
+	}
+	strncpy(q, p, pend-p);
+	buf[buflen] = '\0';
+	return buf;
 }
 
 
 /* The configure-generated path may have '@' in the pathnames.  We replace
-   it with the installation directory. 
+   it with the installation directory.
 
    NB: This is a static function, but called from gauche-config.c (it includes
    paths.c).
-*/
+ */
 static const char *replace_install_dir(const char *orig,
                                        void (*errfn)(const char *, ...))
 {
-    if (strstr(orig, "@") == NULL) return orig; /* no replace */
-    return substitute_all(orig, "@", get_install_dir(errfn));
+	if (strstr(orig, "@") == NULL) return orig; /* no replace */
+	return substitute_all(orig, "@", get_install_dir(errfn));
 }

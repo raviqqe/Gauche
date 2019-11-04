@@ -45,20 +45,20 @@ extern "C" {
 #if defined(__CYGWIN__)
 # ifdef __x86_64__
 #  define SCM_INIT_EXTENSION(name)                 \
-      do {                                         \
-          Scm_RegisterDL((void*)&__data_start__,   \
-                         (void*)&__data_end__,     \
-                         (void*)&__bss_start__,    \
-                         (void*)&__bss_end__);     \
-      } while (0)
+	do {                                         \
+		Scm_RegisterDL((void*)&__data_start__,   \
+		               (void*)&__data_end__,     \
+		               (void*)&__bss_start__,    \
+		               (void*)&__bss_end__);     \
+	} while (0)
 # else
 #  define SCM_INIT_EXTENSION(name)                \
-      do {                                        \
-          Scm_RegisterDL((void*)&_data_start__,   \
-                         (void*)&_data_end__,     \
-                         (void*)&_bss_start__,    \
-                         (void*)&_bss_end__);     \
-      } while (0)
+	do {                                        \
+		Scm_RegisterDL((void*)&_data_start__,   \
+		               (void*)&_data_end__,     \
+		               (void*)&_bss_start__,    \
+		               (void*)&_bss_end__);     \
+	} while (0)
 # endif
 #else /* !__CYGWIN__ */
 #define SCM_INIT_EXTENSION(name) /* nothing */

@@ -47,7 +47,7 @@
    worry about the bit ordering.  For internal hackers: ScmBits are
    also used in bignum.c, and it must maintain this bit ordering.
    It is important that ScmBignum->values can be casted to ScmBits*.
-*/
+ */
 
 typedef u_long ScmBits;
 
@@ -55,27 +55,27 @@ typedef u_long ScmBits;
 SCM_EXTERN ScmBits *Scm_MakeBits(int numbits);
 
 #define SCM_BITS_NUM_WORDS(size) \
-    (((size)+SCM_WORD_BITS-1)/SCM_WORD_BITS)
+	(((size)+SCM_WORD_BITS-1)/SCM_WORD_BITS)
 
 #define SCM_BITS_TEST_IN_WORD(word, ind_w)  (0!=((word) & (1UL<<(ind_w))))
 #define SCM_BITS_SET_IN_WORD(word, ind_w)   ((word) |= (1UL<<(ind_w)))
 #define SCM_BITS_RESET_IN_WORD(word, ind_w) ((word) &= ~(1UL<<(ind_w)))
 
 #define SCM_BITS_TEST(bits, index)                \
-  SCM_BITS_TEST_IN_WORD((bits)[(index)/SCM_WORD_BITS], (index)%SCM_WORD_BITS)
+	SCM_BITS_TEST_IN_WORD((bits)[(index)/SCM_WORD_BITS], (index)%SCM_WORD_BITS)
 
 #define SCM_BITS_SET(bits, index)                 \
-  SCM_BITS_SET_IN_WORD((bits)[(index)/SCM_WORD_BITS], (index)%SCM_WORD_BITS)
+	SCM_BITS_SET_IN_WORD((bits)[(index)/SCM_WORD_BITS], (index)%SCM_WORD_BITS)
 
 #define SCM_BITS_RESET(bits, index)               \
-  SCM_BITS_RESET_IN_WORD((bits)[(index)/SCM_WORD_BITS], (index)%SCM_WORD_BITS)
+	SCM_BITS_RESET_IN_WORD((bits)[(index)/SCM_WORD_BITS], (index)%SCM_WORD_BITS)
 
 /* calculates a mask to extract bits between s (inclusive) and e (exclusive)
    from a word.  e==0 means e is just left of the word (i.e. bits up to
    the word boundary.  Assume 0 <= s < e' <= SCM_WORD_BITS, where e' = e
    for 1 <= e < SCM_WORD_BITS, and e' = SCM_WORD_BITS if e == 0. */
 #define SCM_BITS_MASK(s, e) \
-    (((e)? (1UL<<(e)) - 1 : (u_long)-1) & ~((1UL<<(s)) - 1))
+	(((e) ? (1UL<<(e)) - 1 : (u_long)-1) & ~((1UL<<(s)) - 1))
 
 /* works on the range of bits, from start (inclusive) to end (exclusive) */
 
@@ -85,22 +85,22 @@ SCM_EXTERN void   Scm_BitsCopyX(ScmBits *target, int tstart,
                                 ScmBits *src, int sstart, int send);
 
 typedef enum {
-    SCM_BIT_AND,                /* r = a & b */
-    SCM_BIT_IOR,                /* r = a | b */
-    SCM_BIT_XOR,                /* r = a ^ b */
-    SCM_BIT_EQV,                /* r = ~(a ^ b) */
-    SCM_BIT_NAND,               /* r = ~(a & b) */
-    SCM_BIT_NOR,                /* r = ~(a | b) */
-    SCM_BIT_ANDC1,              /* r = ~a & b */
-    SCM_BIT_ANDC2,              /* r = a & ~b */
-    SCM_BIT_IORC1,              /* r = ~a | b */
-    SCM_BIT_IORC2,              /* r = a | ~b */
-    SCM_BIT_XORC1,              /* r = ~a ^ b */
-    SCM_BIT_XORC2,              /* r = a ^ ~b */
-    SCM_BIT_SRC1,               /* r = a */
-    SCM_BIT_SRC2,               /* r = b */
-    SCM_BIT_NOT1,               /* r = ~a */
-    SCM_BIT_NOT2,               /* r = ~b */
+	SCM_BIT_AND,            /* r = a & b */
+	SCM_BIT_IOR,            /* r = a | b */
+	SCM_BIT_XOR,            /* r = a ^ b */
+	SCM_BIT_EQV,            /* r = ~(a ^ b) */
+	SCM_BIT_NAND,           /* r = ~(a & b) */
+	SCM_BIT_NOR,            /* r = ~(a | b) */
+	SCM_BIT_ANDC1,          /* r = ~a & b */
+	SCM_BIT_ANDC2,          /* r = a & ~b */
+	SCM_BIT_IORC1,          /* r = ~a | b */
+	SCM_BIT_IORC2,          /* r = a | ~b */
+	SCM_BIT_XORC1,          /* r = ~a ^ b */
+	SCM_BIT_XORC2,          /* r = a ^ ~b */
+	SCM_BIT_SRC1,           /* r = a */
+	SCM_BIT_SRC2,           /* r = b */
+	SCM_BIT_NOT1,           /* r = ~a */
+	SCM_BIT_NOT2,           /* r = ~b */
 } ScmBitOp;
 
 SCM_EXTERN void   Scm_BitsOperate(ScmBits *r, ScmBitOp op,

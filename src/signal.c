@@ -75,20 +75,20 @@ static int sigprocmask_win(int how, const sigset_t *set, sigset_t *oldset);
 
 /* Master signal handler vector. */
 static struct sigHandlersRec {
-    ScmObj handlers[SCM_NSIG];  /* Scheme signal handlers.  This is #<undef> on
-                                   signals to which Gauche does not install
-                                   C-level signal handler (sig_handle). */
-    ScmSysSigset *masks[SCM_NSIG];/* Signal masks during executing Scheme
-                                   handlers.  Can be NULL, which means
-                                   the handling signal(s) are blocked. */
-    sigset_t masterSigset;      /* The signals Gauche is _allowed_ to handle.
-                                   set by Scm_SetMasterSigmask.
-                                   For some signals in this set Gauche sets
-                                   the default signal handlers; for other
-                                   signals in this set Gauche leaves them
-                                   for the system to handle.  These can be
-                                   overridden by Scm_SetSignalHandler. */
-    ScmInternalMutex mutex;
+	ScmObj handlers[SCM_NSIG]; /* Scheme signal handlers.  This is #<undef> on
+	                              signals to which Gauche does not install
+	                              C-level signal handler (sig_handle). */
+	ScmSysSigset *masks[SCM_NSIG];/* Signal masks during executing Scheme
+	                                 handlers.  Can be NULL, which means
+	                                 the handling signal(s) are blocked. */
+	sigset_t masterSigset;  /* The signals Gauche is _allowed_ to handle.
+	                           set by Scm_SetMasterSigmask.
+	                           For some signals in this set Gauche sets
+	                           the default signal handlers; for other
+	                           signals in this set Gauche leaves them
+	                           for the system to handle.  These can be
+	                           overridden by Scm_SetSignalHandler. */
+	ScmInternalMutex mutex;
 } sigHandlers;
 
 /* Maximum # of the same signals before it is processed by the VM loop.
@@ -134,115 +134,115 @@ static unsigned int signalPendingLimit = SIGNAL_PENDING_LIMIT_DEFAULT;
    <system-error>.  To emulate Unix default behavior, however, EPIPE
    caused by standard output and standard error will terminate the
    process by default.  It can be configured per-port basis.
-*/
+ */
 
 #define SIGDEF_NOHANDLE 0       /* Gauche doesn't install a signal handler,
-                                   leaving it to the application. */
+	                           leaving it to the application. */
 #define SIGDEF_DFL      1       /* Gauche resets the singal handler to
-                                   SIG_DFL. */
+	                           SIG_DFL. */
 #define SIGDEF_ERROR    2       /* Gauche installs a default signal handler
-                                   that raises an error. */
+	                           that raises an error. */
 #define SIGDEF_EXIT     3       /* Gauche installs a handler that calls
-                                   Scm_Exit(). */
+	                           Scm_Exit(). */
 #define SIGDEF_INDIFFERENT 4    /* Gauche installs a handler that does
-                                   nothing. */
+	                           nothing. */
 
 #define SIGDEF(x, flag)  { #x, x, flag }
 
 static struct sigdesc {
-    const char *name;
-    int num;
-    int defaultHandle;
+	const char *name;
+	int num;
+	int defaultHandle;
 } sigDesc[] = {
 #ifdef SIGHUP
-    SIGDEF(SIGHUP,  SIGDEF_EXIT),     /* Hangup (POSIX) */
+	SIGDEF(SIGHUP,  SIGDEF_EXIT), /* Hangup (POSIX) */
 #endif
-    SIGDEF(SIGINT,  SIGDEF_ERROR),    /* Interrupt (ANSI) */
+	SIGDEF(SIGINT,  SIGDEF_ERROR),/* Interrupt (ANSI) */
 #ifdef SIGQUIT
-    SIGDEF(SIGQUIT, SIGDEF_EXIT),     /* Quit (POSIX) */
+	SIGDEF(SIGQUIT, SIGDEF_EXIT), /* Quit (POSIX) */
 #endif
-    SIGDEF(SIGILL,  SIGDEF_NOHANDLE), /* Illegal instruction (ANSI) */
+	SIGDEF(SIGILL,  SIGDEF_NOHANDLE),/* Illegal instruction (ANSI) */
 #ifdef SIGTRAP
-    SIGDEF(SIGTRAP, SIGDEF_ERROR),    /* Trace trap */
+	SIGDEF(SIGTRAP, SIGDEF_ERROR), /* Trace trap */
 #endif
-    SIGDEF(SIGABRT, SIGDEF_NOHANDLE), /* Abort (ANSI) */
+	SIGDEF(SIGABRT, SIGDEF_NOHANDLE), /* Abort (ANSI) */
 #ifdef SIGIOT
-    SIGDEF(SIGIOT,  SIGDEF_ERROR),    /* IOT trap (4.2 BSD) */
+	SIGDEF(SIGIOT,  SIGDEF_ERROR),/* IOT trap (4.2 BSD) */
 #endif
 #ifdef SIGBUS
-    SIGDEF(SIGBUS,  SIGDEF_NOHANDLE), /* BUS error (4.2 BSD) */
+	SIGDEF(SIGBUS,  SIGDEF_NOHANDLE),/* BUS error (4.2 BSD) */
 #endif
-    SIGDEF(SIGFPE,  SIGDEF_ERROR),    /* Floating-point exception (ANSI) */
+	SIGDEF(SIGFPE,  SIGDEF_ERROR),/* Floating-point exception (ANSI) */
 #ifdef SIGKILL
-    SIGDEF(SIGKILL, SIGDEF_NOHANDLE), /* Kill, unblockable (POSIX) */
+	SIGDEF(SIGKILL, SIGDEF_NOHANDLE), /* Kill, unblockable (POSIX) */
 #endif
 #ifdef SIGUSR1
-    SIGDEF(SIGUSR1, SIGDEF_ERROR),    /* User-defined signal 1 (POSIX) */
+	SIGDEF(SIGUSR1, SIGDEF_ERROR), /* User-defined signal 1 (POSIX) */
 #endif
-    SIGDEF(SIGSEGV, SIGDEF_NOHANDLE), /* Segmentation violation (ANSI) */
+	SIGDEF(SIGSEGV, SIGDEF_NOHANDLE), /* Segmentation violation (ANSI) */
 #ifdef SIGUSR2
-    SIGDEF(SIGUSR2, SIGDEF_ERROR),    /* User-defined signal 2 (POSIX) */
+	SIGDEF(SIGUSR2, SIGDEF_ERROR), /* User-defined signal 2 (POSIX) */
 #endif
 #ifdef SIGPIPE
-    SIGDEF(SIGPIPE, SIGDEF_INDIFFERENT), /* Broken pipe (POSIX).
-                                            See above note on SIGPIPE. */
+	SIGDEF(SIGPIPE, SIGDEF_INDIFFERENT), /* Broken pipe (POSIX).
+	                                        See above note on SIGPIPE. */
 #endif
 #ifdef SIGALRM
-    SIGDEF(SIGALRM, SIGDEF_ERROR),    /* Alarm clock (POSIX) */
+	SIGDEF(SIGALRM, SIGDEF_ERROR), /* Alarm clock (POSIX) */
 #endif
-    SIGDEF(SIGTERM, SIGDEF_EXIT),     /* Termination (ANSI) */
+	SIGDEF(SIGTERM, SIGDEF_EXIT), /* Termination (ANSI) */
 #ifdef SIGSTKFLT
-    SIGDEF(SIGSTKFLT, SIGDEF_ERROR),  /* Stack fault */
+	SIGDEF(SIGSTKFLT, SIGDEF_ERROR), /* Stack fault */
 #endif
 #ifdef SIGCHLD
-    SIGDEF(SIGCHLD, SIGDEF_DFL),      /* Child status has changed (POSIX) */
+	SIGDEF(SIGCHLD, SIGDEF_DFL),  /* Child status has changed (POSIX) */
 #endif
 #ifdef SIGCONT
-    SIGDEF(SIGCONT, SIGDEF_NOHANDLE), /* Continue (POSIX) */
+	SIGDEF(SIGCONT, SIGDEF_NOHANDLE), /* Continue (POSIX) */
 #endif
 #ifdef SIGSTOP
-    SIGDEF(SIGSTOP, SIGDEF_NOHANDLE), /* Stop, unblockable (POSIX) */
+	SIGDEF(SIGSTOP, SIGDEF_NOHANDLE), /* Stop, unblockable (POSIX) */
 #endif
 #ifdef SIGTSTP
-    SIGDEF(SIGTSTP, SIGDEF_NOHANDLE), /* Keyboard stop (POSIX) */
+	SIGDEF(SIGTSTP, SIGDEF_NOHANDLE), /* Keyboard stop (POSIX) */
 #endif
 #ifdef SIGTTIN
-    SIGDEF(SIGTTIN, SIGDEF_NOHANDLE), /* Background read from tty (POSIX) */
+	SIGDEF(SIGTTIN, SIGDEF_NOHANDLE), /* Background read from tty (POSIX) */
 #endif
 #ifdef SIGTTOU
-    SIGDEF(SIGTTOU, SIGDEF_NOHANDLE), /* Background write to tty (POSIX) */
+	SIGDEF(SIGTTOU, SIGDEF_NOHANDLE), /* Background write to tty (POSIX) */
 #endif
 #ifdef SIGURG
-    SIGDEF(SIGURG,  SIGDEF_NOHANDLE), /* Urgent condition on socket (4.2 BSD) */
+	SIGDEF(SIGURG,  SIGDEF_NOHANDLE),/* Urgent condition on socket (4.2 BSD) */
 #endif
 #ifdef SIGXCPU
-    SIGDEF(SIGXCPU, SIGDEF_NOHANDLE), /* CPU limit exceeded (4.2 BSD) */
+	SIGDEF(SIGXCPU, SIGDEF_NOHANDLE), /* CPU limit exceeded (4.2 BSD) */
 #endif
 #ifdef SIGXFSZ
-    SIGDEF(SIGXFSZ, SIGDEF_ERROR),    /* File size limit exceeded (4.2 BSD) */
+	SIGDEF(SIGXFSZ, SIGDEF_ERROR), /* File size limit exceeded (4.2 BSD) */
 #endif
 #ifdef SIGVTALRM
-    SIGDEF(SIGVTALRM, SIGDEF_ERROR),  /* Virtual alarm clock (4.2 BSD) */
+	SIGDEF(SIGVTALRM, SIGDEF_ERROR), /* Virtual alarm clock (4.2 BSD) */
 #endif
 #ifdef SIGPROF
-    SIGDEF(SIGPROF, SIGDEF_ERROR),    /* Profiling alarm clock (4.2 BSD) */
+	SIGDEF(SIGPROF, SIGDEF_ERROR), /* Profiling alarm clock (4.2 BSD) */
 #endif
 #ifdef SIGWINCH
-    SIGDEF(SIGWINCH, SIGDEF_NOHANDLE),/* Window size change (4.3 BSD, Sun) */
+	SIGDEF(SIGWINCH, SIGDEF_NOHANDLE),/* Window size change (4.3 BSD, Sun) */
 #endif
 #ifdef SIGPOLL
-    SIGDEF(SIGPOLL, SIGDEF_ERROR),    /* Pollable event occurred (System V) */
+	SIGDEF(SIGPOLL, SIGDEF_ERROR), /* Pollable event occurred (System V) */
 #endif
 #ifdef SIGIO
-    SIGDEF(SIGIO,   SIGDEF_ERROR),    /* I/O now possible (4.2 BSD) */
+	SIGDEF(SIGIO,   SIGDEF_ERROR),/* I/O now possible (4.2 BSD) */
 #endif
 #ifdef SIGPWR
-    SIGDEF(SIGPWR,  SIGDEF_NOHANDLE), /* Power failure restart (System V) */
+	SIGDEF(SIGPWR,  SIGDEF_NOHANDLE),/* Power failure restart (System V) */
 #endif
 #ifdef SIGTHR
-    SIGDEF(SIGTHR,  SIGDEF_NOHANDLE), /* Thread interrupt / AST (FreeBSD, OpenBSD) */
+	SIGDEF(SIGTHR,  SIGDEF_NOHANDLE),/* Thread interrupt / AST (FreeBSD, OpenBSD) */
 #endif
-    { NULL, -1, 0 }
+	{ NULL, -1, 0 }
 };
 
 /*===============================================================
@@ -254,47 +254,47 @@ static struct sigdesc {
  */
 static void display_sigset(sigset_t *set, ScmPort *port)
 {
-    struct sigdesc *desc = sigDesc;
-    int cnt = 0;
-    for (; desc->name; desc++) {
-        if (sigismember(set, desc->num)) {
-            if (cnt++) Scm_Putc('|', port);
-            Scm_Putz(desc->name+3, -1, port);
-        }
-    }
+	struct sigdesc *desc = sigDesc;
+	int cnt = 0;
+	for (; desc->name; desc++) {
+		if (sigismember(set, desc->num)) {
+			if (cnt++) Scm_Putc('|', port);
+			Scm_Putz(desc->name+3, -1, port);
+		}
+	}
 }
 
 static int validsigp(int signum)
 {
-    if (signum > 0) {
-        struct sigdesc *desc = sigDesc;
-        for (; desc->name; desc++) {
-            if (desc->num == signum) return TRUE;
-        }
-    }
-    return FALSE;
+	if (signum > 0) {
+		struct sigdesc *desc = sigDesc;
+		for (; desc->name; desc++) {
+			if (desc->num == signum) return TRUE;
+		}
+	}
+	return FALSE;
 }
 
 static void sigset_op(sigset_t *s1, sigset_t *s2, int delp)
 {
-    struct sigdesc *desc = sigDesc;
-    for (; desc->name; desc++) {
-        if (sigismember(s2, desc->num)) {
-            if (!delp) sigaddset(s1, desc->num);
-            else       sigdelset(s1, desc->num);
-        }
-    }
+	struct sigdesc *desc = sigDesc;
+	for (; desc->name; desc++) {
+		if (sigismember(s2, desc->num)) {
+			if (!delp) sigaddset(s1, desc->num);
+			else sigdelset(s1, desc->num);
+		}
+	}
 }
 
 ScmObj Scm_SignalName(int signum)
 {
-    struct sigdesc *desc = sigDesc;
-    for (; desc->name; desc++) {
-        if (desc->num == signum) {
-            return SCM_MAKE_STR_IMMUTABLE(desc->name);
-        }
-    }
-    return SCM_FALSE;
+	struct sigdesc *desc = sigDesc;
+	for (; desc->name; desc++) {
+		if (desc->num == signum) {
+			return SCM_MAKE_STR_IMMUTABLE(desc->name);
+		}
+	}
+	return SCM_FALSE;
 }
 
 /*
@@ -307,100 +307,100 @@ static ScmObj sigset_allocate(ScmClass *klass, ScmObj initargs);
 SCM_DEFINE_BUILTIN_CLASS(Scm_SysSigsetClass, sigset_print,
                          NULL, NULL, sigset_allocate, SCM_CLASS_DEFAULT_CPL);
 
-void sigset_print(ScmObj obj, ScmPort *out, 
+void sigset_print(ScmObj obj, ScmPort *out,
                   ScmWriteContext *ctx SCM_UNUSED)
 {
-    Scm_Printf(out, "#<sys-sigset [");
-    display_sigset(&SCM_SYS_SIGSET(obj)->set, out);
-    Scm_Printf(out, "]>");
+	Scm_Printf(out, "#<sys-sigset [");
+	display_sigset(&SCM_SYS_SIGSET(obj)->set, out);
+	Scm_Printf(out, "]>");
 }
 
 ScmObj sigset_allocate(ScmClass *klass, ScmObj initargs SCM_UNUSED)
 {
-    ScmSysSigset *s = SCM_NEW_INSTANCE(ScmSysSigset, klass);
-    sigemptyset(&s->set);
-    return SCM_OBJ(s);
+	ScmSysSigset *s = SCM_NEW_INSTANCE(ScmSysSigset, klass);
+	sigemptyset(&s->set);
+	return SCM_OBJ(s);
 }
 
 ScmSysSigset *make_sigset(void)
 {
-    return SCM_SYS_SIGSET(sigset_allocate(SCM_CLASS_SYS_SIGSET, SCM_NIL));
+	return SCM_SYS_SIGSET(sigset_allocate(SCM_CLASS_SYS_SIGSET, SCM_NIL));
 }
 
 /* multifunction on sigset
     if delp == FALSE, signals are added to set.
     else, signals are removed from set.
     signals is a list of either integer or #t (all signals), or other sigset.
-*/
+ */
 ScmObj Scm_SysSigsetOp(ScmSysSigset *set, ScmObj signals, int delp)
 {
-    if (!SCM_PAIRP(signals)) {
-        Scm_Error("list of signals required, but got %S", signals);
-    }
+	if (!SCM_PAIRP(signals)) {
+		Scm_Error("list of signals required, but got %S", signals);
+	}
 
-    ScmObj cp;
-    SCM_FOR_EACH(cp, signals) {
-        ScmObj s = SCM_CAR(cp);
-        if (SCM_TRUEP(s)) {
-            if (!delp) sigfillset(&set->set);
-            else       sigemptyset(&set->set);
-            break;
-        }
-        if (SCM_SYS_SIGSET_P(s)) {
-            sigset_op(&set->set, &SCM_SYS_SIGSET(s)->set, delp);
-            continue;
-        }
-        if (!SCM_INTP(s) || !validsigp(SCM_INT_VALUE(s))) {
-            Scm_Error("bad signal number %S", s);
-        }
-        if (!delp) sigaddset(&set->set, SCM_INT_VALUE(s));
-        else       sigdelset(&set->set, SCM_INT_VALUE(s));
-    }
-    return SCM_OBJ(set);
+	ScmObj cp;
+	SCM_FOR_EACH(cp, signals) {
+		ScmObj s = SCM_CAR(cp);
+		if (SCM_TRUEP(s)) {
+			if (!delp) sigfillset(&set->set);
+			else sigemptyset(&set->set);
+			break;
+		}
+		if (SCM_SYS_SIGSET_P(s)) {
+			sigset_op(&set->set, &SCM_SYS_SIGSET(s)->set, delp);
+			continue;
+		}
+		if (!SCM_INTP(s) || !validsigp(SCM_INT_VALUE(s))) {
+			Scm_Error("bad signal number %S", s);
+		}
+		if (!delp) sigaddset(&set->set, SCM_INT_VALUE(s));
+		else sigdelset(&set->set, SCM_INT_VALUE(s));
+	}
+	return SCM_OBJ(set);
 }
 
 /* fill or empty sigset. */
 ScmObj Scm_SysSigsetFill(ScmSysSigset *set, int emptyp)
 {
-    if (emptyp) sigemptyset(&(set->set));
-    else        sigfillset(&(set->set));
-    return SCM_OBJ(set);
+	if (emptyp) sigemptyset(&(set->set));
+	else sigfillset(&(set->set));
+	return SCM_OBJ(set);
 }
 
 /* Fills sigset_t with as many signals as we can reasonably handle. */
 void Scm_SigFillSetMostly(sigset_t *set) /* out */
 {
-    sigfillset(set);
-    sigdelset(set, SIGABRT);
-    sigdelset(set, SIGILL);
+	sigfillset(set);
+	sigdelset(set, SIGABRT);
+	sigdelset(set, SIGILL);
 #ifdef SIGKILL
-    sigdelset(set, SIGKILL);
+	sigdelset(set, SIGKILL);
 #endif
 #ifdef SIGCONT
-    sigdelset(set, SIGCONT);
+	sigdelset(set, SIGCONT);
 #endif
 #ifdef SIGSTOP
-    sigdelset(set, SIGSTOP);
+	sigdelset(set, SIGSTOP);
 #endif
-    sigdelset(set, SIGSEGV);
+	sigdelset(set, SIGSEGV);
 #ifdef SIGBUS
-    sigdelset(set, SIGBUS);
+	sigdelset(set, SIGBUS);
 #endif
 #ifdef SIGTHR
-    sigdelset(set, SIGTHR);
+	sigdelset(set, SIGTHR);
 #endif
 
-    /* Exclude signals used by GC to stop and restart the world. */
+	/* Exclude signals used by GC to stop and restart the world. */
 #ifdef GC_THREADS
-    int sig_suspend = GC_get_suspend_signal();
-    if (sig_suspend >= 0) sigdelset(set, sig_suspend);
-    int sig_restart = GC_get_thr_restart_signal();
-    if (sig_restart >= 0) sigdelset(set, sig_restart);
+	int sig_suspend = GC_get_suspend_signal();
+	if (sig_suspend >= 0) sigdelset(set, sig_suspend);
+	int sig_restart = GC_get_thr_restart_signal();
+	if (sig_restart >= 0) sigdelset(set, sig_restart);
 #endif /*GC_THREADS*/
 
-    /* Exclude SIGPROF when we're using gperftools profiler. */
+	/* Exclude SIGPROF when we're using gperftools profiler. */
 #if defined(HAVE_GPERFTOOLS_PROFILER_H)
-    sigdelset(set, SIGPROF);
+	sigdelset(set, SIGPROF);
 #endif /*WITHGPERFTOOLS*/
 }
 
@@ -415,18 +415,18 @@ void Scm_SigFillSetMostly(sigset_t *set) /* out */
 
 static void sig_handle(int signum)
 {
-    ScmVM *vm = Scm_VM();
-    /* It is possible that vm == NULL at this point, if the thread is
-       terminating and in the cleanup phase. */
-    if (vm == NULL) return;
+	ScmVM *vm = Scm_VM();
+	/* It is possible that vm == NULL at this point, if the thread is
+	   terminating and in the cleanup phase. */
+	if (vm == NULL) return;
 
-    if (signalPendingLimit == 0) {
-        vm->sigq.sigcounts[signum] = 1;
-    } else if (++vm->sigq.sigcounts[signum] >= signalPendingLimit) {
-        Scm_Abort("Received too many signals before processing them.  Exitting for the emergency...\n");
-    }
-    vm->signalPending = TRUE;
-    vm->attentionRequest = TRUE;
+	if (signalPendingLimit == 0) {
+		vm->sigq.sigcounts[signum] = 1;
+	} else if (++vm->sigq.sigcounts[signum] >= signalPendingLimit) {
+		Scm_Abort("Received too many signals before processing them.  Exitting for the emergency...\n");
+	}
+	vm->signalPending = TRUE;
+	vm->attentionRequest = TRUE;
 }
 
 /*-------------------------------------------------------------------
@@ -438,7 +438,7 @@ static void sig_handle(int signum)
  */
 void Scm_SignalQueueClear(ScmSignalQueue* q)
 {
-    for (int i=0; i<SCM_NSIG; i++) q->sigcounts[i] = 0;
+	for (int i=0; i<SCM_NSIG; i++) q->sigcounts[i] = 0;
 }
 
 /*
@@ -446,9 +446,9 @@ void Scm_SignalQueueClear(ScmSignalQueue* q)
  */
 void Scm_SignalQueueInit(ScmSignalQueue* q)
 {
-    q->sigcounts = SCM_NEW_ARRAY(unsigned char, SCM_NSIG);
-    Scm_SignalQueueClear(q);
-    q->pending = SCM_NIL;
+	q->sigcounts = SCM_NEW_ARRAY(unsigned char, SCM_NSIG);
+	Scm_SignalQueueClear(q);
+	q->pending = SCM_NIL;
 }
 
 /*
@@ -456,15 +456,15 @@ void Scm_SignalQueueInit(ScmSignalQueue* q)
  */
 int Scm_GetSignalPendingLimit(void)
 {
-    return signalPendingLimit;
+	return signalPendingLimit;
 }
 
 void Scm_SetSignalPendingLimit(int num)
 {
-    if (num < 0 || num >= SIGNAL_PENDING_LIMIT_MAX) {
-        Scm_Error("signal-pending-limit argument out of range: %d", num);
-    }
-    signalPendingLimit = num;
+	if (num < 0 || num >= SIGNAL_PENDING_LIMIT_MAX) {
+		Scm_Error("signal-pending-limit argument out of range: %d", num);
+	}
+	signalPendingLimit = num;
 }
 
 /*
@@ -473,76 +473,76 @@ void Scm_SetSignalPendingLimit(int num)
  */
 void Scm_SigCheck(ScmVM *vm)
 {
-    ScmSignalQueue *q = &vm->sigq;
-    unsigned char sigcounts[SCM_NSIG]; /* copy of signal counter */
+	ScmSignalQueue *q = &vm->sigq;
+	unsigned char sigcounts[SCM_NSIG]; /* copy of signal counter */
 
-    /* Copy VM's signal counter to local storage, for we can't call
-       storage allocation during blocking signals. */
-    sigset_t omask;
-    SIGPROCMASK(SIG_BLOCK, &sigHandlers.masterSigset, &omask);
-    memcpy(sigcounts, vm->sigq.sigcounts, SCM_NSIG * sizeof(unsigned char));
-    Scm_SignalQueueClear(&vm->sigq);
-    vm->signalPending = FALSE;
-    SIGPROCMASK(SIG_SETMASK, &omask, NULL);
+	/* Copy VM's signal counter to local storage, for we can't call
+	   storage allocation during blocking signals. */
+	sigset_t omask;
+	SIGPROCMASK(SIG_BLOCK, &sigHandlers.masterSigset, &omask);
+	memcpy(sigcounts, vm->sigq.sigcounts, SCM_NSIG * sizeof(unsigned char));
+	Scm_SignalQueueClear(&vm->sigq);
+	vm->signalPending = FALSE;
+	SIGPROCMASK(SIG_SETMASK, &omask, NULL);
 
 #if defined(GAUCHE_USE_PTHREADS) && defined(GAUCHE_PTHREAD_SIGNAL)
-    /* We may use GAUCHE_PTHREAD_SIGNAL signal to terminate a thread
-       gracefully.  See Scm_ThreadTerminate in ext/threads/threads.c */
-    if (sigcounts[GAUCHE_PTHREAD_SIGNAL] > 0) {
-        /* The thread state will be set to TERMINATED by the cleanup
-           handler so we don't need to change it. */
-        SCM_INTERNAL_THREAD_EXIT();
-        /* NOTREACHED */
-    }
+	/* We may use GAUCHE_PTHREAD_SIGNAL signal to terminate a thread
+	   gracefully.  See Scm_ThreadTerminate in ext/threads/threads.c */
+	if (sigcounts[GAUCHE_PTHREAD_SIGNAL] > 0) {
+		/* The thread state will be set to TERMINATED by the cleanup
+		   handler so we don't need to change it. */
+		SCM_INTERNAL_THREAD_EXIT();
+		/* NOTREACHED */
+	}
 #endif  /* defined(GAUCHE_USE_PTHREADS) && defined(GAUCHE_PTHREAD_SIGNAL) */
 
-    /* Now, queue the signal handlers */
-    ScmObj tail = q->pending;
-    if (!SCM_NULLP(tail)) tail = Scm_LastPair(tail);
-    for (int i=0; i<SCM_NSIG; i++) {
-        if (sigcounts[i] == 0) continue;
-        if (SCM_PROCEDUREP(sigHandlers.handlers[i])) {
-            ScmObj cell = Scm_Cons(SCM_LIST3(sigHandlers.handlers[i],
-                                             SCM_MAKE_INT(i),
-                                             SCM_OBJ_SAFE(sigHandlers.masks[i])),
-                            SCM_NIL);
-            if (SCM_NULLP(tail)) {
-                q->pending = tail = cell;
-            } else {
-                SCM_SET_CDR(tail, cell);
-                tail = SCM_CDR(tail);
-            }
-        }
-    }
+	/* Now, queue the signal handlers */
+	ScmObj tail = q->pending;
+	if (!SCM_NULLP(tail)) tail = Scm_LastPair(tail);
+	for (int i=0; i<SCM_NSIG; i++) {
+		if (sigcounts[i] == 0) continue;
+		if (SCM_PROCEDUREP(sigHandlers.handlers[i])) {
+			ScmObj cell = Scm_Cons(SCM_LIST3(sigHandlers.handlers[i],
+			                                 SCM_MAKE_INT(i),
+			                                 SCM_OBJ_SAFE(sigHandlers.masks[i])),
+			                       SCM_NIL);
+			if (SCM_NULLP(tail)) {
+				q->pending = tail = cell;
+			} else {
+				SCM_SET_CDR(tail, cell);
+				tail = SCM_CDR(tail);
+			}
+		}
+	}
 
-    /* Call the queued signal handlers.  If an error is thrown in one
-       of those handlers, the rest of handlers remain in the queue. */
-    /* TODO: if VM is active, it'd be better to make the active VM to handle
-       those handler procs, instead of calling Scm_Eval. */
-    ScmObj sp;
-    SCM_FOR_EACH(sp, q->pending) {
-        ScmObj e = SCM_CAR(sp);
-        q->pending = SCM_CDR(sp);
-        ScmObj handler = SCM_CAR(e);
-        ScmObj num = SCM_CADR(e);
-        ScmObj mask = SCM_CAR(SCM_CDDR(e));
-        if (SCM_SYS_SIGSET_P(mask)) {
-            sigset_t omask;
-            sigemptyset(&omask);
-            SCM_UNWIND_PROTECT {
-                SIGPROCMASK(SIG_BLOCK, &SCM_SYS_SIGSET(mask)->set, &omask);
-                Scm_ApplyRec(handler, SCM_LIST1(num));
-            }
-            SCM_WHEN_ERROR {
-                SIGPROCMASK(SIG_SETMASK, &omask, NULL);
-                SCM_NEXT_HANDLER;
-            }
-            SCM_END_PROTECT;
-            SIGPROCMASK(SIG_SETMASK, &omask, NULL);
-        } else {
-            Scm_ApplyRec(handler, SCM_LIST1(num));
-        }
-    }
+	/* Call the queued signal handlers.  If an error is thrown in one
+	   of those handlers, the rest of handlers remain in the queue. */
+	/* TODO: if VM is active, it'd be better to make the active VM to handle
+	   those handler procs, instead of calling Scm_Eval. */
+	ScmObj sp;
+	SCM_FOR_EACH(sp, q->pending) {
+		ScmObj e = SCM_CAR(sp);
+		q->pending = SCM_CDR(sp);
+		ScmObj handler = SCM_CAR(e);
+		ScmObj num = SCM_CADR(e);
+		ScmObj mask = SCM_CAR(SCM_CDDR(e));
+		if (SCM_SYS_SIGSET_P(mask)) {
+			sigset_t omask;
+			sigemptyset(&omask);
+			SCM_UNWIND_PROTECT {
+				SIGPROCMASK(SIG_BLOCK, &SCM_SYS_SIGSET(mask)->set, &omask);
+				Scm_ApplyRec(handler, SCM_LIST1(num));
+			}
+			SCM_WHEN_ERROR {
+				SIGPROCMASK(SIG_SETMASK, &omask, NULL);
+				SCM_NEXT_HANDLER;
+			}
+			SCM_END_PROTECT;
+			SIGPROCMASK(SIG_SETMASK, &omask, NULL);
+		} else {
+			Scm_ApplyRec(handler, SCM_LIST1(num));
+		}
+	}
 }
 
 /*=============================================================
@@ -555,29 +555,29 @@ void Scm_SigCheck(ScmVM *vm)
 /* For most signals, default handler raises an error. */
 static ScmObj default_sighandler(ScmObj *args, int nargs, void *data SCM_UNUSED)
 {
-    SCM_ASSERT(nargs == 1 && SCM_INTP(args[0]));
-    int signum = SCM_INT_VALUE(args[0]);
+	SCM_ASSERT(nargs == 1 && SCM_INTP(args[0]));
+	int signum = SCM_INT_VALUE(args[0]);
 
-    struct sigdesc *desc;
-    const char *name = NULL;
-    for (desc = sigDesc; desc->name; desc++) {
-        if (desc->num == signum) {
-            name = desc->name;
-            break;
-        }
-    }
-    if (name) {
-        Scm_RaiseCondition(SCM_OBJ(SCM_CLASS_UNHANDLED_SIGNAL_ERROR),
-                           "signal", SCM_MAKE_INT(signum),
-                           SCM_RAISE_CONDITION_MESSAGE,
-                           "unhandled signal %d (%s)", signum, name);
-    } else {
-        Scm_RaiseCondition(SCM_OBJ(SCM_CLASS_UNHANDLED_SIGNAL_ERROR),
-                           "signal", SCM_MAKE_INT(signum),
-                           SCM_RAISE_CONDITION_MESSAGE,
-                           "unhandled signal %d (unknown signal)", signum);
-    }
-    return SCM_UNDEFINED;       /* dummy */
+	struct sigdesc *desc;
+	const char *name = NULL;
+	for (desc = sigDesc; desc->name; desc++) {
+		if (desc->num == signum) {
+			name = desc->name;
+			break;
+		}
+	}
+	if (name) {
+		Scm_RaiseCondition(SCM_OBJ(SCM_CLASS_UNHANDLED_SIGNAL_ERROR),
+		                   "signal", SCM_MAKE_INT(signum),
+		                   SCM_RAISE_CONDITION_MESSAGE,
+		                   "unhandled signal %d (%s)", signum, name);
+	} else {
+		Scm_RaiseCondition(SCM_OBJ(SCM_CLASS_UNHANDLED_SIGNAL_ERROR),
+		                   "signal", SCM_MAKE_INT(signum),
+		                   SCM_RAISE_CONDITION_MESSAGE,
+		                   "unhandled signal %d (unknown signal)", signum);
+	}
+	return SCM_UNDEFINED;   /* dummy */
 }
 
 static SCM_DEFINE_STRING_CONST(default_sighandler_name,
@@ -594,8 +594,8 @@ static ScmObj exit_sighandler(ScmObj *args SCM_UNUSED,
                               int nargs SCM_UNUSED,
                               void *data SCM_UNUSED)
 {
-    Scm_Exit(0);
-    return SCM_UNDEFINED;       /* dummy */
+	Scm_Exit(0);
+	return SCM_UNDEFINED;   /* dummy */
 }
 
 static SCM_DEFINE_STRING_CONST(exit_sighandler_name,
@@ -612,7 +612,7 @@ static ScmObj indifferent_sighandler(ScmObj *args SCM_UNUSED,
                                      int nargs SCM_UNUSED,
                                      void *data SCM_UNUSED)
 {
-    return SCM_UNDEFINED;
+	return SCM_UNDEFINED;
 }
 
 static SCM_DEFINE_STRING_CONST(indifferent_sighandler_name,
@@ -640,20 +640,20 @@ static SCM_DEFINE_SUBR(indifferent_sighandler_stub, 1, 0,
 int sigaction(int signum, const struct sigaction *act,
               struct sigaction *oact)
 {
-    if (oact != NULL) {
-        Scm_Panic("sigaction() with oldact != NULL isn't supported on MinGW port");
-    }
-    if (signal(signum, act->sa_handler) == SIG_ERR) {
-        return -1;
-    } else {
-        return 0;
-    }
+	if (oact != NULL) {
+		Scm_Panic("sigaction() with oldact != NULL isn't supported on MinGW port");
+	}
+	if (signal(signum, act->sa_handler) == SIG_ERR) {
+		return -1;
+	} else {
+		return 0;
+	}
 }
 
 int sigprocmask_win(int how SCM_UNUSED, const sigset_t *set SCM_UNUSED,
                     sigset_t *oldset SCM_UNUSED)
 {
-    return 0;
+	return 0;
 }
 #endif /* GAUCHE_WINDOWS */
 
@@ -662,111 +662,111 @@ int sigprocmask_win(int how SCM_UNUSED, const sigset_t *set SCM_UNUSED,
  */
 ScmObj Scm_SetSignalHandler(ScmObj sigs, ScmObj handler, ScmSysSigset *mask)
 {
-    sigset_t sigset;
-    int badproc = FALSE, sigactionfailed = FALSE;
+	sigset_t sigset;
+	int badproc = FALSE, sigactionfailed = FALSE;
 
-    sigemptyset(&sigset);
-    if (SCM_INTP(sigs)) {
-        int signum = SCM_INT_VALUE(sigs);
-        if (signum < 0 || signum >= SCM_NSIG) {
-            Scm_Error("bad signal number: %d", signum);
-        }
-        sigaddset(&sigset, signum);
-    } else if (SCM_SYS_SIGSET_P(sigs)) {
-        sigset = SCM_SYS_SIGSET(sigs)->set;
-    } else {
-        Scm_Error("bad signal number: must be an integer signal number or a <sys-sigset> object, but got %S", sigs);
-    }
+	sigemptyset(&sigset);
+	if (SCM_INTP(sigs)) {
+		int signum = SCM_INT_VALUE(sigs);
+		if (signum < 0 || signum >= SCM_NSIG) {
+			Scm_Error("bad signal number: %d", signum);
+		}
+		sigaddset(&sigset, signum);
+	} else if (SCM_SYS_SIGSET_P(sigs)) {
+		sigset = SCM_SYS_SIGSET(sigs)->set;
+	} else {
+		Scm_Error("bad signal number: must be an integer signal number or a <sys-sigset> object, but got %S", sigs);
+	}
 
-    if (SCM_UNDEFINEDP(handler)) return SCM_UNDEFINED;
+	if (SCM_UNDEFINEDP(handler)) return SCM_UNDEFINED;
 
-    struct sigaction act;
-    if (SCM_TRUEP(handler)) {
-        act.sa_handler = SIG_DFL;
-    } else if (SCM_FALSEP(handler)) {
-        act.sa_handler = SIG_IGN;
-    } else if (SCM_PROCEDUREP(handler)
-               && SCM_PROCEDURE_TAKE_NARG_P(handler, 1)) {
-        act.sa_handler = sig_handle;
-    } else {
-        badproc = TRUE;
-    }
+	struct sigaction act;
+	if (SCM_TRUEP(handler)) {
+		act.sa_handler = SIG_DFL;
+	} else if (SCM_FALSEP(handler)) {
+		act.sa_handler = SIG_IGN;
+	} else if (SCM_PROCEDUREP(handler)
+	           && SCM_PROCEDURE_TAKE_NARG_P(handler, 1)) {
+		act.sa_handler = sig_handle;
+	} else {
+		badproc = TRUE;
+	}
 
-    if (mask == NULL) {
-        /* If no mask is specified, block signals in SIGS. */
-        mask = make_sigset();
-        mask->set = sigset;
-    }
+	if (mask == NULL) {
+		/* If no mask is specified, block signals in SIGS. */
+		mask = make_sigset();
+		mask->set = sigset;
+	}
 
-    (void)SCM_INTERNAL_MUTEX_LOCK(sigHandlers.mutex);
-    if (!badproc) {
-        sigfillset(&act.sa_mask); /* we should block all the signals */
-        act.sa_flags = 0;
-        for (struct sigdesc *desc=sigDesc; desc->name; desc++) {
-            if (!sigismember(&sigset, desc->num)) continue;
-            if (!sigismember(&sigHandlers.masterSigset, desc->num)) continue;
-            else if (sigaction(desc->num, &act, NULL) != 0) {
-                sigactionfailed = desc->num;
-            } else {
-                sigHandlers.handlers[desc->num] = handler;
-                sigHandlers.masks[desc->num] = mask;
-            }
-        }
-    }
-    (void)SCM_INTERNAL_MUTEX_UNLOCK(sigHandlers.mutex);
-    if (badproc) Scm_Error("bad signal handling procedure: must be either a procedure that takes at least one argument, #t, or #f, but got %S", handler);
-    if (sigactionfailed) Scm_Error("sigaction failed when setting a sighandler for signal %d", sigactionfailed);
-    return SCM_UNDEFINED;
+	(void)SCM_INTERNAL_MUTEX_LOCK(sigHandlers.mutex);
+	if (!badproc) {
+		sigfillset(&act.sa_mask); /* we should block all the signals */
+		act.sa_flags = 0;
+		for (struct sigdesc *desc=sigDesc; desc->name; desc++) {
+			if (!sigismember(&sigset, desc->num)) continue;
+			if (!sigismember(&sigHandlers.masterSigset, desc->num)) continue;
+			else if (sigaction(desc->num, &act, NULL) != 0) {
+				sigactionfailed = desc->num;
+			} else {
+				sigHandlers.handlers[desc->num] = handler;
+				sigHandlers.masks[desc->num] = mask;
+			}
+		}
+	}
+	(void)SCM_INTERNAL_MUTEX_UNLOCK(sigHandlers.mutex);
+	if (badproc) Scm_Error("bad signal handling procedure: must be either a procedure that takes at least one argument, #t, or #f, but got %S", handler);
+	if (sigactionfailed) Scm_Error("sigaction failed when setting a sighandler for signal %d", sigactionfailed);
+	return SCM_UNDEFINED;
 }
 
 ScmObj Scm_GetSignalHandler(int signum)
 {
-    if (signum < 0 || signum >= SCM_NSIG) {
-        Scm_Error("bad signal number: %d", signum);
-    }
-    /* No lock; atomic pointer access */
-    return sigHandlers.handlers[signum];
+	if (signum < 0 || signum >= SCM_NSIG) {
+		Scm_Error("bad signal number: %d", signum);
+	}
+	/* No lock; atomic pointer access */
+	return sigHandlers.handlers[signum];
 }
 
 ScmObj Scm_GetSignalHandlerMask(int signum)
 {
-    ScmSysSigset *r;
-    if (signum < 0 || signum >= SCM_NSIG) {
-        Scm_Error("bad signal number: %d", signum);
-    }
-    /* No lock; atomic pointer access */
-    r = sigHandlers.masks[signum];
-    return r? SCM_OBJ(r) : SCM_FALSE;
+	ScmSysSigset *r;
+	if (signum < 0 || signum >= SCM_NSIG) {
+		Scm_Error("bad signal number: %d", signum);
+	}
+	/* No lock; atomic pointer access */
+	r = sigHandlers.masks[signum];
+	return r ? SCM_OBJ(r) : SCM_FALSE;
 }
 
 ScmObj Scm_GetSignalHandlers(void)
 {
-    ScmObj h = SCM_NIL;
-    ScmObj handlers[SCM_NSIG];
+	ScmObj h = SCM_NIL;
+	ScmObj handlers[SCM_NSIG];
 
-    /* copy handler vector and master sig set locally, so that we won't
-       grab the lock for extensive time */
-    (void)SCM_INTERNAL_MUTEX_LOCK(sigHandlers.mutex);
-    for (int i=0; i<SCM_NSIG; i++) handlers[i] = sigHandlers.handlers[i];
-    sigset_t masterSet = sigHandlers.masterSigset;
-    (void)SCM_INTERNAL_MUTEX_UNLOCK(sigHandlers.mutex);
+	/* copy handler vector and master sig set locally, so that we won't
+	   grab the lock for extensive time */
+	(void)SCM_INTERNAL_MUTEX_LOCK(sigHandlers.mutex);
+	for (int i=0; i<SCM_NSIG; i++) handlers[i] = sigHandlers.handlers[i];
+	sigset_t masterSet = sigHandlers.masterSigset;
+	(void)SCM_INTERNAL_MUTEX_UNLOCK(sigHandlers.mutex);
 
-    for (struct sigdesc *desc=sigDesc; desc->name; desc++) {
-        if (!sigismember(&masterSet, desc->num)) continue;
-        ScmObj hp;
-        SCM_FOR_EACH(hp, h) {
-            if (SCM_EQ(SCM_CDAR(hp), handlers[desc->num])) {
-                sigaddset(&(SCM_SYS_SIGSET(SCM_CAAR(hp))->set), desc->num);
-                break;
-            }
-        }
-        if (SCM_NULLP(hp)) {
-            ScmSysSigset *set = make_sigset();
-            sigaddset(&(set->set), desc->num);
-            h = Scm_Acons(SCM_OBJ(set), handlers[desc->num], h);
-        }
-    }
-    return h;
+	for (struct sigdesc *desc=sigDesc; desc->name; desc++) {
+		if (!sigismember(&masterSet, desc->num)) continue;
+		ScmObj hp;
+		SCM_FOR_EACH(hp, h) {
+			if (SCM_EQ(SCM_CDAR(hp), handlers[desc->num])) {
+				sigaddset(&(SCM_SYS_SIGSET(SCM_CAAR(hp))->set), desc->num);
+				break;
+			}
+		}
+		if (SCM_NULLP(hp)) {
+			ScmSysSigset *set = make_sigset();
+			sigaddset(&(set->set), desc->num);
+			h = Scm_Acons(SCM_OBJ(set), handlers[desc->num], h);
+		}
+	}
+	return h;
 }
 
 /*
@@ -774,71 +774,71 @@ ScmObj Scm_GetSignalHandlers(void)
  */
 sigset_t Scm_GetMasterSigmask(void)
 {
-    return sigHandlers.masterSigset;
+	return sigHandlers.masterSigset;
 }
 
 /* this should be called before any thread is created. */
 void Scm_SetMasterSigmask(sigset_t *set)
 {
-    struct sigdesc *desc = sigDesc;
-    struct sigaction acton, actoff;
+	struct sigdesc *desc = sigDesc;
+	struct sigaction acton, actoff;
 
-    acton.sa_handler = (void(*)(int))sig_handle;
-    acton.sa_mask = *set;
-    acton.sa_flags = 0;
-    actoff.sa_handler = SIG_DFL;
-    sigemptyset(&actoff.sa_mask);
-    actoff.sa_flags = 0;
+	acton.sa_handler = (void (*)(int))sig_handle;
+	acton.sa_mask = *set;
+	acton.sa_flags = 0;
+	actoff.sa_handler = SIG_DFL;
+	sigemptyset(&actoff.sa_mask);
+	actoff.sa_flags = 0;
 
-    for (; desc->name; desc++) {
-        if (sigismember(&sigHandlers.masterSigset, desc->num)
-            && !sigismember(set, desc->num)) {
-            /* remove sighandler */
-            if (sigaction(desc->num, &actoff, NULL) != 0) {
-                Scm_SysError("sigaction on %d failed", desc->num);
-            }
-            sigHandlers.handlers[desc->num] = SCM_TRUE;
-        } else if (!sigismember(&sigHandlers.masterSigset, desc->num)
-                   && sigismember(set, desc->num)) {
-            /* add sighandler if necessary */
-            if (desc->defaultHandle == SIGDEF_DFL) {
-                if (sigaction(desc->num, &actoff, NULL) != 0) {
-                    Scm_SysError("sigaction on %d failed", desc->num);
-                }
-                sigHandlers.handlers[desc->num] = SCM_TRUE;
-            } else if (desc->defaultHandle != SIGDEF_NOHANDLE) {
-                if (sigaction(desc->num, &acton, NULL) != 0) {
-                    Scm_SysError("sigaction on %d failed", desc->num);
-                }
-                switch (desc->defaultHandle) {
-                case SIGDEF_ERROR:
-                    sigHandlers.handlers[desc->num] = DEFAULT_SIGHANDLER;
-                    break;
-                case SIGDEF_EXIT:
-                    sigHandlers.handlers[desc->num] = EXIT_SIGHANDLER;
-                    break;
-                case SIGDEF_INDIFFERENT:
-                    sigHandlers.handlers[desc->num] = INDIFFERENT_SIGHANDLER;
-                    break;
-                default:
-                    Scm_Panic("Scm_SetMasterSigmask: can't be here");
-                }
-            }
-        }
-    }
+	for (; desc->name; desc++) {
+		if (sigismember(&sigHandlers.masterSigset, desc->num)
+		    && !sigismember(set, desc->num)) {
+			/* remove sighandler */
+			if (sigaction(desc->num, &actoff, NULL) != 0) {
+				Scm_SysError("sigaction on %d failed", desc->num);
+			}
+			sigHandlers.handlers[desc->num] = SCM_TRUE;
+		} else if (!sigismember(&sigHandlers.masterSigset, desc->num)
+		           && sigismember(set, desc->num)) {
+			/* add sighandler if necessary */
+			if (desc->defaultHandle == SIGDEF_DFL) {
+				if (sigaction(desc->num, &actoff, NULL) != 0) {
+					Scm_SysError("sigaction on %d failed", desc->num);
+				}
+				sigHandlers.handlers[desc->num] = SCM_TRUE;
+			} else if (desc->defaultHandle != SIGDEF_NOHANDLE) {
+				if (sigaction(desc->num, &acton, NULL) != 0) {
+					Scm_SysError("sigaction on %d failed", desc->num);
+				}
+				switch (desc->defaultHandle) {
+				case SIGDEF_ERROR:
+					sigHandlers.handlers[desc->num] = DEFAULT_SIGHANDLER;
+					break;
+				case SIGDEF_EXIT:
+					sigHandlers.handlers[desc->num] = EXIT_SIGHANDLER;
+					break;
+				case SIGDEF_INDIFFERENT:
+					sigHandlers.handlers[desc->num] = INDIFFERENT_SIGHANDLER;
+					break;
+				default:
+					Scm_Panic("Scm_SetMasterSigmask: can't be here");
+				}
+			}
+		}
+	}
 #ifdef GAUCHE_PTHREAD_SIGNAL
-    /* On pthread and when available, we reserve one signal for inter-thread
-       communication.  See gauche/pthread.h for the definition of
-       GAUCHE_PTHREAD_SIGNAL.  In sigHandlers we set DEFAULT_SIGHANDLER,
-       but this signal is intercepted in Scm_SigCheck() so a you can't
-       set Scheme handler for this signal. */
-    if (sigaction(GAUCHE_PTHREAD_SIGNAL, &acton, NULL) != 0) {
-        Scm_SysError("sigaction on %d failed", GAUCHE_PTHREAD_SIGNAL);
-    }
-    sigHandlers.handlers[GAUCHE_PTHREAD_SIGNAL] = DEFAULT_SIGHANDLER;
+	/* On pthread and when available, we reserve one signal for inter-thread
+	   communication.  See gauche/pthread.h for the definition of
+	   GAUCHE_PTHREAD_SIGNAL.  In sigHandlers we set DEFAULT_SIGHANDLER,
+	   but this signal is intercepted in Scm_SigCheck() so a you can't
+	   set Scheme handler for this signal. */
+	if (sigaction(GAUCHE_PTHREAD_SIGNAL, &acton, NULL) != 0) {
+		Scm_SysError("sigaction on %d failed", GAUCHE_PTHREAD_SIGNAL);
+	}
+	sigHandlers.handlers[GAUCHE_PTHREAD_SIGNAL] = DEFAULT_SIGHANDLER;
 #endif  /* GAUCHE_PTHREAD_SIGNAL */
-    sigHandlers.masterSigset = *set;
-    Scm_VM()->sigMask = sigHandlers.masterSigset;
+	sigHandlers.masterSigset = *set;
+	Scm_VM()->sigMask = sigHandlers.masterSigset;
 }
 
 /*============================================================
@@ -854,16 +854,16 @@ void Scm_SetMasterSigmask(sigset_t *set)
  */
 void Scm_GetSigmask(sigset_t *mask)
 {
-    if (SIGPROCMASK(SIG_SETMASK, NULL, mask) != 0) {
-        Scm_SysError("sigprocmask failed");
-    }
+	if (SIGPROCMASK(SIG_SETMASK, NULL, mask) != 0) {
+		Scm_SysError("sigprocmask failed");
+	}
 }
 
 void Scm_SetSigmask(sigset_t *mask)
 {
-    if (SIGPROCMASK(SIG_SETMASK, mask, NULL) != 0) {
-        Scm_SysError("sigprocmask failed");
-    }
+	if (SIGPROCMASK(SIG_SETMASK, mask, NULL) != 0) {
+		Scm_SysError("sigprocmask failed");
+	}
 }
 
 /*
@@ -872,19 +872,19 @@ void Scm_SetSigmask(sigset_t *mask)
 
 ScmObj Scm_SysSigmask(int how, ScmSysSigset *newmask)
 {
-    ScmSysSigset *oldmask = make_sigset();
-    sigset_t *newset = NULL;
+	ScmSysSigset *oldmask = make_sigset();
+	sigset_t *newset = NULL;
 
-    if (newmask) {
-        newset = &(newmask->set);
-        if (how != SIG_SETMASK && how != SIG_BLOCK && how != SIG_UNBLOCK) {
-            Scm_Error("bad 'how' argument for signal mask action: %d", how);
-        }
-    }
-    if (SIGPROCMASK(how, newset, &(oldmask->set)) != 0) {
-        Scm_SysError("sigprocmask failed");
-    }
-    return SCM_OBJ(oldmask);
+	if (newmask) {
+		newset = &(newmask->set);
+		if (how != SIG_SETMASK && how != SIG_BLOCK && how != SIG_UNBLOCK) {
+			Scm_Error("bad 'how' argument for signal mask action: %d", how);
+		}
+	}
+	if (SIGPROCMASK(how, newset, &(oldmask->set)) != 0) {
+		Scm_SysError("sigprocmask failed");
+	}
+	return SCM_OBJ(oldmask);
 }
 
 /*
@@ -895,18 +895,18 @@ ScmObj Scm_SysSigmask(int how, ScmSysSigset *newmask)
  */
 void Scm_ResetSignalHandlers(sigset_t *mask)
 {
-    struct sigdesc *desc = sigDesc;
-    struct sigaction act;
+	struct sigdesc *desc = sigDesc;
+	struct sigaction act;
 
-    for (; desc->name; desc++) {
-        if (!sigismember(&sigHandlers.masterSigset, desc->num)
-            && (!mask || !sigismember(mask, desc->num))) {
-            act.sa_flags = 0;
-            act.sa_handler = SIG_IGN;
-            // NB: we tolerate failure of this
-            sigaction(desc->num, &act, NULL);
-        }
-    }
+	for (; desc->name; desc++) {
+		if (!sigismember(&sigHandlers.masterSigset, desc->num)
+		    && (!mask || !sigismember(mask, desc->num))) {
+			act.sa_flags = 0;
+			act.sa_handler = SIG_IGN;
+			// NB: we tolerate failure of this
+			sigaction(desc->num, &act, NULL);
+		}
+	}
 }
 
 /*
@@ -915,30 +915,30 @@ void Scm_ResetSignalHandlers(sigset_t *mask)
 static void scm_sigsuspend(sigset_t *mask)
 {
 #if !defined(GAUCHE_WINDOWS)
-    sigset_t omask;
-    ScmVM *vm = Scm_VM();
-    for (;;) {
-        SIGPROCMASK(SIG_BLOCK, &sigHandlers.masterSigset, &omask);
-        if (vm->signalPending) {
-            SIGPROCMASK(SIG_SETMASK, &omask, NULL);
-            Scm_SigCheck(vm);
-            continue;
-        }
-        break;
-    }
-    sigsuspend(mask);
-    SIGPROCMASK(SIG_SETMASK, &omask, NULL);
-    SCM_SIGCHECK(vm);
+	sigset_t omask;
+	ScmVM *vm = Scm_VM();
+	for (;;) {
+		SIGPROCMASK(SIG_BLOCK, &sigHandlers.masterSigset, &omask);
+		if (vm->signalPending) {
+			SIGPROCMASK(SIG_SETMASK, &omask, NULL);
+			Scm_SigCheck(vm);
+			continue;
+		}
+		break;
+	}
+	sigsuspend(mask);
+	SIGPROCMASK(SIG_SETMASK, &omask, NULL);
+	SCM_SIGCHECK(vm);
 #else  /* GAUCHE_WINDOWS */
-    (void)mask; /* suppress unused var warning */
-    Scm_Error("sigsuspend not supported on Windows port");
+	(void)mask; /* suppress unused var warning */
+	Scm_Error("sigsuspend not supported on Windows port");
 #endif /* GAUCHE_WINDOWS */
 }
 
 ScmObj Scm_SigSuspend(ScmSysSigset *mask)
 {
-    scm_sigsuspend(&(mask->set));
-    return SCM_UNDEFINED;
+	scm_sigsuspend(&(mask->set));
+	return SCM_UNDEFINED;
 }
 
 /*
@@ -950,10 +950,10 @@ ScmObj Scm_SigSuspend(ScmSysSigset *mask)
  */
 ScmObj Scm_Pause(void)
 {
-    sigset_t omask;
-    SIGPROCMASK(SIG_SETMASK, NULL, &omask);
-    scm_sigsuspend(&omask);
-    return SCM_UNDEFINED;
+	sigset_t omask;
+	SIGPROCMASK(SIG_SETMASK, NULL, &omask);
+	scm_sigsuspend(&omask);
+	return SCM_UNDEFINED;
 }
 
 /*
@@ -977,71 +977,71 @@ ScmObj Scm_Pause(void)
 int Scm_SigWait(ScmSysSigset *mask)
 {
 #if defined(HAVE_SIGWAIT)
-    int r = 0, sig = 0;
-    int failed_sig = -1;
-    int sigwait_called = FALSE;
-    int errno_save = 0;
-    sigset_t to_wait;        /* real set of signals to wait */
-    sigset_t saved;
-    struct sigaction act, oacts[SCM_NSIG];
+	int r = 0, sig = 0;
+	int failed_sig = -1;
+	int sigwait_called = FALSE;
+	int errno_save = 0;
+	sigset_t to_wait;    /* real set of signals to wait */
+	sigset_t saved;
+	struct sigaction act, oacts[SCM_NSIG];
 
-    (void)SCM_INTERNAL_MUTEX_LOCK(sigHandlers.mutex);
-    /* we can't wait for the signals Gauche doesn't handle. */
-    to_wait = mask->set;
-    for (int i=0; i<SCM_NSIG; i++) {
-        if (!sigismember(&sigHandlers.masterSigset, i)) {
-            sigdelset(&to_wait, i);
-        }
-    }
+	(void)SCM_INTERNAL_MUTEX_LOCK(sigHandlers.mutex);
+	/* we can't wait for the signals Gauche doesn't handle. */
+	to_wait = mask->set;
+	for (int i=0; i<SCM_NSIG; i++) {
+		if (!sigismember(&sigHandlers.masterSigset, i)) {
+			sigdelset(&to_wait, i);
+		}
+	}
 
-    /* Remove C-level handlers */
-    sigemptyset(&saved);
-    act.sa_handler = SIG_DFL;
-    act.sa_flags = 0;
-    for (int i=1; i<SCM_NSIG; i++) {
-        if (!sigismember(&to_wait, i)) continue;
-        if (sigaction(i, &act, &oacts[i]) < 0) {
-            failed_sig = i;
-            errno_save = errno;
-            break;
-        }
-        sigaddset(&saved, i);
-    }
+	/* Remove C-level handlers */
+	sigemptyset(&saved);
+	act.sa_handler = SIG_DFL;
+	act.sa_flags = 0;
+	for (int i=1; i<SCM_NSIG; i++) {
+		if (!sigismember(&to_wait, i)) continue;
+		if (sigaction(i, &act, &oacts[i]) < 0) {
+			failed_sig = i;
+			errno_save = errno;
+			break;
+		}
+		sigaddset(&saved, i);
+	}
 
-    if (failed_sig < 0) {
-        (void)SCM_INTERNAL_MUTEX_UNLOCK(sigHandlers.mutex);
-        sigwait_called = TRUE;
-        r = sigwait(&to_wait, &sig);
-        (void)SCM_INTERNAL_MUTEX_LOCK(sigHandlers.mutex);
-    }
+	if (failed_sig < 0) {
+		(void)SCM_INTERNAL_MUTEX_UNLOCK(sigHandlers.mutex);
+		sigwait_called = TRUE;
+		r = sigwait(&to_wait, &sig);
+		(void)SCM_INTERNAL_MUTEX_LOCK(sigHandlers.mutex);
+	}
 
-    /* Restore C-level handlers */
-    for (int i=1; i<SCM_NSIG; i++) {
-        if (!sigismember(&saved, i)) continue;
-        if (sigaction(i, &oacts[i], NULL) < 0) {
-            failed_sig = i;
-            errno_save = errno;
-        }
-    }
-    (void)SCM_INTERNAL_MUTEX_UNLOCK(sigHandlers.mutex);
+	/* Restore C-level handlers */
+	for (int i=1; i<SCM_NSIG; i++) {
+		if (!sigismember(&saved, i)) continue;
+		if (sigaction(i, &oacts[i], NULL) < 0) {
+			failed_sig = i;
+			errno_save = errno;
+		}
+	}
+	(void)SCM_INTERNAL_MUTEX_UNLOCK(sigHandlers.mutex);
 
-    /* error handling */
-    if (failed_sig >= 0) {
-        errno = errno_save;
-        Scm_SysError("sigaction(2) call failed on signal %d"
-                     " %s sigwait call",
-                     failed_sig,
-                     sigwait_called? "after" : "before");
-    }
-    if (r != 0) {
-        errno = r;
-        Scm_SysError("sigwait failed");
-    }
-    return sig;
+	/* error handling */
+	if (failed_sig >= 0) {
+		errno = errno_save;
+		Scm_SysError("sigaction(2) call failed on signal %d"
+		             " %s sigwait call",
+		             failed_sig,
+		             sigwait_called ? "after" : "before");
+	}
+	if (r != 0) {
+		errno = r;
+		Scm_SysError("sigwait failed");
+	}
+	return sig;
 #else  /* !HAVE_SIGWAIT */
-    (void)mask; /* suppress unused var warning */
-    Scm_Error("sigwait not supported on this platform");
-    return 0;
+	(void)mask; /* suppress unused var warning */
+	Scm_Error("sigwait not supported on this platform");
+	return 0;
 #endif
 }
 
@@ -1052,18 +1052,18 @@ int Scm_SigWait(ScmSysSigset *mask)
 
 void Scm__InitSignal(void)
 {
-    ScmModule *mod = Scm_GaucheModule();
-    ScmObj defsigh_sym = Scm_Intern(&default_sighandler_name);
+	ScmModule *mod = Scm_GaucheModule();
+	ScmObj defsigh_sym = Scm_Intern(&default_sighandler_name);
 
-    (void)SCM_INTERNAL_MUTEX_INIT(sigHandlers.mutex);
-    sigemptyset(&sigHandlers.masterSigset);
-    for (int i=0; i<SCM_NSIG; i++) sigHandlers.handlers[i] = SCM_UNDEFINED;
+	(void)SCM_INTERNAL_MUTEX_INIT(sigHandlers.mutex);
+	sigemptyset(&sigHandlers.masterSigset);
+	for (int i=0; i<SCM_NSIG; i++) sigHandlers.handlers[i] = SCM_UNDEFINED;
 
-    Scm_InitStaticClass(&Scm_SysSigsetClass, "<sys-sigset>",
-                        mod, NULL, 0);
+	Scm_InitStaticClass(&Scm_SysSigsetClass, "<sys-sigset>",
+	                    mod, NULL, 0);
 
-    for (struct sigdesc *desc = sigDesc; desc->name; desc++) {
-        SCM_DEFINE(mod, desc->name, SCM_MAKE_INT(desc->num));
-    }
-    Scm_Define(mod, SCM_SYMBOL(defsigh_sym), DEFAULT_SIGHANDLER);
+	for (struct sigdesc *desc = sigDesc; desc->name; desc++) {
+		SCM_DEFINE(mod, desc->name, SCM_MAKE_INT(desc->num));
+	}
+	Scm_Define(mod, SCM_SYMBOL(defsigh_sym), DEFAULT_SIGHANDLER);
 }

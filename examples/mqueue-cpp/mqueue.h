@@ -19,56 +19,72 @@
 using namespace std;
 
 class Message {
-  public:
-    Message(string body_, int urgency_ = 0)
-        : body(body_), urgency(urgency_)
-        {}
+public:
+Message(string body_, int urgency_ = 0)
+	: body(body_), urgency(urgency_)
+{
+}
 
-    bool operator< (const Message& m) const {
-        return urgency < m.urgency;
-    }
+bool operator< (const Message& m) const {
+	return urgency < m.urgency;
+}
 
-    int getUrgency() const { return urgency;}
-    string getBody() const { return body; }
+int getUrgency() const {
+	return urgency;
+}
+string getBody() const {
+	return body;
+}
 
-  private:
-    string body;
-    int urgency;
+private:
+string body;
+int urgency;
 };
 
 class MQueueException {
-  public:
-    string reason;
-    MQueueException(string reason_) : reason(reason_) {}
+public:
+string reason;
+MQueueException(string reason_) : reason(reason_) {
+}
 };
 
 class MQueue {
-  public:
-    MQueue(string name_) : name(name_) { registerSelf(); }
-    ~MQueue() { unregisterSelf(); }
+public:
+MQueue(string name_) : name(name_) {
+	registerSelf();
+}
+~MQueue() {
+	unregisterSelf();
+}
 
-    string getName() const { return name; }
+string getName() const {
+	return name;
+}
 
-    // Basic queue operations.  The client doesn't need to know
-    // about Message.
-    bool empty() const      { return q.empty(); }
-    string popMessage() throw (MQueueException);
-    size_t pushMessage(string body, int urgency = 0);
+// Basic queue operations.  The client doesn't need to know
+// about Message.
+bool empty() const {
+	return q.empty();
+}
+string popMessage() throw (MQueueException);
+size_t pushMessage(string body, int urgency = 0);
 
-    // One can find a previously created MQueue by its name.
-    static MQueue *findByName(string name);
+// One can find a previously created MQueue by its name.
+static MQueue *findByName(string name);
 
-    bool operator< (const MQueue& m) const { return name < m.name; }
+bool operator< (const MQueue& m) const {
+	return name < m.name;
+}
 
-  private:
-    string name;
-    priority_queue<Message> q;
+private:
+string name;
+priority_queue<Message> q;
 
-    static set<MQueue*> knownQueues;
-    void registerSelf();
-    void unregisterSelf();
+static set<MQueue*> knownQueues;
+void registerSelf();
+void unregisterSelf();
 };
 
-    
+
 #endif  // MQUEUE_H
 

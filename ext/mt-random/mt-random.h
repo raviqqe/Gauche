@@ -46,7 +46,7 @@
    Any feedback is very welcome.
    http://www.math.keio.ac.jp/matumoto/emt.html
    email: matumoto@math.keio.ac.jp
-*/
+ */
 
 #include <gauche.h>
 #include <gauche/extend.h>
@@ -59,9 +59,9 @@
 #define N 624
 
 typedef struct ScmMersenneTwisterRec {
-    SCM_HEADER;
-    unsigned long mt[N]; /* the array for the state vector  */
-    int mti;             /* mti==N+1 means mt[N] is not initialized */
+	SCM_HEADER;
+	unsigned long mt[N]; /* the array for the state vector  */
+	int mti;         /* mti==N+1 means mt[N] is not initialized */
 } ScmMersenneTwister;
 
 SCM_CLASS_DECL(Scm_MersenneTwisterClass);

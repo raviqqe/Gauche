@@ -57,22 +57,22 @@
 #define SCM_CHAR_SET_SMALL_CHARS 128
 
 struct ScmCharSetRec {
-    SCM_HEADER;
-    ScmBits small[SCM_BITS_NUM_WORDS(SCM_CHAR_SET_SMALL_CHARS)];
-    u_int flags;
-    union {
-        ScmTreeCore tree;
-        struct {
-            ScmSize size; /* size of vec.  # of entries is half of this */
-            const uint32_t *vec; 
-            uint32_t ivec[2]; /* if size==2, vec points here */
-        } frozen;
-    } large;
+	SCM_HEADER;
+	ScmBits small[SCM_BITS_NUM_WORDS(SCM_CHAR_SET_SMALL_CHARS)];
+	u_int flags;
+	union {
+		ScmTreeCore tree;
+		struct {
+			ScmSize size; /* size of vec.  # of entries is half of this */
+			const uint32_t *vec;
+			uint32_t ivec[2]; /* if size==2, vec points here */
+		} frozen;
+	} large;
 };
 
 typedef enum {
-    SCM_CHAR_SET_LARGE = 1,
-    SCM_CHAR_SET_IMMUTABLE = 2,
+	SCM_CHAR_SET_LARGE = 1,
+	SCM_CHAR_SET_IMMUTABLE = 2,
 } ScmCharSetType;
 
 SCM_CLASS_DECL(Scm_CharSetClass);
@@ -81,9 +81,9 @@ SCM_CLASS_DECL(Scm_CharSetClass);
 #define SCM_CHAR_SET_P(obj) SCM_XTYPEP(obj, SCM_CLASS_CHAR_SET)
 
 #define SCM_CHAR_SET_LARGE_P(obj) \
-    (SCM_CHAR_SET(obj)->flags & SCM_CHAR_SET_LARGE)
+	(SCM_CHAR_SET(obj)->flags & SCM_CHAR_SET_LARGE)
 #define SCM_CHAR_SET_IMMUTABLE_P(obj) \
-    (SCM_CHAR_SET(obj)->flags & SCM_CHAR_SET_IMMUTABLE)
+	(SCM_CHAR_SET(obj)->flags & SCM_CHAR_SET_IMMUTABLE)
 
 /* for backward compatibility.  deprecated. */
 #define SCM_CLASS_CHARSET   SCM_CLASS_CHAR_SET

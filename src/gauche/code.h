@@ -43,38 +43,38 @@ SCM_DECL_BEGIN
  */
 
 struct ScmCompiledCodeRec {
-    SCM_HEADER;
-    ScmWord *code;              /* Code vector (*1). This is allocated as
-                                   atomic, to prevent GC from scanning it.
-                                   (*2) */
-    ScmObj *constants;          /* Constant vector.  this isn't used during
-                                   execution, but kept here so that the
-                                   constants in the code vector won't be
-                                   GC-ed. (*2) */
-    int codeSize;               /* size of code vector */
-    int constantSize;           /* size of constant vector (*2) */
-    int maxstack;               /* maximum runtime stack depth */
-    u_short requiredArgs;       /* # of required args, if this code is the
-                                   body of a closure.  Otherwise 0. */
-    u_short optionalArgs;       /* 1 if this code is the body of a closure.
-                                   that takes rest arg.  Otherwise 0. */
-    ScmObj name;                /* If this is the body of a closure, holds
-                                   its name.  Otherwise #f. */
-    ScmObj debugInfo;           /* debug info, that associates instructions
-                                   and source code / other metainfo.  May be
-                                   () if no info is available. (*3) */
-    ScmObj signatureInfo;       /* signature info, a metainfo related to the
-                                   interface of this closure.   Maybe #f
-                                   if no info is available. (*4) */
-    ScmObj parent;              /* ScmCompiledCode if this code is compiled
-                                   within other code chunk.  #f otherwise. */
-    ScmObj intermediateForm;    /* A packed IForm of the body (see compile.scm
-                                   for the details of IForm).  It is used
-                                   to inline this procedure.  Only set if
-                                   the procedure is defined with define-inline.
-                                   #f otherwise. (*5) */
-    void *builder;              /* An opaque data used during consturcting
-                                   the code vector.  Usually NULL. */
+	SCM_HEADER;
+	ScmWord *code;          /* Code vector (*1). This is allocated as
+	                           atomic, to prevent GC from scanning it.
+	                           (*2) */
+	ScmObj *constants;      /* Constant vector.  this isn't used during
+	                           execution, but kept here so that the
+	                           constants in the code vector won't be
+	                           GC-ed. (*2) */
+	int codeSize;           /* size of code vector */
+	int constantSize;       /* size of constant vector (*2) */
+	int maxstack;           /* maximum runtime stack depth */
+	u_short requiredArgs;   /* # of required args, if this code is the
+	                           body of a closure.  Otherwise 0. */
+	u_short optionalArgs;   /* 1 if this code is the body of a closure.
+	                           that takes rest arg.  Otherwise 0. */
+	ScmObj name;            /* If this is the body of a closure, holds
+	                           its name.  Otherwise #f. */
+	ScmObj debugInfo;       /* debug info, that associates instructions
+	                           and source code / other metainfo.  May be
+	                           () if no info is available. (*3) */
+	ScmObj signatureInfo;   /* signature info, a metainfo related to the
+	                           interface of this closure.   Maybe #f
+	                           if no info is available. (*4) */
+	ScmObj parent;          /* ScmCompiledCode if this code is compiled
+	                           within other code chunk.  #f otherwise. */
+	ScmObj intermediateForm; /* A packed IForm of the body (see compile.scm
+	                            for the details of IForm).  It is used
+	                            to inline this procedure.  Only set if
+	                            the procedure is defined with define-inline.
+	                          #f otherwise. (*5) */
+	void *builder;          /* An opaque data used during consturcting
+	                           the code vector.  Usually NULL. */
 };
 
 /* Footnotes on ScmCompiledCodeRec
@@ -109,15 +109,15 @@ SCM_CLASS_DECL(Scm_CompiledCodeClass);
 #define SCM_COMPILED_CODE_P(obj)  SCM_XTYPEP(obj, SCM_CLASS_COMPILED_CODE)
 #define SCM_COMPILED_CODE_ARG_INFO(obj) (SCM_COMPILED_CODE(obj)->argInfo)
 #define SCM_COMPILED_CODE_REQUIRED_ARGS(obj) \
-    (SCM_COMPILED_CODE(obj)->requiredArgs)
+	(SCM_COMPILED_CODE(obj)->requiredArgs)
 #define SCM_COMPILED_CODE_OPTIONAL_ARGS(obj) \
-    (SCM_COMPILED_CODE(obj)->optionalArgs)
+	(SCM_COMPILED_CODE(obj)->optionalArgs)
 
 #define SCM_COMPILED_CODE_CONST_INITIALIZER(code, codesize, maxstack, reqargs, optargs, name, debuginfo, signatureinfo, parent, iform) \
-    { { SCM_CLASS_STATIC_TAG(Scm_CompiledCodeClass) },   \
-      (code), NULL, (codesize), 0, (maxstack),           \
-      (reqargs), (optargs), (name), (debuginfo), (signatureinfo),   \
-      (parent), (iform), NULL /*builder*/ }
+	{ { SCM_CLASS_STATIC_TAG(Scm_CompiledCodeClass) },   \
+		(code), NULL, (codesize), 0, (maxstack),           \
+		(reqargs), (optargs), (name), (debuginfo), (signatureinfo),   \
+		(parent), (iform), NULL /*builder*/ }
 
 SCM_EXTERN void   Scm_CompiledCodeCopyX(ScmCompiledCode *dest,
                                         const ScmCompiledCode *src);
@@ -132,7 +132,7 @@ SCM_EXTERN void   Scm_VMExecuteToplevels(ScmCompiledCode *cv[]);
 #define SCM_VM_INSN_ARG_MAX          ((1L<<(32-13))-1)
 #define SCM_VM_INSN_ARG_MIN          (-SCM_VM_INSN_ARG_MAX)
 #define SCM_VM_INSN_ARG_FITS(k) \
-    (((k)<=SCM_VM_INSN_ARG_MAX)&&((k)>=SCM_VM_INSN_ARG_MIN))
+	(((k)<=SCM_VM_INSN_ARG_MAX)&&((k)>=SCM_VM_INSN_ARG_MIN))
 
 /* Macros for transition to the packed code vector of NVM.
    In the packed code vector, VM insns are stored untagged.
@@ -145,22 +145,22 @@ SCM_EXTERN void   Scm_VMExecuteToplevels(ScmCompiledCode *cv[]);
 #define SCM_VM_INSN(code)           SCM_WORD(code)
 #define SCM_VM_INSN1(code, arg)     SCM_WORD((long)((arg)<<12) | (code))
 #define SCM_VM_INSN2(code, arg0, arg1)  \
-    SCM_WORD((long)((arg1) << 22) | ((arg0) << 12) | (code))
+	SCM_WORD((long)((arg1) << 22) | ((arg0) << 12) | (code))
 
 /* insn flags.  see vminsn.scm for details. */
 enum ScmVMInsnFlag {
-    SCM_VM_INSN_OBSOLETED = (1L<<0),
-    SCM_VM_INSN_FOLD_LREF = (1L<<1)
+	SCM_VM_INSN_OBSOLETED = (1L<<0),
+	SCM_VM_INSN_FOLD_LREF = (1L<<1)
 };
 
 /* Operand type */
 enum {
-    SCM_VM_OPERAND_NONE,        /* take no operand */
-    SCM_VM_OPERAND_OBJ,         /* take ScmObj */
-    SCM_VM_OPERAND_CODE,        /* take ScmCompiledCode */
-    SCM_VM_OPERAND_CODES,       /* take a list of ScmCompiledCodes */
-    SCM_VM_OPERAND_ADDR,        /* take address of next code */
-    SCM_VM_OPERAND_OBJ_ADDR     /* take an object and address of next code */
+	SCM_VM_OPERAND_NONE,    /* take no operand */
+	SCM_VM_OPERAND_OBJ,     /* take ScmObj */
+	SCM_VM_OPERAND_CODE,    /* take ScmCompiledCode */
+	SCM_VM_OPERAND_CODES,   /* take a list of ScmCompiledCodes */
+	SCM_VM_OPERAND_ADDR,    /* take address of next code */
+	SCM_VM_OPERAND_OBJ_ADDR /* take an object and address of next code */
 };
 
 SCM_EXTERN const char *Scm_VMInsnName(u_int code);

@@ -45,19 +45,19 @@ SCM_DEFINE_ABSTRACT_CLASS(Scm_DictionaryClass, SCM_CLASS_COLLECTION_CPL);
 SCM_DEFINE_ABSTRACT_CLASS(Scm_OrderedDictionaryClass, Scm__OrderedDictionaryCPL+1);
 
 ScmClass *Scm__OrderedDictionaryCPL[] = {
-    SCM_CLASS_STATIC_PTR(Scm_OrderedDictionaryClass),
-    SCM_CLASS_STATIC_PTR(Scm_SequenceClass),
-    SCM_CLASS_STATIC_PTR(Scm_DictionaryClass),
-    SCM_CLASS_STATIC_PTR(Scm_CollectionClass),
-    SCM_CLASS_STATIC_PTR(Scm_TopClass),
-    NULL
+	SCM_CLASS_STATIC_PTR(Scm_OrderedDictionaryClass),
+	SCM_CLASS_STATIC_PTR(Scm_SequenceClass),
+	SCM_CLASS_STATIC_PTR(Scm_DictionaryClass),
+	SCM_CLASS_STATIC_PTR(Scm_CollectionClass),
+	SCM_CLASS_STATIC_PTR(Scm_TopClass),
+	NULL
 };
 
 ScmClass *Scm__SequenceCPL[] = {
-    SCM_CLASS_STATIC_PTR(Scm_SequenceClass),
-    SCM_CLASS_STATIC_PTR(Scm_CollectionClass),
-    SCM_CLASS_STATIC_PTR(Scm_TopClass),
-    NULL
+	SCM_CLASS_STATIC_PTR(Scm_SequenceClass),
+	SCM_CLASS_STATIC_PTR(Scm_CollectionClass),
+	SCM_CLASS_STATIC_PTR(Scm_TopClass),
+	NULL
 };
 
 /*
@@ -66,10 +66,10 @@ ScmClass *Scm__SequenceCPL[] = {
 
 intptr_t Scm__CheckDictValue(ScmObj val, const char *file, int line)
 {
-    if (val == NULL || SCM_UNBOUNDP(val)) {
-        Scm_Panic("[internal] attempted to set an invalid ScmObj value (%p) as a value of a dictionary, at %s:%d", val, file, line);
-    }
-    return (intptr_t)val;
+	if (val == NULL || SCM_UNBOUNDP(val)) {
+		Scm_Panic("[internal] attempted to set an invalid ScmObj value (%p) as a value of a dictionary, at %s:%d", val, file, line);
+	}
+	return (intptr_t)val;
 }
 
 /*
@@ -77,14 +77,14 @@ intptr_t Scm__CheckDictValue(ScmObj val, const char *file, int line)
  */
 void Scm__InitCollection(void)
 {
-    ScmModule *mod = Scm_GaucheModule();
+	ScmModule *mod = Scm_GaucheModule();
 
-    Scm_InitStaticClass(&Scm_CollectionClass, "<collection>",
-                        mod, NULL, 0);
-    Scm_InitStaticClass(&Scm_SequenceClass, "<sequence>",
-                        mod, NULL, 0);
-    Scm_InitStaticClass(&Scm_DictionaryClass, "<dictionary>",
-                        mod, NULL, 0);
-    Scm_InitStaticClass(&Scm_OrderedDictionaryClass, "<ordered-dictionary>",
-                        mod, NULL, 0);
+	Scm_InitStaticClass(&Scm_CollectionClass, "<collection>",
+	                    mod, NULL, 0);
+	Scm_InitStaticClass(&Scm_SequenceClass, "<sequence>",
+	                    mod, NULL, 0);
+	Scm_InitStaticClass(&Scm_DictionaryClass, "<dictionary>",
+	                    mod, NULL, 0);
+	Scm_InitStaticClass(&Scm_OrderedDictionaryClass, "<ordered-dictionary>",
+	                    mod, NULL, 0);
 }

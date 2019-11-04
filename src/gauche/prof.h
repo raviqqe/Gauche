@@ -76,15 +76,15 @@
 
 /* Profiler status */
 enum {
-    SCM_PROFILER_INACTIVE,
-    SCM_PROFILER_RUNNING,
-    SCM_PROFILER_PAUSING
+	SCM_PROFILER_INACTIVE,
+	SCM_PROFILER_RUNNING,
+	SCM_PROFILER_PAUSING
 };
 
 /* A sample of statistic sampler */
 typedef struct ScmProfSampleRec {
-    ScmObj func;                /* ScmCompiledCode or ScmSubr */
-    ScmWord *pc;
+	ScmObj func;            /* ScmCompiledCode or ScmSubr */
+	ScmWord *pc;
 } ScmProfSample;
 
 /* # of on-memory samples for the statistic sampler. */
@@ -92,7 +92,7 @@ typedef struct ScmProfSampleRec {
 
 /* A record of call counter */
 typedef struct ScmProfCountRec {
-    ScmObj func;                /* Called Function */
+	ScmObj func;            /* Called Function */
 } ScmProfCount;
 
 /* # of on-memory samples for the call counter. */
@@ -103,23 +103,23 @@ typedef struct ScmProfCountRec {
  * for the first time.
  */
 struct ScmVMProfilerRec {
-    int state;                  /* profiler state */
-    int samplerFd;              /* temporary file for the sampler */
-    int currentSample;          /* index to the current sample */
-    int totalSamples;           /* total # of samples */
-    int errorOccurred;          /* TRUE if error has occurred during I/O */
-    int currentCount;           /* index to the current counter */
-    ScmHashTable* statHash;     /* hashtable for collected data.
-                                   value is a pair of integers,
-                                   (<call-count> . <sample-hits>) */
+	int state;              /* profiler state */
+	int samplerFd;          /* temporary file for the sampler */
+	int currentSample;      /* index to the current sample */
+	int totalSamples;       /* total # of samples */
+	int errorOccurred;      /* TRUE if error has occurred during I/O */
+	int currentCount;       /* index to the current counter */
+	ScmHashTable* statHash; /* hashtable for collected data.
+	                           value is a pair of integers,
+	                           (<call-count> . <sample-hits>) */
 #if defined(GAUCHE_WINDOWS)
-    HANDLE hTargetThread;       /* target thread */
-    HANDLE hObserverThread;     /* observer thread */
-    HANDLE hTimerEvent;         /* sampling timer event */
-    char *samplerFileName;      /* temporary file name to remove the file */
+	HANDLE hTargetThread;   /* target thread */
+	HANDLE hObserverThread; /* observer thread */
+	HANDLE hTimerEvent;     /* sampling timer event */
+	char *samplerFileName;  /* temporary file name to remove the file */
 #endif /* GAUCHE_WINDOWS */
-    ScmProfSample samples[SCM_PROF_SAMPLES_IN_BUFFER];
-    ScmProfCount  counts[SCM_PROF_COUNTER_IN_BUFFER];
+	ScmProfSample samples[SCM_PROF_SAMPLES_IN_BUFFER];
+	ScmProfCount counts[SCM_PROF_COUNTER_IN_BUFFER];
 };
 
 SCM_EXTERN ScmObj Scm_ProfilerRawResult(void);
@@ -130,14 +130,14 @@ SCM_EXTERN void Scm_ProfilerCountBufferFlush(ScmVM *vm);
 
 #ifdef GAUCHE_PROFILE
 #define SCM_PROF_COUNT_CALL(vm, obj)                                    \
-    do {                                                                \
-        if (vm->profilerRunning) {                                      \
-            if (vm->prof->currentCount == SCM_PROF_COUNTER_IN_BUFFER) { \
-                Scm_ProfilerCountBufferFlush(vm);                       \
-            }                                                           \
-            vm->prof->counts[vm->prof->currentCount++].func = obj;      \
-        }                                                               \
-    } while (0)
+	do {                                                                \
+		if (vm->profilerRunning) {                                      \
+			if (vm->prof->currentCount == SCM_PROF_COUNTER_IN_BUFFER) { \
+				Scm_ProfilerCountBufferFlush(vm);                       \
+			}                                                           \
+			vm->prof->counts[vm->prof->currentCount++].func = obj;      \
+		}                                                               \
+	} while (0)
 #else  /*!GAUCHE_PROFILE*/
 #define SCM_PROF_COUNT_CALL(vm, obj)  /*empty*/
 #endif /*!GAUCHE_PROFILE*/

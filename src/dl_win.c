@@ -41,24 +41,24 @@
 
 static void *dl_open(const char *path)
 {
-    LPTSTR xpath = (LPTSTR)SCM_MBS2WCS(path);
-    return (void*)LoadLibrary(xpath);
+	LPTSTR xpath = (LPTSTR)SCM_MBS2WCS(path);
+	return (void*)LoadLibrary(xpath);
 }
 
 static const char *dl_error(void)
 {
-    char buf[80];
-    DWORD code = GetLastError();
-    snprintf(buf, sizeof(buf), "error code %ld", code);
-    return SCM_STRDUP(buf);
+	char buf[80];
+	DWORD code = GetLastError();
+	snprintf(buf, sizeof(buf), "error code %ld", code);
+	return SCM_STRDUP(buf);
 }
 
 static ScmDynLoadInitFn dl_sym(void *handle, const char *name)
 {
-    return (ScmDynLoadInitFn)GetProcAddress((HMODULE)handle, name);
+	return (ScmDynLoadInitFn)GetProcAddress((HMODULE)handle, name);
 }
 
 static void dl_close(void *handle)
 {
-    (void)FreeLibrary((HMODULE)handle);
+	(void)FreeLibrary((HMODULE)handle);
 }

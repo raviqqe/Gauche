@@ -42,13 +42,13 @@
 
 /* Hash types */
 typedef enum {
-    SCM_HASH_EQ,
-    SCM_HASH_EQV,
-    SCM_HASH_EQUAL,
-    SCM_HASH_STRING,
-    SCM_HASH_GENERAL,
+	SCM_HASH_EQ,
+	SCM_HASH_EQV,
+	SCM_HASH_EQUAL,
+	SCM_HASH_STRING,
+	SCM_HASH_GENERAL,
 
-    SCM_HASH_WORD
+	SCM_HASH_WORD
 } ScmHashType;
 
 typedef struct ScmHashCoreRec ScmHashCore;
@@ -56,22 +56,22 @@ typedef struct ScmHashIterRec ScmHashIter;
 
 /* Called when the hashtable needs to calculate a hash value from
    the key given to Scm_HashCoreSearch.   Returns a hash value. */
-typedef u_long ScmHashProc(const ScmHashCore *hc, intptr_t key);
+typedef u_long ScmHashProc (const ScmHashCore *hc, intptr_t key);
 
 /* Called when the hashtable needs to compare the given key KEY
    with an entry's key ENTRYKEY. */
-typedef int    ScmHashCompareProc(const ScmHashCore *hc, intptr_t key,
-                                  intptr_t entrykey);
+typedef int ScmHashCompareProc (const ScmHashCore *hc, intptr_t key,
+                                intptr_t entrykey);
 
 struct ScmHashCoreRec {
-    void **buckets;
-    int numBuckets;
-    int numEntries;
-    int numBucketsLog2;
-    void                 *accessfn; /* actual type hidden */
-    ScmHashProc          *hashfn;
-    ScmHashCompareProc   *cmpfn;
-    void *data;
+	void **buckets;
+	int numBuckets;
+	int numEntries;
+	int numBucketsLog2;
+	void                 *accessfn;/* actual type hidden */
+	ScmHashProc          *hashfn;
+	ScmHashCompareProc   *cmpfn;
+	void *data;
 };
 
 SCM_EXTERN void Scm_HashCoreInitSimple(ScmHashCore *core,
@@ -100,9 +100,9 @@ SCM_EXTERN int  Scm_HashCoreNumEntries(ScmHashCore *core);
 SCM_EXTERN void Scm_HashCoreClear(ScmHashCore *core);
 
 struct ScmHashIterRec {
-    ScmHashCore *core;
-    int   bucket;
-    void *next;
+	ScmHashCore *core;
+	int bucket;
+	void *next;
 };
 
 SCM_EXTERN void Scm_HashIterInit(ScmHashIter *iter, ScmHashCore *core);
@@ -131,9 +131,9 @@ SCM_EXTERN u_long Scm_Hash(ScmObj obj); /* DEPRECATED */
  */
 
 struct ScmHashTableRec {
-    SCM_HEADER;
-    ScmHashType type;
-    ScmHashCore core;
+	SCM_HEADER;
+	ScmHashType type;
+	ScmHashCore core;
 };
 
 SCM_CLASS_DECL(Scm_HashTableClass);
@@ -177,8 +177,8 @@ SCM_EXTERN ScmObj Scm_HashTableStat(ScmHashTable *table);
 #define SCM_HASH_ADDRESS       SCM_HASH_EQ
 
 typedef struct ScmHashEntryRec {
-    void *key;
-    void *value;
+	void *key;
+	void *value;
 } ScmHashEntry;
 
 SCM_EXTERN ScmHashEntry *Scm_HashTableGet(ScmHashTable *hash, ScmObj key);

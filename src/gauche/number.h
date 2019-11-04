@@ -55,7 +55,7 @@
 #define SCM_SMALL_INT_MAX          ((1L << SCM_SMALL_INT_SIZE) - 1)
 #define SCM_SMALL_INT_MIN          (-SCM_SMALL_INT_MAX-1)
 #define SCM_SMALL_INT_FITS(k) \
-    (((k)<=SCM_SMALL_INT_MAX)&&((k)>=SCM_SMALL_INT_MIN))
+	(((k)<=SCM_SMALL_INT_MAX)&&((k)>=SCM_SMALL_INT_MIN))
 
 #define SCM_RADIX_MAX              36
 #define SCM_RADIX_MIN              2
@@ -71,7 +71,7 @@
 #define SCM_EXACT_ONE_P(obj)       SCM_EQ(obj, SCM_MAKE_INT(1))
 
 #define SCM_UINTEGERP(obj) \
-    (SCM_UINTP(obj) || (SCM_BIGNUMP(obj)&&SCM_BIGNUM_SIGN(obj)>=0))
+	(SCM_UINTP(obj) || (SCM_BIGNUMP(obj)&&SCM_BIGNUM_SIGN(obj)>=0))
 
 SCM_CLASS_DECL(Scm_NumberClass);
 SCM_CLASS_DECL(Scm_ComplexClass);
@@ -86,10 +86,10 @@ SCM_CLASS_DECL(Scm_IntegerClass);
 #define SCM_CLASS_INTEGER       (&Scm_IntegerClass)
 
 struct ScmBignumRec {
-    SCM_HEADER;
-    int sign : 2;
-    unsigned int size : (SIZEOF_INT*CHAR_BIT-2);
-    unsigned long values[1];           /* variable length */
+	SCM_HEADER;
+	int sign : 2;
+	unsigned int size : (SIZEOF_INT*CHAR_BIT-2);
+	unsigned long values[1];       /* variable length */
 };
 
 #define SCM_BIGNUM(obj)        ((ScmBignum*)(obj))
@@ -100,9 +100,9 @@ struct ScmBignumRec {
 #define SCM_BIGNUM_MAX_DIGITS  ((1UL<<(SIZEOF_INT*CHAR_BIT-2))-1)
 
 struct ScmRatnumRec {
-    SCM_HEADER;
-    ScmObj numerator;
-    ScmObj denominator;
+	SCM_HEADER;
+	ScmObj numerator;
+	ScmObj denominator;
 };
 
 #define SCM_RATNUM(obj)            ((ScmRatnum*)(obj))
@@ -111,9 +111,9 @@ struct ScmRatnumRec {
 #define SCM_RATNUM_DENOM(obj)      SCM_RATNUM(obj)->denominator
 
 struct ScmCompnumRec {
-    SCM_HEADER;
-    double real;
-    double imag;
+	SCM_HEADER;
+	double real;
+	double imag;
 };
 
 #define SCM_COMPNUM(obj)           ((ScmCompnum*)(obj))
@@ -153,11 +153,11 @@ struct ScmCompnumRec {
 
 #if GAUCHE_FFX
 #define SCM_FLONUM_ENSURE_MEM(var)                              \
-    do {                                                        \
-        if (SCM_FLONUM_REG_P(var)) {                            \
-            var = Scm_MakeFlonum(SCM_FLONUM_VALUE(var));        \
-        }                                                       \
-    } while (0)
+	do {                                                        \
+		if (SCM_FLONUM_REG_P(var)) {                            \
+			var = Scm_MakeFlonum(SCM_FLONUM_VALUE(var));        \
+		}                                                       \
+	} while (0)
 #else  /*!GAUCHE_FFX*/
 #define SCM_FLONUM_ENSURE_MEM(var) /* empty */
 #endif /*!GAUCHE_FFX*/
@@ -183,11 +183,11 @@ struct ScmCompnumRec {
  */
 
 enum ScmClampMode {
-    SCM_CLAMP_ERROR = 0,       /* throws an error when out-of-range */
-    SCM_CLAMP_HI = 1,
-    SCM_CLAMP_LO = 2,
-    SCM_CLAMP_BOTH = 3,
-    SCM_CLAMP_NONE = 4         /* do not convert when out-of-range */
+	SCM_CLAMP_ERROR = 0,   /* throws an error when out-of-range */
+	SCM_CLAMP_HI = 1,
+	SCM_CLAMP_LO = 2,
+	SCM_CLAMP_BOTH = 3,
+	SCM_CLAMP_NONE = 4     /* do not convert when out-of-range */
 };
 
 SCM_EXTERN int    Scm_ClampMode(ScmObj clamp);
@@ -225,7 +225,7 @@ SCM_EXTERN uint64_t Scm_GetIntegerU64Clamp(ScmObj obj, int clamp, int *oor);
    Scm_GetInteger64 and Scm_GetIntegerU64, and they were clamping.
    We change it in 0.9.4 to make error-signaling default, in the spirit
    of safety by default.
-*/
+ */
 #define Scm_GetInteger(x)    Scm_GetIntegerClamp(x, SCM_CLAMP_ERROR, NULL)
 #define Scm_GetIntegerU(x)   Scm_GetIntegerUClamp(x, SCM_CLAMP_ERROR, NULL)
 #define Scm_GetInteger8(x)   Scm_GetInteger8Clamp(x, SCM_CLAMP_ERROR, NULL)
@@ -316,10 +316,10 @@ SCM_EXTERN ScmObj Scm_LogNot(ScmObj x);
 SCM_EXTERN ScmObj Scm_Ash(ScmObj x, ScmSmallInt cnt);
 
 enum ScmRoundMode {
-    SCM_ROUND_FLOOR,
-    SCM_ROUND_CEIL,
-    SCM_ROUND_TRUNC,
-    SCM_ROUND_ROUND
+	SCM_ROUND_FLOOR,
+	SCM_ROUND_CEIL,
+	SCM_ROUND_TRUNC,
+	SCM_ROUND_ROUND
 };
 SCM_EXTERN ScmObj Scm_Round(ScmObj num, int mode);
 SCM_EXTERN ScmObj Scm_RoundToExact(ScmObj num, int mode);
@@ -336,34 +336,34 @@ SCM_EXTERN double Scm_ImagPart(ScmObj z);
    also take those flags.  The [N] and [S] mark the meaning of the flag
    in Scm_NumberToString and Scm_StringToNumber, respectively. */
 enum ScmNumberFormatFlags {
-    SCM_NUMBER_FORMAT_USE_UPPER = (1L<<0), /* use ABCDEF.. for base > 10
-                                              [N] same.
-                                              [S] ignored. */
-    SCM_NUMBER_FORMAT_SHOW_PLUS = (1L<<1), /* show '+' in positive number
-                                              [N] same.
-                                              [S] ignored. */
-    SCM_NUMBER_FORMAT_ALT_RADIX = (1L<<2), /* alternative radix prefix handling
-                                              specifying non-default behavior
-                                              (the actual behavior differs
-                                              between N and S:
-                                              [N] always add radix prefix
-                                              [S] never allow radix prefix */
-    SCM_NUMBER_FORMAT_ROUND_NOTATIONAL = (1L<<3)
-                                           /* Using notational decimal rounding.
-                                              [N] When rounding fractional part,
-                                              we first generate the closest
-                                              decimal notation, then round.
-                                              [S] ignored.
-                                            */
+	SCM_NUMBER_FORMAT_USE_UPPER = (1L<<0), /* use ABCDEF.. for base > 10
+	                                          [N] same.
+	                                          [S] ignored. */
+	SCM_NUMBER_FORMAT_SHOW_PLUS = (1L<<1), /* show '+' in positive number
+	                                          [N] same.
+	                                          [S] ignored. */
+	SCM_NUMBER_FORMAT_ALT_RADIX = (1L<<2), /* alternative radix prefix handling
+	                                          specifying non-default behavior
+	                                          (the actual behavior differs
+	                                          between N and S:
+	                                          [N] always add radix prefix
+	                                          [S] never allow radix prefix */
+	SCM_NUMBER_FORMAT_ROUND_NOTATIONAL = (1L<<3)
+	                                     /* Using notational decimal rounding.
+	                                        [N] When rounding fractional part,
+	                                        we first generate the closest
+	                                        decimal notation, then round.
+	                                        [S] ignored.
+	                                      */
 };
 
 typedef struct ScmNumberFormatRec {
-    u_long flags;
-    int radix;
-    int precision;    /* # of digits after decimal point, -1 for unlimited */
-    int exp_lo;       /* use exp notation if exponent <= exp_lo */
-    int exp_hi;       /* use exp notation if exponent >= exp_hi */
-    int exp_width;    /* min # of digits used for exponent */
+	u_long flags;
+	int radix;
+	int precision; /* # of digits after decimal point, -1 for unlimited */
+	int exp_lo;   /* use exp notation if exponent <= exp_lo */
+	int exp_hi;   /* use exp notation if exponent >= exp_hi */
+	int exp_width; /* min # of digits used for exponent */
 } ScmNumberFormat;
 
 SCM_EXTERN void   Scm_NumberFormatInit(ScmNumberFormat*);

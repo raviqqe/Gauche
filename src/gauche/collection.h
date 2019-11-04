@@ -66,19 +66,19 @@ extern ScmClass *Scm__SequenceCPL[];
 
 /* Utility to check start/end range in string and vector operation */
 #define SCM_CHECK_START_END(start, end, len)                            \
-    do {                                                                \
-        if ((start) < 0 || (start) > (len)) {                           \
-            Scm_Error("start argument out of range: %ld", (start));     \
-        }                                                               \
-        if ((end) < 0) (end) = (len);                                   \
-        else if ((end) > (len)) {                                       \
-            Scm_Error("end argument out of range: %ld", (end));         \
-        } else if ((end) < (start)) {                                   \
-            Scm_Error("end argument (%ld) must be greater than or "     \
-                      "equal to the start argument (%ld)",              \
-                      (end), (start));                                  \
-        }                                                               \
-    } while (0)
+	do {                                                                \
+		if ((start) < 0 || (start) > (len)) {                           \
+			Scm_Error("start argument out of range: %ld", (start));     \
+		}                                                               \
+		if ((end) < 0) (end) = (len);                                   \
+		else if ((end) > (len)) {                                       \
+			Scm_Error("end argument out of range: %ld", (end));         \
+		} else if ((end) < (start)) {                                   \
+			Scm_Error("end argument (%ld) must be greater than or "     \
+			          "equal to the start argument (%ld)",              \
+			          (end), (start));                                  \
+		}                                                               \
+	} while (0)
 
 /*
  * Dictionary-related utilities
@@ -94,8 +94,8 @@ extern ScmClass *Scm__SequenceCPL[];
  * Common part of the entry.  This is for the lower layer.
  */
 typedef struct ScmDictEntryRec {
-    const intptr_t key;
-    intptr_t  value;
+	const intptr_t key;
+	intptr_t value;
 } ScmDictEntry;
 
 /*
@@ -104,7 +104,7 @@ typedef struct ScmDictEntryRec {
 #define SCM_DICT_KEY(entry)   SCM_OBJ((entry)->key)
 #define SCM_DICT_VALUE(entry) SCM_OBJ((entry)->value)
 #define SCM_DICT_SET_VALUE(entry, val) \
-    SCM_OBJ((entry)->value = Scm__CheckDictValue(val, __FILE__, __LINE__))
+	SCM_OBJ((entry)->value = Scm__CheckDictValue(val, __FILE__, __LINE__))
 
 SCM_EXTERN intptr_t Scm__CheckDictValue(ScmObj val, const char *file, int line);
 
@@ -112,19 +112,19 @@ SCM_EXTERN intptr_t Scm__CheckDictValue(ScmObj val, const char *file, int line);
  * Common operation argument for *Search functions
  */
 typedef enum {
-    SCM_DICT_GET,               /* returns ScmDictEntry* if found,
-                                   NULL otherwise. */
-    SCM_DICT_CREATE,            /* if not found, create a new entry.
-                                   always return ScmDictEntry*. */
-    SCM_DICT_DELETE             /* deletes found entry.  */
+	SCM_DICT_GET,           /* returns ScmDictEntry* if found,
+	                           NULL otherwise. */
+	SCM_DICT_CREATE,        /* if not found, create a new entry.
+	                           always return ScmDictEntry*. */
+	SCM_DICT_DELETE         /* deletes found entry.  */
 } ScmDictOp;
 
 /*
  * Common flags for *Set functions
  */
 typedef enum {
-    SCM_DICT_NO_OVERWRITE = (1L<<0),/* do not overwrite the existing entry */
-    SCM_DICT_NO_CREATE    = (1L<<1) /* do not create new one if no match */
+	SCM_DICT_NO_OVERWRITE = (1L<<0),/* do not overwrite the existing entry */
+	SCM_DICT_NO_CREATE    = (1L<<1)/* do not create new one if no match */
 } ScmDictSetFlags;
 
 #endif /* GAUCHE_COLLECTION_H */

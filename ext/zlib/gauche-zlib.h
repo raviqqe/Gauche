@@ -48,19 +48,19 @@
 SCM_DECL_BEGIN
 
 typedef struct ScmZlibInfoRec {
-    z_streamp strm;
-    ScmPort *remote;            /* source or drain port */
-    int ownerp;
-    int flush;
-    int stream_endp;
-    ScmSize bufsiz;
-    char *buf;
-    char *ptr;
-    unsigned char *dict;
-    ScmSize dictlen;
-    int level;
-    int strategy;
-    ScmObj dict_adler;
+	z_streamp strm;
+	ScmPort *remote;        /* source or drain port */
+	int ownerp;
+	int flush;
+	int stream_endp;
+	ScmSize bufsiz;
+	char *buf;
+	char *ptr;
+	unsigned char *dict;
+	ScmSize dictlen;
+	int level;
+	int strategy;
+	ScmObj dict_adler;
 } ScmZlibInfo;
 
 #define SCM_PORT_ZLIB_INFO(p) ((ScmZlibInfo*)(p)->src.buf.data)

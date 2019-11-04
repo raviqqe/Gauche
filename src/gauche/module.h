@@ -44,31 +44,31 @@
  */
 
 struct ScmModuleRec {
-    SCM_HEADER;
-    ScmObj name;                /* symbol or #f */
-    ScmObj imported;            /* list of imported modules. */
-    int    exportAll;           /* TRUE if (export-all) */
-    ScmObj parents;             /* direct parent modules */
-    ScmObj mpl;                 /* module precedence list */
-    ScmObj depended;            /* list of modules that are depended by this
-                                   module for compilation */
-    ScmHashTable *internal;     /* Symbol -> GLoc, looked up from this module
-                                   itself and inherited ones */
-    ScmHashTable *external;     /* Symbol -> GLoc, looked up from the modules
-                                   that imports this module.  This table only
-                                   holds exported symbols (it may have
-                                   different name if export renaming is in
-                                   effect) */
-    ScmObj origin;              /* if this module is an anonymous wrapper
-                                   module, this holds a original module.
-                                   this isn't used for resolving bindings,
-                                   but used to avoid duplicating imports. */
-    ScmObj prefix;              /* if symbol, all bindings in this module
-                                   appear to have the prefix.  used in an
-                                   anonymous wrapper modules. */
-    ScmObj info;                /* alist of metainfo; e.g.
-                                   (source-info . <string>) */
-    int    sealed;              /* if true, no modification is allowed */
+	SCM_HEADER;
+	ScmObj name;            /* symbol or #f */
+	ScmObj imported;        /* list of imported modules. */
+	int exportAll;          /* TRUE if (export-all) */
+	ScmObj parents;         /* direct parent modules */
+	ScmObj mpl;             /* module precedence list */
+	ScmObj depended;        /* list of modules that are depended by this
+	                           module for compilation */
+	ScmHashTable *internal; /* Symbol -> GLoc, looked up from this module
+	                           itself and inherited ones */
+	ScmHashTable *external; /* Symbol -> GLoc, looked up from the modules
+	                           that imports this module.  This table only
+	                           holds exported symbols (it may have
+	                           different name if export renaming is in
+	                           effect) */
+	ScmObj origin;          /* if this module is an anonymous wrapper
+	                           module, this holds a original module.
+	                           this isn't used for resolving bindings,
+	                           but used to avoid duplicating imports. */
+	ScmObj prefix;          /* if symbol, all bindings in this module
+	                           appear to have the prefix.  used in an
+	                           anonymous wrapper modules. */
+	ScmObj info;            /* alist of metainfo; e.g.
+	                           (source-info . <string>) */
+	int sealed;             /* if true, no modification is allowed */
 };
 
 #define SCM_MODULE(obj)       ((ScmModule*)(obj))
@@ -82,13 +82,13 @@ SCM_EXTERN ScmObj Scm_MakeModule(ScmSymbol *name, int error_if_exists);
 /* Flags for Scm_FindBinding (F), MakeBinding (M)
    and Scm_GlobalVariableRef (R)*/
 enum {
-    SCM_BINDING_STAY_IN_MODULE = (1L<<0), /*(F,R) do not search parent/imported*/
-    SCM_BINDING_CONST = (1L<<1),          /*(M) constant binding */
-    SCM_BINDING_INLINABLE = (1L<<2),      /*(M) inlinable binding */
-    SCM_BINDING_EXTERNAL = (1L<<3)        /*(F) only search externally visible
-                                            bindings, as if we're importing
-                                            the module.  Currently used to
-                                            create alias binding. */
+	SCM_BINDING_STAY_IN_MODULE = (1L<<0), /*(F,R) do not search parent/imported*/
+	SCM_BINDING_CONST = (1L<<1),      /*(M) constant binding */
+	SCM_BINDING_INLINABLE = (1L<<2),  /*(M) inlinable binding */
+	SCM_BINDING_EXTERNAL = (1L<<3)    /*(F) only search externally visible
+	                                     bindings, as if we're importing
+	                                     the module.  Currently used to
+	                                     create alias binding. */
 };
 
 SCM_EXTERN ScmGloc *Scm_FindBinding(ScmModule *module, ScmSymbol *symbol,
@@ -132,13 +132,13 @@ SCM_EXTERN void   Scm_ModuleSeal(ScmModule *mod);
    module doesn't exist.  This change should be transparent as far
    as the caller's using Gauche's definition of TRUE. */
 enum {
-    SCM_FIND_MODULE_CREATE = 1, /* Create if there's no named module */
-    SCM_FIND_MODULE_QUIET  = 2  /* Do not signal an error if there's no
-                                   named module, but return NULL instead. */
+	SCM_FIND_MODULE_CREATE = 1, /* Create if there's no named module */
+	SCM_FIND_MODULE_QUIET  = 2/* Do not signal an error if there's no
+	                             named module, but return NULL instead. */
 };
 
 #define SCM_FIND_MODULE(name, flags) \
-    Scm_FindModule(SCM_SYMBOL(SCM_INTERN(name)), flags)
+	Scm_FindModule(SCM_SYMBOL(SCM_INTERN(name)), flags)
 
 SCM_EXTERN ScmObj Scm_ModuleNameToPath(ScmSymbol *name);
 SCM_EXTERN ScmObj Scm_PathToModuleName(ScmString *path);
@@ -150,16 +150,16 @@ SCM_EXTERN ScmModule *Scm_UserModule(void);
 SCM_EXTERN ScmModule *Scm_CurrentModule(void);
 
 #define SCM_DEFINE(module, cstr, val)           \
-    Scm_Define(SCM_MODULE(module),              \
-               SCM_SYMBOL(SCM_INTERN(cstr)),    \
-               SCM_OBJ(val))
+	Scm_Define(SCM_MODULE(module),              \
+	           SCM_SYMBOL(SCM_INTERN(cstr)),    \
+	           SCM_OBJ(val))
 
 /* OBSOLETED */
 #define Scm_SymbolValue(m, s) Scm_GlobalVariableRef(m, s, FALSE)
 /* OBSOLETED */
 #define SCM_SYMBOL_VALUE(module_name, symbol_name)                      \
-    Scm_SymbolValue(SCM_FIND_MODULE(module_name, 0),                    \
-                    SCM_SYMBOL(SCM_INTERN(symbol_name)))
+	Scm_SymbolValue(SCM_FIND_MODULE(module_name, 0),                    \
+	                SCM_SYMBOL(SCM_INTERN(symbol_name)))
 
 
 #endif /*GAUCHE_MODULE_H*/

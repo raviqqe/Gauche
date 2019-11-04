@@ -53,21 +53,21 @@ SCM_DEFINE_BUILTIN_CLASS(Scm_SysTermiosClass,
 static ScmObj termios_allocate(ScmClass *klass SCM_UNUSED,
                                ScmObj initargs SCM_UNUSED)
 {
-    ScmSysTermios *t = SCM_NEW(ScmSysTermios);
-    SCM_SET_CLASS(t, SCM_CLASS_SYS_TERMIOS);
-    memset(&t->term, 0, sizeof(t->term));
-    return SCM_OBJ(t);
+	ScmSysTermios *t = SCM_NEW(ScmSysTermios);
+	SCM_SET_CLASS(t, SCM_CLASS_SYS_TERMIOS);
+	memset(&t->term, 0, sizeof(t->term));
+	return SCM_OBJ(t);
 }
 
 /* slot accessors */
 #define TERMIOS_GET_N_SET(name) \
-  static ScmObj SCM_CPP_CAT3(termios_, name, _get)(ScmSysTermios* t)         \
-  { return Scm_MakeIntegerFromUI((u_long)t->term.name); }                    \
-  static void SCM_CPP_CAT3(termios_, name, _set)(ScmSysTermios* t, ScmObj v) \
-  {                                                                          \
-      if (!SCM_INTEGERP(v)) Scm_Error("integer required, but got %S", v);    \
-      t->term.name = (tcflag_t)Scm_GetUInteger(v);                           \
-  }
+	static ScmObj SCM_CPP_CAT3(termios_, name, _get)(ScmSysTermios* t)         \
+	{ return Scm_MakeIntegerFromUI((u_long)t->term.name); }                    \
+	static void SCM_CPP_CAT3(termios_, name, _set)(ScmSysTermios* t, ScmObj v) \
+	{                                                                          \
+		if (!SCM_INTEGERP(v)) Scm_Error("integer required, but got %S", v);    \
+		t->term.name = (tcflag_t)Scm_GetUInteger(v);                           \
+	}
 
 TERMIOS_GET_N_SET(c_iflag)
 TERMIOS_GET_N_SET(c_oflag)
@@ -76,33 +76,33 @@ TERMIOS_GET_N_SET(c_lflag)
 
 static ScmObj termios_c_cc_get(ScmSysTermios* t)
 {
-    return Scm_MakeU8VectorFromArray(NCCS, (const unsigned char*)t->term.c_cc);
+	return Scm_MakeU8VectorFromArray(NCCS, (const unsigned char*)t->term.c_cc);
 }
 
 static void termios_c_cc_set(ScmSysTermios* t, ScmObj val)
 {
-    if (!SCM_U8VECTORP(val)) {
-        Scm_Error("cc type must be a u8vector, but got %S", val);
-    }
-    if (SCM_U8VECTOR_SIZE(val) != NCCS) {
-        Scm_Error("size of cc must be %u, but got %u",
-                  NCCS, SCM_U8VECTOR_SIZE(val));
-    }
-    memcpy(t->term.c_cc, SCM_U8VECTOR_ELEMENTS(val), NCCS);
+	if (!SCM_U8VECTORP(val)) {
+		Scm_Error("cc type must be a u8vector, but got %S", val);
+	}
+	if (SCM_U8VECTOR_SIZE(val) != NCCS) {
+		Scm_Error("size of cc must be %u, but got %u",
+		          NCCS, SCM_U8VECTOR_SIZE(val));
+	}
+	memcpy(t->term.c_cc, SCM_U8VECTOR_ELEMENTS(val), NCCS);
 }
 
 static ScmClassStaticSlotSpec termios_slots[] = {
-    SCM_CLASS_SLOT_SPEC("iflag", termios_c_iflag_get, termios_c_iflag_set),
-    SCM_CLASS_SLOT_SPEC("oflag", termios_c_oflag_get, termios_c_oflag_set),
-    SCM_CLASS_SLOT_SPEC("cflag", termios_c_cflag_get, termios_c_cflag_set),
-    SCM_CLASS_SLOT_SPEC("lflag", termios_c_lflag_get, termios_c_lflag_set),
-    SCM_CLASS_SLOT_SPEC("cc", termios_c_cc_get, termios_c_cc_set),
-    SCM_CLASS_SLOT_SPEC_END()
+	SCM_CLASS_SLOT_SPEC("iflag", termios_c_iflag_get, termios_c_iflag_set),
+	SCM_CLASS_SLOT_SPEC("oflag", termios_c_oflag_get, termios_c_oflag_set),
+	SCM_CLASS_SLOT_SPEC("cflag", termios_c_cflag_get, termios_c_cflag_set),
+	SCM_CLASS_SLOT_SPEC("lflag", termios_c_lflag_get, termios_c_lflag_set),
+	SCM_CLASS_SLOT_SPEC("cc", termios_c_cc_get, termios_c_cc_set),
+	SCM_CLASS_SLOT_SPEC_END()
 };
 
 ScmObj Scm_MakeSysTermios(void)
 {
-    return termios_allocate(NULL, SCM_NIL);
+	return termios_allocate(NULL, SCM_NIL);
 }
 
 /*
@@ -112,68 +112,68 @@ ScmObj Scm_MakeSysTermios(void)
 #ifdef HAVE_OPENPTY
 ScmObj Scm_Openpty(ScmObj slaveterm)
 {
-    int master, slave;
-    struct termios *term = NULL;
+	int master, slave;
+	struct termios *term = NULL;
 
-    if (SCM_SYS_TERMIOS_P(slaveterm)) {
-        term = &SCM_SYS_TERMIOS(slaveterm)->term;
-    }
-    if (openpty(&master, &slave, NULL, term, NULL) < 0) {
-        Scm_SysError("openpty failed");
-    }
-    return Scm_Values2(SCM_MAKE_INT(master), SCM_MAKE_INT(slave));
+	if (SCM_SYS_TERMIOS_P(slaveterm)) {
+		term = &SCM_SYS_TERMIOS(slaveterm)->term;
+	}
+	if (openpty(&master, &slave, NULL, term, NULL) < 0) {
+		Scm_SysError("openpty failed");
+	}
+	return Scm_Values2(SCM_MAKE_INT(master), SCM_MAKE_INT(slave));
 }
 #endif /*HAVE_OPENPTY*/
 
 #ifdef HAVE_FORKPTY
 ScmObj Scm_Forkpty(ScmObj slaveterm)
 {
-    int master;
-    pid_t pid;
-    struct termios *term = NULL;
-    if (SCM_SYS_TERMIOS_P(slaveterm)) {
-        term = &SCM_SYS_TERMIOS(slaveterm)->term;
-    }
-    if ((pid = forkpty(&master, NULL, term, NULL)) < 0) {
-        Scm_SysError("forkpty failed");
-    }
-    return Scm_Values2(Scm_MakeInteger(pid), SCM_MAKE_INT(master));
+	int master;
+	pid_t pid;
+	struct termios *term = NULL;
+	if (SCM_SYS_TERMIOS_P(slaveterm)) {
+		term = &SCM_SYS_TERMIOS(slaveterm)->term;
+	}
+	if ((pid = forkpty(&master, NULL, term, NULL)) < 0) {
+		Scm_SysError("forkpty failed");
+	}
+	return Scm_Values2(Scm_MakeInteger(pid), SCM_MAKE_INT(master));
 }
 
 ScmObj Scm_ForkptyAndExec(ScmString *file, ScmObj args, ScmObj iomap,
                           ScmObj slaveterm, ScmSysSigset *mask)
 {
-    int argc = Scm_Length(args);
-    struct termios *term = NULL;
+	int argc = Scm_Length(args);
+	struct termios *term = NULL;
 
-    if (argc < 1) {
-        Scm_Error("argument list must have at least one element: %S", args);
-    }
-    char **argv = Scm_ListToCStringArray(args, TRUE, NULL);
-    const char *program = Scm_GetStringConst(file);
+	if (argc < 1) {
+		Scm_Error("argument list must have at least one element: %S", args);
+	}
+	char **argv = Scm_ListToCStringArray(args, TRUE, NULL);
+	const char *program = Scm_GetStringConst(file);
 
-    if (SCM_SYS_TERMIOS_P(slaveterm)) {
-        term = &SCM_SYS_TERMIOS(slaveterm)->term;
-    }
+	if (SCM_SYS_TERMIOS_P(slaveterm)) {
+		term = &SCM_SYS_TERMIOS(slaveterm)->term;
+	}
 
-    int *fds = Scm_SysPrepareFdMap(iomap);
+	int *fds = Scm_SysPrepareFdMap(iomap);
 
-    int master;
-    pid_t pid;
-    if ((pid = forkpty(&master, NULL, term, NULL)) < 0) {
-        Scm_SysError("forkpty failed");
-    }
-    if (pid == 0) {
-        Scm_SysSwapFds(fds);
-        if (mask) {
-            Scm_ResetSignalHandlers(&mask->set);
-            Scm_SysSigmask(SIG_SETMASK, mask);
-        }
-        execvp(program, (char *const*)argv);
-        /* here, we failed */
-        Scm_Panic("exec failed: %s: %s", program, strerror(errno));
-    }
-    return Scm_Values2(Scm_MakeInteger(pid), SCM_MAKE_INT(master));
+	int master;
+	pid_t pid;
+	if ((pid = forkpty(&master, NULL, term, NULL)) < 0) {
+		Scm_SysError("forkpty failed");
+	}
+	if (pid == 0) {
+		Scm_SysSwapFds(fds);
+		if (mask) {
+			Scm_ResetSignalHandlers(&mask->set);
+			Scm_SysSigmask(SIG_SETMASK, mask);
+		}
+		execvp(program, (char *const*)argv);
+		/* here, we failed */
+		Scm_Panic("exec failed: %s: %s", program, strerror(errno));
+	}
+	return Scm_Values2(Scm_MakeInteger(pid), SCM_MAKE_INT(master));
 }
 #endif /*HAVE_FORKPTY*/
 
@@ -185,218 +185,218 @@ ScmObj Scm_ForkptyAndExec(ScmString *file, ScmObj args, ScmObj iomap,
 
 void Scm_Init_termios(void)
 {
-    SCM_INIT_EXTENSION(gauche__termios);
-    ScmModule *mod = SCM_FIND_MODULE("gauche.termios", SCM_FIND_MODULE_CREATE);
-    (void)mod; /* suppress unused var warning */
+	SCM_INIT_EXTENSION(gauche__termios);
+	ScmModule *mod = SCM_FIND_MODULE("gauche.termios", SCM_FIND_MODULE_CREATE);
+	(void)mod; /* suppress unused var warning */
 
 #if !defined(GAUCHE_WINDOWS)
-    Scm_InitStaticClass(&Scm_SysTermiosClass, "<sys-termios>", mod,
-                        termios_slots, 0);
+	Scm_InitStaticClass(&Scm_SysTermiosClass, "<sys-termios>", mod,
+	                    termios_slots, 0);
 
-    /* Constants for termios.  Non-POSIX symbols are guarded by #ifdef's */
+	/* Constants for termios.  Non-POSIX symbols are guarded by #ifdef's */
 #define DEFSYM(sym) \
-    SCM_DEFINE(mod, #sym, Scm_MakeIntegerFromUI(sym))
+	SCM_DEFINE(mod, #sym, Scm_MakeIntegerFromUI(sym))
 
-    /* c_iflag masks */
-    DEFSYM(IGNBRK);
-    DEFSYM(BRKINT);
-    DEFSYM(IGNPAR);
-    DEFSYM(PARMRK);
-    DEFSYM(INPCK);
-    DEFSYM(ISTRIP);
-    DEFSYM(INLCR);
-    DEFSYM(IGNCR);
-    DEFSYM(ICRNL);
-    DEFSYM(IXON);
-    DEFSYM(IXOFF);
+	/* c_iflag masks */
+	DEFSYM(IGNBRK);
+	DEFSYM(BRKINT);
+	DEFSYM(IGNPAR);
+	DEFSYM(PARMRK);
+	DEFSYM(INPCK);
+	DEFSYM(ISTRIP);
+	DEFSYM(INLCR);
+	DEFSYM(IGNCR);
+	DEFSYM(ICRNL);
+	DEFSYM(IXON);
+	DEFSYM(IXOFF);
 #ifdef IXANY
-    DEFSYM(IXANY);
+	DEFSYM(IXANY);
 #endif
 #ifdef IUCLC
-    DEFSYM(IUCLC);
+	DEFSYM(IUCLC);
 #endif
 #ifdef IMAXBEL
-    DEFSYM(IMAXBEL);
+	DEFSYM(IMAXBEL);
 #endif
 
-    /* c_oflag masks */
-    DEFSYM(OPOST);
+	/* c_oflag masks */
+	DEFSYM(OPOST);
 #ifdef OLCUC
-    DEFSYM(OLCUC);
+	DEFSYM(OLCUC);
 #endif
 #ifdef ONLCR
-    DEFSYM(ONLCR);
+	DEFSYM(ONLCR);
 #endif
 #ifdef OCRNL
-    DEFSYM(OCRNL);
+	DEFSYM(OCRNL);
 #endif
 #ifdef ONOCR
-    DEFSYM(ONOCR);
+	DEFSYM(ONOCR);
 #endif
 #ifdef ONLRET
-    DEFSYM(ONLRET);
+	DEFSYM(ONLRET);
 #endif
 #ifdef OFILL
-    DEFSYM(OFILL);
+	DEFSYM(OFILL);
 #endif
 #ifdef OFDEL
-    DEFSYM(OFDEL);
+	DEFSYM(OFDEL);
 #endif
 #ifdef NLDLY
-    DEFSYM(NLDLY);
+	DEFSYM(NLDLY);
 #endif
 #ifdef NL0
-    DEFSYM(NL0);
+	DEFSYM(NL0);
 #endif
 #ifdef NL1
-    DEFSYM(NL1);
+	DEFSYM(NL1);
 #endif
 #ifdef CRDLY
-    DEFSYM(CRDLY);
+	DEFSYM(CRDLY);
 #endif
 #ifdef CR0
-    DEFSYM(CR0);
+	DEFSYM(CR0);
 #endif
 #ifdef CR1
-    DEFSYM(CR1);
+	DEFSYM(CR1);
 #endif
 #ifdef CR2
-    DEFSYM(CR2);
+	DEFSYM(CR2);
 #endif
 #ifdef CR3
-    DEFSYM(CR3);
+	DEFSYM(CR3);
 #endif
 #ifdef BSDLY
-    DEFSYM(BSDLY);
+	DEFSYM(BSDLY);
 #endif
 #ifdef BS0
-    DEFSYM(BS0);
+	DEFSYM(BS0);
 #endif
 #ifdef BS1
-    DEFSYM(BS1);
+	DEFSYM(BS1);
 #endif
 #ifdef VTDLY
-    DEFSYM(VTDLY);
+	DEFSYM(VTDLY);
 #endif
 #ifdef VT0
-    DEFSYM(VT0);
+	DEFSYM(VT0);
 #endif
 #ifdef VT1
-    DEFSYM(VT1);
+	DEFSYM(VT1);
 #endif
 #ifdef FFDLY
-    DEFSYM(FFDLY);
+	DEFSYM(FFDLY);
 #endif
 #ifdef FF0
-    DEFSYM(FF0);
+	DEFSYM(FF0);
 #endif
 #ifdef FF1
-    DEFSYM(FF1);
+	DEFSYM(FF1);
 #endif
 
-    /* c_cflag masks */
-    DEFSYM(CLOCAL);
-    DEFSYM(CREAD);
-    DEFSYM(CSIZE);
-    DEFSYM(CS5);
-    DEFSYM(CS6);
-    DEFSYM(CS7);
-    DEFSYM(CS8);
-    DEFSYM(CSTOPB);
-    DEFSYM(HUPCL);
-    DEFSYM(PARENB);
-    DEFSYM(PARODD);
+	/* c_cflag masks */
+	DEFSYM(CLOCAL);
+	DEFSYM(CREAD);
+	DEFSYM(CSIZE);
+	DEFSYM(CS5);
+	DEFSYM(CS6);
+	DEFSYM(CS7);
+	DEFSYM(CS8);
+	DEFSYM(CSTOPB);
+	DEFSYM(HUPCL);
+	DEFSYM(PARENB);
+	DEFSYM(PARODD);
 #ifdef CIBAUD
-    DEFSYM(CIBAUD);
+	DEFSYM(CIBAUD);
 #endif
 #ifdef CRTSCTS
-    DEFSYM(CRTSCTS);
+	DEFSYM(CRTSCTS);
 #endif
 
-    /* c_lflag masks */
-    DEFSYM(ECHO);
-    DEFSYM(ECHOE);
-    DEFSYM(ECHOK);
-    DEFSYM(ECHONL);
-    DEFSYM(ICANON);
-    DEFSYM(ISIG);
-    DEFSYM(NOFLSH);
-    DEFSYM(TOSTOP);
-    DEFSYM(IEXTEN);
+	/* c_lflag masks */
+	DEFSYM(ECHO);
+	DEFSYM(ECHOE);
+	DEFSYM(ECHOK);
+	DEFSYM(ECHONL);
+	DEFSYM(ICANON);
+	DEFSYM(ISIG);
+	DEFSYM(NOFLSH);
+	DEFSYM(TOSTOP);
+	DEFSYM(IEXTEN);
 #ifdef XCASE
-    DEFSYM(XCASE);
+	DEFSYM(XCASE);
 #endif
 #ifdef ECHOCTL
-    DEFSYM(ECHOCTL);
+	DEFSYM(ECHOCTL);
 #endif
 #ifdef ECHOPRT
-    DEFSYM(ECHOPRT);
+	DEFSYM(ECHOPRT);
 #endif
 #ifdef ECHOKE
-    DEFSYM(ECHOKE);
+	DEFSYM(ECHOKE);
 #endif
 #ifdef FLUSH0
-    DEFSYM(FLUSH0);
+	DEFSYM(FLUSH0);
 #endif
 #ifdef PENDIN
-    DEFSYM(PENDIN);
+	DEFSYM(PENDIN);
 #endif
 
-    /* c_cc size */
-    DEFSYM(NCCS);
+	/* c_cc size */
+	DEFSYM(NCCS);
 
-    /* disable character */
-    DEFSYM(_POSIX_VDISABLE);
+	/* disable character */
+	DEFSYM(_POSIX_VDISABLE);
 
-    /* c_cc subscripts */
-    DEFSYM(VEOF);
-    DEFSYM(VEOL);
-    DEFSYM(VERASE);
-    DEFSYM(VINTR);
-    DEFSYM(VKILL);
-    DEFSYM(VMIN);
-    DEFSYM(VQUIT);
-    DEFSYM(VSTART);
-    DEFSYM(VSTOP);
-    DEFSYM(VSUSP);
-    DEFSYM(VTIME);
+	/* c_cc subscripts */
+	DEFSYM(VEOF);
+	DEFSYM(VEOL);
+	DEFSYM(VERASE);
+	DEFSYM(VINTR);
+	DEFSYM(VKILL);
+	DEFSYM(VMIN);
+	DEFSYM(VQUIT);
+	DEFSYM(VSTART);
+	DEFSYM(VSTOP);
+	DEFSYM(VSUSP);
+	DEFSYM(VTIME);
 #ifdef VDISCARD
-    DEFSYM(VDISCARD);
+	DEFSYM(VDISCARD);
 #endif
 #ifdef VDSUSP
-    DEFSYM(VDSUSP);
+	DEFSYM(VDSUSP);
 #endif
 #ifdef EOL2
-    DEFSYM(VEOL2);
+	DEFSYM(VEOL2);
 #endif
 #ifdef LNEXT
-    DEFSYM(VLNEXT);
+	DEFSYM(VLNEXT);
 #endif
 #ifdef VREPRINT
-    DEFSYM(VREPRINT);
+	DEFSYM(VREPRINT);
 #endif
 #ifdef VSTATUS
-    DEFSYM(VSTATUS);
+	DEFSYM(VSTATUS);
 #endif
 #ifdef WERASE
-    DEFSYM(VWERASE);
+	DEFSYM(VWERASE);
 #endif
 #ifdef VSWTCH
-    DEFSYM(VSWTCH);
+	DEFSYM(VSWTCH);
 #endif
 #ifdef VSWTC
-    DEFSYM(VSWTC);
+	DEFSYM(VSWTC);
 #endif
 
-    /* extra baudrates.   <= B38400 is defined in termiolib.stub */
+	/* extra baudrates.   <= B38400 is defined in termiolib.stub */
 #ifdef B57600
-    DEFSYM(B57600);
+	DEFSYM(B57600);
 #endif
 #ifdef B115200
-    DEFSYM(B115200);
+	DEFSYM(B115200);
 #endif
 #ifdef B230400
-    DEFSYM(B230400);
+	DEFSYM(B230400);
 #endif
 
 #endif /*!GAUCHE_WINDOWS*/

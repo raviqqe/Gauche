@@ -2,11 +2,11 @@
  * gauche.h - Gauche scheme system header
  *
  *   Copyright (c) 2000-2019  Shiro Kawai  <shiro@acm.org>
- * 
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions
  *   are met:
- * 
+ *
  *   1. Redistributions of source code must retain the above copyright
  *      notice, this list of conditions and the following disclaimer.
  *
@@ -98,7 +98,7 @@ typedef ssize_t ScmSize;
 #if !defined(GC_BUILD)
 #define GC_BUILD  /* ditto */
 #endif
-#endif /* LIBGAUCHE_BODY */ 
+#endif /* LIBGAUCHE_BODY */
 #include <gc.h>
 
 #ifndef SCM_DECL_BEGIN
@@ -259,7 +259,7 @@ typedef struct ScmClassRec ScmClass;
  *      -------- -------- -------- -----111
  *      Only appears at the first word of heap-allocated
  *      objects except pairs and flonums.   Masking lower
- *      3bits gives a pointer to ScmClass.  
+ *      3bits gives a pointer to ScmClass.
  */
 
 /* Type coercer */
@@ -315,7 +315,7 @@ typedef struct ScmClassRec ScmClass;
  */
 #define SCM_BOOLP(obj)       ((obj) == SCM_TRUE || (obj) == SCM_FALSE)
 #define SCM_BOOL_VALUE(obj)  (!SCM_FALSEP(obj))
-#define SCM_MAKE_BOOL(obj)   ((obj)? SCM_TRUE:SCM_FALSE)
+#define SCM_MAKE_BOOL(obj)   ((obj) ? SCM_TRUE : SCM_FALSE)
 
 #define SCM_EQ(x, y)         ((x) == (y))
 
@@ -325,9 +325,9 @@ SCM_EXTERN int Scm_EqualP(ScmObj x, ScmObj y);
 
 /* comparison mode */
 enum {
-    SCM_CMP_EQ,
-    SCM_CMP_EQV,
-    SCM_CMP_EQUAL
+	SCM_CMP_EQ,
+	SCM_CMP_EQV,
+	SCM_CMP_EQUAL
 };
 
 SCM_EXTERN int Scm_EqualM(ScmObj x, ScmObj y, int mode);
@@ -349,7 +349,7 @@ typedef long ScmSmallInt;    /* C integer type corresponds to Scheme fixnum
  */
 
 typedef struct ScmFlonumRec {
-    double val;
+	double val;
 } ScmFlonum SCM_ALIGN8;
 
 #define SCM_FLONUM(obj)            ((ScmFlonum*)(SCM_WORD(obj)&~0x07))
@@ -413,9 +413,9 @@ SCM_EXTERN ScmChar Scm_CharFoldcase(ScmChar ch);
 
 /* Character lexer category.  See 7.1.1 of R7RS */
 typedef enum {
-    SCM_CHAR_INITIAL,
-    SCM_CHAR_SUBSEQUENT,
-    SCM_CHAR_SIGN_SUBSEQUENT,
+	SCM_CHAR_INITIAL,
+	SCM_CHAR_SUBSEQUENT,
+	SCM_CHAR_SIGN_SUBSEQUENT,
 } ScmCharLexerCategory;
 
 SCM_EXTERN int Scm_CharLexerCategoryP(ScmChar c, ScmCharLexerCategory cat);
@@ -430,7 +430,7 @@ SCM_EXTERN int Scm_CharLexerCategoryP(ScmChar c, ScmCharLexerCategory cat);
 
 #define SCM_HOBJP(obj)  (SCM_HPTRP(obj)&&(SCM_HTAG(obj)==7))
 
-#define SCM_CPP_CAT(a, b)   a##b
+#define SCM_CPP_CAT(a, b)   a ## b
 #define SCM_CPP_CAT3(a, b, c)  a ## b ## c
 
 /* We use a pointer to the class structure (with low-bit tag) as
@@ -442,9 +442,9 @@ SCM_EXTERN int Scm_CharLexerCategoryP(ScmChar c, ScmCharLexerCategory cat);
 
 /* A common header for heap-allocated objects */
 typedef struct ScmHeaderRec {
-    ScmByte *tag;                /* private.  should be accessed
-                                    only via SCM_CLASS_OF and SCM_SET_CLASS
-                                    macros. */
+	ScmByte *tag;            /* private.  should be accessed
+	                            only via SCM_CLASS_OF and SCM_SET_CLASS
+	                            macros. */
 } ScmHeader;
 
 #define SCM_HEADER       ScmHeader hdr /* for declaration */
@@ -468,14 +468,14 @@ typedef struct ScmHeaderRec {
    We can check SCM_HPTRP instead of SCM_HOBJP here, since a pair never
    satisfies the second test. */
 # define SCM_XTYPEP(obj, klass) \
-    (SCM_HPTRP(obj)&&(SCM_OBJ(obj)->tag == SCM_CLASS2TAG(klass)))
+	(SCM_HPTRP(obj)&&(SCM_OBJ(obj)->tag == SCM_CLASS2TAG(klass)))
 
 #else  /*GAUCHE_BROKEN_LINKER_WORKAROUND*/
 
 /* You don't want to understand these. */
 # define SCM_CLASS_DECL(klass) \
-    SCM_EXTERN ScmClass klass; \
-    extern ScmClass *SCM_CPP_CAT(_imp__, klass) 
+	SCM_EXTERN ScmClass klass; \
+	extern ScmClass *SCM_CPP_CAT(_imp__, klass)
 # define SCM_CLASS_STATIC_PTR(klass) ((ScmClass*)(&SCM_CPP_CAT(_imp__,klass)))
 # define SCM_CLASS_STATIC_TAG(klass) SCM_CLASS2TAG(SCM_CLASS_STATIC_PTR(klass))
 
@@ -483,7 +483,7 @@ typedef struct ScmHeaderRec {
 # define SCM_SET_CLASS(obj, k)  (SCM_OBJ(obj)->tag = (ScmByte*)((k)->classPtr) + 7)
 
 # define SCM_XTYPEP(obj, klass) \
-    (SCM_HOBJP(obj)&&(SCM_CLASS_OF(obj) == klass))
+	(SCM_HOBJP(obj)&&(SCM_CLASS_OF(obj) == klass))
 #endif /*GAUCHE_BROKEN_LINKER_WORKAROUND*/
 
 
@@ -493,8 +493,8 @@ typedef struct ScmHeaderRec {
 
 /* A common header for objects whose class is defined in Scheme */
 typedef struct ScmInstanceRec {
-    ScmByte *tag;               /* private */
-    ScmObj *slots;              /* private */
+	ScmByte *tag;           /* private */
+	ScmObj *slots;          /* private */
 } ScmInstance;
 
 #define SCM_INSTANCE_HEADER  ScmInstance hdr  /* for declaration */
@@ -521,45 +521,45 @@ SCM_EXTERN void Scm_RegisterFinalizer(ScmObj z, ScmFinalizerProc finalizer,
 SCM_EXTERN void Scm_UnregisterFinalizer(ScmObj z);
 
 /* Safe coercer */
-#define SCM_OBJ_SAFE(obj)     ((obj)?SCM_OBJ(obj):SCM_UNDEFINED)
+#define SCM_OBJ_SAFE(obj)     ((obj) ? SCM_OBJ(obj) : SCM_UNDEFINED)
 
-typedef struct ScmVMRec             ScmVM;
-typedef struct ScmPairRec           ScmPair;
-typedef struct ScmExtendedPairRec   ScmExtendedPair;
-typedef struct ScmLazyPairRec       ScmLazyPair;
-typedef struct ScmCharSetRec        ScmCharSet;
-typedef struct ScmStringRec         ScmString;
-typedef struct ScmDStringRec        ScmDString;
-typedef struct ScmVectorRec         ScmVector;
-typedef struct ScmBignumRec         ScmBignum;
-typedef struct ScmRatnumRec         ScmRatnum;
-typedef struct ScmCompnumRec        ScmCompnum;
-typedef struct ScmPortRec           ScmPort;
-typedef struct ScmHashTableRec      ScmHashTable;
-typedef struct ScmTreeMapRec        ScmTreeMap;
-typedef struct ScmModuleRec         ScmModule;
-typedef struct ScmSymbolRec         ScmSymbol;
-typedef struct ScmGlocRec           ScmGloc;
-typedef struct ScmProcedureRec      ScmProcedure;
-typedef struct ScmClosureRec        ScmClosure;
-typedef struct ScmSubrRec           ScmSubr;
-typedef struct ScmGenericRec        ScmGeneric;
-typedef struct ScmMethodRec         ScmMethod;
-typedef struct ScmNextMethodRec     ScmNextMethod;
-typedef struct ScmSyntaxRec         ScmSyntax;
-typedef struct ScmMacroRec          ScmMacro;
-typedef struct ScmPromiseRec        ScmPromise;
-typedef struct ScmRegexpRec         ScmRegexp;
-typedef struct ScmRegMatchRec       ScmRegMatch;
-typedef struct ScmWriteControlsRec  ScmWriteControls;  /* see writerP.h */
-typedef struct ScmWriteContextRec   ScmWriteContext;   /* see writerP.h */
-typedef struct ScmWriteStateRec     ScmWriteState;     /* see wrtierP.h */
-typedef struct ScmAutoloadRec       ScmAutoload;
-typedef struct ScmComparatorRec     ScmComparator;
-typedef struct ScmDLObjRec          ScmDLObj;          /* see load.c */
-typedef struct ScmReadContextRec    ScmReadContext;    /* see read.c */
+typedef struct ScmVMRec ScmVM;
+typedef struct ScmPairRec ScmPair;
+typedef struct ScmExtendedPairRec ScmExtendedPair;
+typedef struct ScmLazyPairRec ScmLazyPair;
+typedef struct ScmCharSetRec ScmCharSet;
+typedef struct ScmStringRec ScmString;
+typedef struct ScmDStringRec ScmDString;
+typedef struct ScmVectorRec ScmVector;
+typedef struct ScmBignumRec ScmBignum;
+typedef struct ScmRatnumRec ScmRatnum;
+typedef struct ScmCompnumRec ScmCompnum;
+typedef struct ScmPortRec ScmPort;
+typedef struct ScmHashTableRec ScmHashTable;
+typedef struct ScmTreeMapRec ScmTreeMap;
+typedef struct ScmModuleRec ScmModule;
+typedef struct ScmSymbolRec ScmSymbol;
+typedef struct ScmGlocRec ScmGloc;
+typedef struct ScmProcedureRec ScmProcedure;
+typedef struct ScmClosureRec ScmClosure;
+typedef struct ScmSubrRec ScmSubr;
+typedef struct ScmGenericRec ScmGeneric;
+typedef struct ScmMethodRec ScmMethod;
+typedef struct ScmNextMethodRec ScmNextMethod;
+typedef struct ScmSyntaxRec ScmSyntax;
+typedef struct ScmMacroRec ScmMacro;
+typedef struct ScmPromiseRec ScmPromise;
+typedef struct ScmRegexpRec ScmRegexp;
+typedef struct ScmRegMatchRec ScmRegMatch;
+typedef struct ScmWriteControlsRec ScmWriteControls;   /* see writerP.h */
+typedef struct ScmWriteContextRec ScmWriteContext;     /* see writerP.h */
+typedef struct ScmWriteStateRec ScmWriteState;         /* see wrtierP.h */
+typedef struct ScmAutoloadRec ScmAutoload;
+typedef struct ScmComparatorRec ScmComparator;
+typedef struct ScmDLObjRec ScmDLObj;                   /* see load.c */
+typedef struct ScmReadContextRec ScmReadContext;       /* see read.c */
 
-typedef ScmObj ScmSubrProc(ScmObj *, int, void*);
+typedef ScmObj ScmSubrProc (ScmObj *, int, void*);
 
 #include <gauche/bits.h>
 
@@ -582,15 +582,15 @@ typedef ScmObj ScmSubrProc(ScmObj *, int, void*);
 SCM_EXTERN ScmVM *Scm_VM(void);     /* Returns the current VM */
 
 /* The new APIs to run Scheme code from C.
-   Returns # of results (>=0) if operation is successful, 
+   Returns # of results (>=0) if operation is successful,
    -1 if an error is occurred and captured.
    All result values are available in ScmEvalPacket.
    Exceptions are captured and returned in the ScmEvalPacket. */
 typedef struct ScmEvalPacketRec {
-    ScmObj results[SCM_VM_MAX_VALUES];
-    int    numResults;
-    ScmObj exception;
-    ScmModule *module;          /* 'Current module' after evaluation */
+	ScmObj results[SCM_VM_MAX_VALUES];
+	int numResults;
+	ScmObj exception;
+	ScmModule *module;      /* 'Current module' after evaluation */
 } ScmEvalPacket;
 
 SCM_EXTERN int Scm_Eval(ScmObj form, ScmObj env, ScmEvalPacket *packet);
@@ -663,8 +663,8 @@ SCM_EXTERN ScmObj Scm_VMGetStack(ScmVM *vm);
  */
 
 typedef struct ScmBoxRec {
-    SCM_HEADER;
-    ScmObj value;
+	SCM_HEADER;
+	ScmObj value;
 } ScmBox;
 
 SCM_CLASS_DECL(Scm_BoxClass);
@@ -683,10 +683,10 @@ SCM_EXTERN ScmBox *Scm_MakeBox(ScmObj value);
 typedef void (*ScmClassPrintProc)(ScmObj obj,
                                   ScmPort *sink,
                                   ScmWriteContext *mode);
-typedef int  (*ScmClassCompareProc)(ScmObj x, ScmObj y, int equalp);
-typedef int  (*ScmClassSerializeProc)(ScmObj obj,
-                                      ScmPort *sink,
-                                      ScmObj context);
+typedef int (*ScmClassCompareProc)(ScmObj x, ScmObj y, int equalp);
+typedef int (*ScmClassSerializeProc)(ScmObj obj,
+                                     ScmPort *sink,
+                                     ScmObj context);
 typedef ScmObj (*ScmClassAllocateProc)(ScmClass *klass, ScmObj initargs);
 
 /* See class.c for the description of function pointer members.
@@ -694,46 +694,46 @@ typedef ScmObj (*ScmClassAllocateProc)(ScmClass *klass, ScmObj initargs);
    those fields casually.  Also, the order of these fields must be
    reflected to the class definition macros below. */
 struct ScmClassRec {
-    /* A trick to align statically allocated class structure on 8-byte
-       boundary.  This doesn't guarantee, though, so we use __alignment__
-       attribute as well, whenever possible (see SCM_ALIGN8 macro). */
-    union {
-        SCM_INSTANCE_HEADER;
-        double align_dummy;
-    } classHdr;
+	/* A trick to align statically allocated class structure on 8-byte
+	   boundary.  This doesn't guarantee, though, so we use __alignment__
+	   attribute as well, whenever possible (see SCM_ALIGN8 macro). */
+	union {
+		SCM_INSTANCE_HEADER;
+		double align_dummy;
+	} classHdr;
 #if defined(GAUCHE_BROKEN_LINKER_WORKAROUND)
-    ScmClass **classPtr;
+	ScmClass **classPtr;
 #endif
-    ScmClassPrintProc     print;
-    ScmClassCompareProc   compare;
-    ScmClassSerializeProc serialize;
-    ScmClassAllocateProc  allocate;
-    ScmClass **cpa;             /* class precedence array, NULL terminated */
-    int numInstanceSlots;       /* # of instance slots */
-    int coreSize;               /* size of core structure; 0 == unknown */
-    unsigned int flags;
-    ScmObj name;                /* scheme name */
-    ScmObj directSupers;        /* list of classes */
-    ScmObj cpl;                 /* list of classes */
-    ScmObj accessors;           /* alist of slot-name & slot-accessor */
-    ScmObj directSlots;         /* alist of slot-name & slot-definition */
-    ScmObj slots;               /* alist of slot-name & slot-definition */
-    ScmObj directSubclasses;    /* list of direct subclasses */
-    ScmObj directMethods;       /* list of methods that has this class in
-                                   its specializer */
-    ScmObj initargs;            /* saved key-value list for redefinition */
-    ScmObj modules;             /* modules where this class is defined */
-    ScmObj redefined;           /* if this class is obsoleted by class
-                                   redefinition, points to the new class.
-                                   if this class is being redefined, points
-                                   to a thread that is handling the
-                                   redefinition.  (it won't be seen by
-                                   Scheme; see class.c)
-                                   otherwise #f */
-    ScmInternalMutex mutex;     /* to protect from MT hazard */
-    ScmInternalCond cv;         /* wait on this while a class being updated */
-    void   *data;               /* extra data to do nasty trick.  See the note
-                                   in class.c */
+	ScmClassPrintProc print;
+	ScmClassCompareProc compare;
+	ScmClassSerializeProc serialize;
+	ScmClassAllocateProc allocate;
+	ScmClass **cpa;         /* class precedence array, NULL terminated */
+	int numInstanceSlots;   /* # of instance slots */
+	int coreSize;           /* size of core structure; 0 == unknown */
+	unsigned int flags;
+	ScmObj name;            /* scheme name */
+	ScmObj directSupers;    /* list of classes */
+	ScmObj cpl;             /* list of classes */
+	ScmObj accessors;       /* alist of slot-name & slot-accessor */
+	ScmObj directSlots;     /* alist of slot-name & slot-definition */
+	ScmObj slots;           /* alist of slot-name & slot-definition */
+	ScmObj directSubclasses; /* list of direct subclasses */
+	ScmObj directMethods;   /* list of methods that has this class in
+	                           its specializer */
+	ScmObj initargs;        /* saved key-value list for redefinition */
+	ScmObj modules;         /* modules where this class is defined */
+	ScmObj redefined;       /* if this class is obsoleted by class
+	                           redefinition, points to the new class.
+	                           if this class is being redefined, points
+	                           to a thread that is handling the
+	                           redefinition.  (it won't be seen by
+	                           Scheme; see class.c)
+	                           otherwise #f */
+	ScmInternalMutex mutex; /* to protect from MT hazard */
+	ScmInternalCond cv;     /* wait on this while a class being updated */
+	void   *data;           /* extra data to do nasty trick.  See the note
+	                           in class.c */
 } SCM_ALIGN8;
 
 typedef struct ScmClassStaticSlotSpecRec ScmClassStaticSlotSpec;
@@ -755,7 +755,7 @@ typedef struct ScmClassStaticSlotSpecRec ScmClassStaticSlotSpec;
        code with the standard inheritance mechanism; though it can have
        subclasses, provided a special allocator and initializer.
 
-   SCM_CLASS_ABSTRACT 
+   SCM_CLASS_ABSTRACT
        This class is defined in C, but doesn't allowed to create an
        instance by its own.  It is intended to be used as a mixin from
        both C and Scheme-defined class.   An instance of this class
@@ -782,7 +782,7 @@ typedef struct ScmClassStaticSlotSpecRec ScmClassStaticSlotSpec;
    instance (i.e. it has to be castable to ScmInstance*).
 
    Here's the basic inheritance rules:
-                   
+
    - First, ABSTRACT class can be inserted at any place in the
      inheritance chain.  It doesn't affect C-level operation.  It is
      only to add the type information in Scheme-level.
@@ -793,35 +793,35 @@ typedef struct ScmClassStaticSlotSpecRec ScmClassStaticSlotSpec;
 
    - BUILTIN class can be inherited from BUILTIN classes, and
      its inheritance chain must form a single inheritance
-     
+
    - SCHEME class can be inherited from SCHEME or BASE classes.
      It can inherite from multiple SCHEME and/or BASE classes.
-*/
+ */
 
 enum {
-    SCM_CLASS_BUILTIN  = 0,
-    SCM_CLASS_ABSTRACT = 1,
-    SCM_CLASS_BASE     = 2,
-    SCM_CLASS_SCHEME   = 3,
+	SCM_CLASS_BUILTIN  = 0,
+	SCM_CLASS_ABSTRACT = 1,
+	SCM_CLASS_BASE     = 2,
+	SCM_CLASS_SCHEME   = 3,
 
-    /* A special flag that only be used for "natively applicable"
-       objects, which basically inherits ScmProcedure. */
-    SCM_CLASS_APPLICABLE = 0x04,
+	/* A special flag that only be used for "natively applicable"
+	   objects, which basically inherits ScmProcedure. */
+	SCM_CLASS_APPLICABLE = 0x04,
 
-    /* If this flag is set, important slots such as class-precedence-list
-       or class-slots becomes settable.
-       We reset this flag at the end of class initialization, so that
-       we can avoid the behavior of a class from being accidentally
-       changed.  The flag may be set during updating a class metaobject
-       triggered by metaclass change (see lib/gauche/redefutil.scm).
-     */
-    SCM_CLASS_MALLEABLE = 0x08,
+	/* If this flag is set, important slots such as class-precedence-list
+	   or class-slots becomes settable.
+	   We reset this flag at the end of class initialization, so that
+	   we can avoid the behavior of a class from being accidentally
+	   changed.  The flag may be set during updating a class metaobject
+	   triggered by metaclass change (see lib/gauche/redefutil.scm).
+	 */
+	SCM_CLASS_MALLEABLE = 0x08,
 
-    /* This flag indicates the class is for the aggregate data type.
-       Currently the writer uses this info to determine when to stop
-       recursing (see print-level).  We may use this later for generic
-       data structure walker. */
-    SCM_CLASS_AGGREGATE = 0x10
+	/* This flag indicates the class is for the aggregate data type.
+	   Currently the writer uses this info to determine when to stop
+	   recursing (see print-level).  We may use this later for generic
+	   data structure walker. */
+	SCM_CLASS_AGGREGATE = 0x10
 };
 
 #define SCM_CLASS_FLAGS(obj)        (SCM_CLASS(obj)->flags)
@@ -915,66 +915,66 @@ extern ScmClass *Scm_ObjectCPL[];
 #if defined(GAUCHE_BROKEN_LINKER_WORKAROUND)
 #define SCM__CLASS_PTR_SLOT(cname)  (&SCM_CPP_CAT(_imp__, cname)),
 #define SCM__CLASS_PTR_BODY(cname) \
-    ; ScmClass *SCM_CPP_CAT(_imp__, cname) = &cname
+	; ScmClass *SCM_CPP_CAT(_imp__, cname) = &cname
 #else  /*!GAUCHE_BROKEN_LINKER_WORKAROUND*/
 #define SCM__CLASS_PTR_SLOT(cname)  /* none */
 #define SCM__CLASS_PTR_BODY(cname)  /* none */
 #endif /*!GAUCHE_BROKEN_LINKER_WORKAROUND*/
 
 #define SCM__DEFINE_CLASS_COMMON(cname, coreSize, flag, printer, compare, serialize, allocate, cpa) \
-    ScmClass cname = {                           \
-        {{ SCM_CLASS_STATIC_TAG(Scm_ClassClass), NULL }},       \
-        SCM__CLASS_PTR_SLOT(cname)               \
-        printer,                                 \
-        compare,                                 \
-        serialize,                               \
-        allocate,                                \
-        cpa,                                     \
-        0,        /*numInstanceSlots*/           \
-        coreSize, /*coreSize*/                   \
-        flag,     /*flags*/                      \
-        SCM_FALSE,/*name*/                       \
-        SCM_NIL,  /*directSupers*/               \
-        SCM_NIL,  /*cpl*/                        \
-        SCM_NIL,  /*accessors*/                  \
-        SCM_NIL,  /*directSlots*/                \
-        SCM_NIL,  /*slots*/                      \
-        SCM_NIL,  /*directSubclasses*/           \
-        SCM_NIL,  /*directMethods*/              \
-        SCM_NIL,  /*initargs*/                   \
-        SCM_NIL,  /*modules*/                    \
-        SCM_FALSE, /*redefined*/                 \
-        SCM_INTERNAL_MUTEX_INITIALIZER,          \
-        SCM_INTERNAL_COND_INITIALIZER,           \
-        NULL       /* data */                    \
-    } SCM__CLASS_PTR_BODY(cname)
-    
+	ScmClass cname = {                           \
+		{{ SCM_CLASS_STATIC_TAG(Scm_ClassClass), NULL }},       \
+		SCM__CLASS_PTR_SLOT(cname)               \
+		printer,                                 \
+		compare,                                 \
+		serialize,                               \
+		allocate,                                \
+		cpa,                                     \
+		0, /*numInstanceSlots*/           \
+		coreSize, /*coreSize*/                   \
+		flag, /*flags*/                      \
+		SCM_FALSE,/*name*/                       \
+		SCM_NIL, /*directSupers*/               \
+		SCM_NIL, /*cpl*/                        \
+		SCM_NIL, /*accessors*/                  \
+		SCM_NIL, /*directSlots*/                \
+		SCM_NIL, /*slots*/                      \
+		SCM_NIL, /*directSubclasses*/           \
+		SCM_NIL, /*directMethods*/              \
+		SCM_NIL, /*initargs*/                   \
+		SCM_NIL, /*modules*/                    \
+		SCM_FALSE, /*redefined*/                 \
+		SCM_INTERNAL_MUTEX_INITIALIZER,          \
+		SCM_INTERNAL_COND_INITIALIZER,           \
+		NULL /* data */                    \
+	} SCM__CLASS_PTR_BODY(cname)
+
 /* Define built-in class statically -- full-featured version */
 #define SCM_DEFINE_BUILTIN_CLASS(cname, printer, compare, serialize, allocate, cpa) \
-    SCM__DEFINE_CLASS_COMMON(cname, 0,                    \
-                             SCM_CLASS_BUILTIN,           \
-                             printer, compare, serialize, allocate, cpa)
+	SCM__DEFINE_CLASS_COMMON(cname, 0,                    \
+	                         SCM_CLASS_BUILTIN,           \
+	                         printer, compare, serialize, allocate, cpa)
 
 #define SCM_DEFINE_BUILTIN_CLASS_FLAGS(cname, printer, compare, serialize, allocate, cpa, flags) \
-    SCM__DEFINE_CLASS_COMMON(cname, 0,                                  \
-                             SCM_CLASS_BUILTIN|(flags),                 \
-                             printer, compare, serialize, allocate, cpa)
+	SCM__DEFINE_CLASS_COMMON(cname, 0,                                  \
+	                         SCM_CLASS_BUILTIN|(flags),                 \
+	                         printer, compare, serialize, allocate, cpa)
 
 /* Define built-in class statically -- simpler version */
 #define SCM_DEFINE_BUILTIN_CLASS_SIMPLE(cname, printer)         \
-    SCM_DEFINE_BUILTIN_CLASS(cname, printer, NULL, NULL, NULL, NULL)
+	SCM_DEFINE_BUILTIN_CLASS(cname, printer, NULL, NULL, NULL, NULL)
 
 /* define an abstract class */
 #define SCM_DEFINE_ABSTRACT_CLASS(cname, cpa)             \
-    SCM__DEFINE_CLASS_COMMON(cname, 0,                    \
-                             SCM_CLASS_ABSTRACT,          \
-                             NULL, NULL, NULL, NULL, cpa)
+	SCM__DEFINE_CLASS_COMMON(cname, 0,                    \
+	                         SCM_CLASS_ABSTRACT,          \
+	                         NULL, NULL, NULL, NULL, cpa)
 
 /* define a class that can be subclassed by Scheme */
 #define SCM_DEFINE_BASE_CLASS(cname, ctype, printer, compare, serialize, allocate, cpa) \
-    SCM__DEFINE_CLASS_COMMON(cname, sizeof(ctype),        \
-                             SCM_CLASS_BASE,              \
-                             printer, compare, serialize, allocate, cpa)
+	SCM__DEFINE_CLASS_COMMON(cname, sizeof(ctype),        \
+	                         SCM_CLASS_BASE,              \
+	                         printer, compare, serialize, allocate, cpa)
 
 /*
  * A simple class and instance API to wrap C pointer.
@@ -982,20 +982,20 @@ extern ScmClass *Scm_ObjectCPL[];
  * but don't want to go through full-fledged class mechanism.
  */
 typedef struct ScmForeignPointerRec {
-    SCM_HEADER;
-    void *ptr;                  /* foreign object.  this pointer shouldn't
-                                   be modified once <foreign-pointer> is
-                                   constructed by Scm_MakeForeignPointer. */
-    ScmObj attributes;          /* alist.  useful to store e.g. callbacks.
-                                   use accessor procedures. */
-    ScmWord flags;              /* used internally.  We use ScmWord to keep
-                                   ScmForeignPointer fit in 4 words. */
+	SCM_HEADER;
+	void *ptr;              /* foreign object.  this pointer shouldn't
+	                           be modified once <foreign-pointer> is
+	                           constructed by Scm_MakeForeignPointer. */
+	ScmObj attributes;      /* alist.  useful to store e.g. callbacks.
+	                           use accessor procedures. */
+	ScmWord flags;          /* used internally.  We use ScmWord to keep
+	                           ScmForeignPointer fit in 4 words. */
 } ScmForeignPointer;
 
 #define SCM_FOREIGN_POINTER_P(obj)   SCM_ISA(obj, SCM_CLASS_FOREIGN_POINTER)
 #define SCM_FOREIGN_POINTER(obj)     ((ScmForeignPointer*)(obj))
 #define SCM_FOREIGN_POINTER_REF(type, obj) \
-    ((type)(Scm_ForeignPointerRef(SCM_FOREIGN_POINTER(obj))))
+	((type)(Scm_ForeignPointerRef(SCM_FOREIGN_POINTER(obj))))
 
 typedef void (*ScmForeignCleanupProc)(ScmObj);
 
@@ -1013,19 +1013,19 @@ SCM_EXTERN void   Scm_ForeignPointerInvalidate(ScmForeignPointer *fp);
 
 /* foreign pointer class flags */
 enum {
-    SCM_FOREIGN_POINTER_KEEP_IDENTITY = (1L<<0),
-         /* If set, a foreign pointer class keeps a weak hash table that maps
-            PTR to the wrapping ScmObj, so Scm_MakeForeignPointer returns
-            eq? object if the same PTR is given.  This incurs some overhead,
-            but cleanup procedure can safely free the foreign object without
-            worring if there's other ScmObj that's pointing to PTR.
-            Do not use this flag if PTR is also allocated by GC_malloc.  The
-            used hash table is only weak for its value, so PTR wouldn't be
-            GCed. */
-    SCM_FOREIGN_POINTER_MAP_NULL = (1L<<1)
-         /* If set, Scm_MakeForeignPointer returns SCM_FALSE whenever the
-            given PTR is NULL.   It is the only case that
-            Scm_MakeForeignPointer returns non-ForeignPointer object. */
+	SCM_FOREIGN_POINTER_KEEP_IDENTITY = (1L<<0),
+	/* If set, a foreign pointer class keeps a weak hash table that maps
+	   PTR to the wrapping ScmObj, so Scm_MakeForeignPointer returns
+	   eq? object if the same PTR is given.  This incurs some overhead,
+	   but cleanup procedure can safely free the foreign object without
+	   worring if there's other ScmObj that's pointing to PTR.
+	   Do not use this flag if PTR is also allocated by GC_malloc.  The
+	   used hash table is only weak for its value, so PTR wouldn't be
+	   GCed. */
+	SCM_FOREIGN_POINTER_MAP_NULL = (1L<<1)
+	                               /* If set, Scm_MakeForeignPointer returns SCM_FALSE whenever the
+	                                  given PTR is NULL.   It is the only case that
+	                                  Scm_MakeForeignPointer returns non-ForeignPointer object. */
 };
 
 /* foreign pointer attributes.  you can attach info to each foreign pointer.
@@ -1062,8 +1062,8 @@ SCM_CLASS_DECL(Scm_ConnectionClass);
  * have "11" in the lower bits.
  */
 struct ScmPairRec {
-    ScmObj car;                 /* should be accessed via macros */
-    ScmObj cdr;                 /* ditto */
+	ScmObj car;             /* should be accessed via macros */
+	ScmObj cdr;             /* ditto */
 };
 
 /* To keep extra information such as source-code info, some pairs
@@ -1072,14 +1072,14 @@ struct ScmPairRec {
  * operation, so the use of extended pair should be kept minimal.
  */
 struct ScmExtendedPairRec {
-    ScmObj car;                 /* should be accessed via macros */
-    ScmObj cdr;                 /* ditto */
-    ScmObj attributes;          /* should be accessed via API func. */
+	ScmObj car;             /* should be accessed via macros */
+	ScmObj cdr;             /* ditto */
+	ScmObj attributes;      /* should be accessed via API func. */
 };
 
 #if GAUCHE_LAZY_PAIR
 #define SCM_PAIRP(obj)  \
-    (SCM_HPTRP(obj)&&(SCM_HTAG(obj)!=7||Scm_PairP(SCM_OBJ(obj))))
+	(SCM_HPTRP(obj)&&(SCM_HTAG(obj)!=7||Scm_PairP(SCM_OBJ(obj))))
 #else  /*!GAUCHE_LAZY_PAIR*/
 #define SCM_PAIRP(obj)          (SCM_HPTRP(obj)&&(SCM_HTAG(obj)!=7))
 #endif /*!GAUCHE_LAZY_PAIR*/
@@ -1096,7 +1096,7 @@ struct ScmExtendedPairRec {
 #define SCM_SET_CDR(obj, value) (SCM_CDR(obj) = (value))
 
 #define SCM_EXTENDED_PAIR_P(obj) \
-    (SCM_PAIRP(obj)&&GC_base(obj)&&GC_size(obj)>=sizeof(ScmExtendedPair))
+	(SCM_PAIRP(obj)&&GC_base(obj)&&GC_size(obj)>=sizeof(ScmExtendedPair))
 #define SCM_EXTENDED_PAIR(obj)  ((ScmExtendedPair*)(obj))
 
 
@@ -1112,31 +1112,31 @@ SCM_CLASS_DECL(Scm_NullClass);
 /* Useful macros to manipulate lists. */
 
 #define SCM_FOR_EACH(p, list) \
-    for((p) = (list); SCM_PAIRP(p); (p) = SCM_CDR(p))
+	for((p) = (list); SCM_PAIRP(p); (p) = SCM_CDR(p))
 
 #define SCM_APPEND1(start, last, obj)                           \
-    do {                                                        \
-        if (SCM_NULLP(start)) {                                 \
-            (start) = (last) = Scm_Cons((obj), SCM_NIL);        \
-        } else {                                                \
-            SCM_SET_CDR((last), Scm_Cons((obj), SCM_NIL));      \
-            (last) = SCM_CDR(last);                             \
-        }                                                       \
-    } while (0)
+	do {                                                        \
+		if (SCM_NULLP(start)) {                                 \
+			(start) = (last) = Scm_Cons((obj), SCM_NIL);        \
+		} else {                                                \
+			SCM_SET_CDR((last), Scm_Cons((obj), SCM_NIL));      \
+			(last) = SCM_CDR(last);                             \
+		}                                                       \
+	} while (0)
 
 #define SCM_APPEND(start, last, obj)                    \
-    do {                                                \
-        ScmObj list_SCM_GLS = (obj);                    \
-        if (SCM_NULLP(start)) {                         \
-            (start) = (list_SCM_GLS);                   \
-            if (!SCM_NULLP(list_SCM_GLS)) {             \
-                (last) = Scm_LastPair(list_SCM_GLS);    \
-            }                                           \
-        } else {                                        \
-            SCM_SET_CDR((last), (list_SCM_GLS));        \
-            (last) = Scm_LastPair(last);                \
-        }                                               \
-    } while (0)
+	do {                                                \
+		ScmObj list_SCM_GLS = (obj);                    \
+		if (SCM_NULLP(start)) {                         \
+			(start) = (list_SCM_GLS);                   \
+			if (!SCM_NULLP(list_SCM_GLS)) {             \
+				(last) = Scm_LastPair(list_SCM_GLS);    \
+			}                                           \
+		} else {                                        \
+			SCM_SET_CDR((last), (list_SCM_GLS));        \
+			(last) = Scm_LastPair(last);                \
+		}                                               \
+	} while (0)
 
 #define SCM_LIST1(a)             Scm_Cons(a, SCM_NIL)
 #define SCM_LIST2(a,b)           Scm_Cons(a, SCM_LIST1(b))
@@ -1146,8 +1146,8 @@ SCM_CLASS_DECL(Scm_NullClass);
 
 /* special return value of Scm_Length */
 enum {
-    SCM_LIST_DOTTED = -1,       /* dotted list */
-    SCM_LIST_CIRCULAR = -2      /* circular list */
+	SCM_LIST_DOTTED = -1,   /* dotted list */
+	SCM_LIST_CIRCULAR = -2  /* circular list */
 };
 
 #define SCM_PROPER_LIST_P(obj)   (Scm_Length(obj) >= 0)
@@ -1221,16 +1221,16 @@ SCM_EXTERN ScmObj Scm_PairAttrSet(ScmPair *pair, ScmObj key, ScmObj value);
 /* This kind of thing is now handled by string-incomplete->complete
    in libstr.scm. */
 typedef enum {
-    SCM_ILLEGAL_CHAR_REJECT,    /* Refuse to handle illegal chars.  For ports
-                                   this means raising an error.  For string
-                                   conversion procedure, this makes it to
-                                   return #f. */
-    SCM_ILLEGAL_CHAR_OMIT,      /* Silently discard the illegal chars. */
-    SCM_ILLEGAL_CHAR_REPLACE    /* Replace an illegal char to a substitute
-                                   char, specified elsewhere. */
+	SCM_ILLEGAL_CHAR_REJECT, /* Refuse to handle illegal chars.  For ports
+	                            this means raising an error.  For string
+	                            conversion procedure, this makes it to
+	                            return #f. */
+	SCM_ILLEGAL_CHAR_OMIT,  /* Silently discard the illegal chars. */
+	SCM_ILLEGAL_CHAR_REPLACE /* Replace an illegal char to a substitute
+	                            char, specified elsewhere. */
 } ScmIllegalCharHandling;
 
-    
+
 /*--------------------------------------------------------
  * STRING
  */
@@ -1320,18 +1320,18 @@ typedef ScmObj (*ScmTransformerProc)(ScmObj self, ScmObj form, ScmObj env,
 
 /* Base structure */
 struct ScmProcedureRec {
-    SCM_INSTANCE_HEADER;
-    unsigned int required : 16;    /* # of required args */
-    unsigned int optional : 8;     /* >=1 if it takes opt args. see below.*/
-    unsigned int type     : 3;     /* ScmProcedureType */
-    unsigned int locked   : 1;     /* setter locked? (see below) */
-    unsigned int currying : 1;     /* autocurrying */
-    unsigned int constant : 1;     /* constant procedure. see below. */
-    unsigned int leaf     : 1;     /* leaf procedure/method */
-    unsigned int reserved : 1;     /* unused yet. */
-    ScmObj info;                   /* source code info (see below) */
-    ScmObj setter;                 /* setter, if exists. */
-    ScmObj inliner;                /* inliner information (see below) */
+	SCM_INSTANCE_HEADER;
+	unsigned int required : 16; /* # of required args */
+	unsigned int optional : 8; /* >=1 if it takes opt args. see below.*/
+	unsigned int type     : 3; /* ScmProcedureType */
+	unsigned int locked   : 1; /* setter locked? (see below) */
+	unsigned int currying : 1; /* autocurrying */
+	unsigned int constant : 1; /* constant procedure. see below. */
+	unsigned int leaf     : 1; /* leaf procedure/method */
+	unsigned int reserved : 1; /* unused yet. */
+	ScmObj info;               /* source code info (see below) */
+	ScmObj setter;             /* setter, if exists. */
+	ScmObj inliner;            /* inliner information (see below) */
 };
 
 /* About locked slot:
@@ -1358,7 +1358,7 @@ struct ScmProcedureRec {
    after argument folding).
 
    This special treatment is to avoid unnecessary consing of argumets;
-   if we know the callee immediately unfolds the rest argument, it's no 
+   if we know the callee immediately unfolds the rest argument, it's no
    use to fold excessive arguments anyway.
  */
 
@@ -1391,7 +1391,7 @@ struct ScmProcedureRec {
            This slot may contain one of this:
            - Signature: For example, the subr `cons' has (cons obj1 obj2)
              in it.  The first pair may have the following pair attributes.
-             
+
                `source-info'   (<filename> <lineno>)
                    The source location the procedure is defined, if known.
                    This info can be retrieved with (source-location PROC).
@@ -1415,7 +1415,7 @@ struct ScmProcedureRec {
            This slot contains the "name" of the gf, which is a symbol.
            A kludge: For setter gf, which can be created indirectly
            via (define-method (setter GF) ...), we use a weird name
-           |setter of GF|.  This is a quick hack to make it work, but ideally
+ |setter of GF|.  This is a quick hack to make it work, but ideally
            we should accept a list (setter GF) as the name.  Anticipate
            this change in future.
            Furthermore, in order to hold source-info, we might just make
@@ -1433,8 +1433,8 @@ struct ScmProcedureRec {
 /* About procedure inliner:
    This slot holds information to inline procedures.  The value of this slot
    can be one of the following kinds:
-   
-   #f: No inliner associated to this procedure.  (For historical
+
+ #f: No inliner associated to this procedure.  (For historical
       reasons, the code that access to this slot expects this slot can be
       NULL and treats it as SCM_FALSE in that case)
 
@@ -1462,11 +1462,11 @@ struct ScmProcedureRec {
 
 /* procedure type */
 enum ScmProcedureType {
-    SCM_PROC_SUBR,
-    SCM_PROC_CLOSURE,
-    SCM_PROC_GENERIC,
-    SCM_PROC_METHOD,
-    SCM_PROC_NEXT_METHOD
+	SCM_PROC_SUBR,
+	SCM_PROC_CLOSURE,
+	SCM_PROC_GENERIC,
+	SCM_PROC_METHOD,
+	SCM_PROC_NEXT_METHOD
 };
 
 #define SCM_PROCEDURE(obj)          ((ScmProcedure*)(obj))
@@ -1483,32 +1483,32 @@ enum ScmProcedureType {
 SCM_CLASS_DECL(Scm_ProcedureClass);
 #define SCM_CLASS_PROCEDURE    (&Scm_ProcedureClass)
 #define SCM_PROCEDUREP(obj) \
-    (SCM_HOBJP(obj) && SCM_CLASS_APPLICABLE_P(SCM_CLASS_OF(obj)))
+	(SCM_HOBJP(obj) && SCM_CLASS_APPLICABLE_P(SCM_CLASS_OF(obj)))
 #define SCM_PROCEDURE_TAKE_NARG_P(obj, narg) \
-    (SCM_PROCEDUREP(obj)&& \
-     (  (!SCM_PROCEDURE_OPTIONAL(obj)&&SCM_PROCEDURE_REQUIRED(obj)==(narg)) \
-      ||(SCM_PROCEDURE_OPTIONAL(obj)&&SCM_PROCEDURE_REQUIRED(obj)<=(narg))))
+	(SCM_PROCEDUREP(obj)&& \
+	 (  (!SCM_PROCEDURE_OPTIONAL(obj)&&SCM_PROCEDURE_REQUIRED(obj)==(narg)) \
+	    ||(SCM_PROCEDURE_OPTIONAL(obj)&&SCM_PROCEDURE_REQUIRED(obj)<=(narg))))
 #define SCM_PROCEDURE_THUNK_P(obj) \
-    (SCM_PROCEDUREP(obj)&& \
-     (  (!SCM_PROCEDURE_OPTIONAL(obj)&&SCM_PROCEDURE_REQUIRED(obj)==0) \
-      ||(SCM_PROCEDURE_OPTIONAL(obj))))
+	(SCM_PROCEDUREP(obj)&& \
+	 (  (!SCM_PROCEDURE_OPTIONAL(obj)&&SCM_PROCEDURE_REQUIRED(obj)==0) \
+	    ||(SCM_PROCEDURE_OPTIONAL(obj))))
 #define SCM_PROCEDURE_INIT(obj, req, opt, typ, inf)     \
-    SCM_PROCEDURE(obj)->required = req,                 \
-    SCM_PROCEDURE(obj)->optional = opt,                 \
-    SCM_PROCEDURE(obj)->type = typ,                     \
-    SCM_PROCEDURE(obj)->locked = FALSE,                 \
-    SCM_PROCEDURE(obj)->currying = FALSE,               \
-    SCM_PROCEDURE(obj)->constant = FALSE,               \
-    SCM_PROCEDURE(obj)->leaf = FALSE,                   \
-    SCM_PROCEDURE(obj)->reserved = 0,                   \
-    SCM_PROCEDURE(obj)->info = inf,                     \
-    SCM_PROCEDURE(obj)->setter = SCM_FALSE,             \
-    SCM_PROCEDURE(obj)->inliner = SCM_FALSE
+	SCM_PROCEDURE(obj)->required = req,                 \
+	SCM_PROCEDURE(obj)->optional = opt,                 \
+	SCM_PROCEDURE(obj)->type = typ,                     \
+	SCM_PROCEDURE(obj)->locked = FALSE,                 \
+	SCM_PROCEDURE(obj)->currying = FALSE,               \
+	SCM_PROCEDURE(obj)->constant = FALSE,               \
+	SCM_PROCEDURE(obj)->leaf = FALSE,                   \
+	SCM_PROCEDURE(obj)->reserved = 0,                   \
+	SCM_PROCEDURE(obj)->info = inf,                     \
+	SCM_PROCEDURE(obj)->setter = SCM_FALSE,             \
+	SCM_PROCEDURE(obj)->inliner = SCM_FALSE
 
 /* This is internal - should never be used directly */
 #define SCM__PROCEDURE_INITIALIZER(klass, req, opt, typ, cst, lef, inf, inl) \
-    { { klass, NULL }, (req), (opt), (typ), FALSE, FALSE, cst, lef, 0,       \
-      (inf), SCM_FALSE, (inl) }
+	{ { klass, NULL }, (req), (opt), (typ), FALSE, FALSE, cst, lef, 0,       \
+		(inf), SCM_FALSE, (inl) }
 
 SCM_EXTERN ScmObj Scm_CopyProcedure(ScmProcedure *proc);
 SCM_EXTERN ScmObj Scm_CurryProcedure(ScmObj proc, ScmObj *given,
@@ -1516,13 +1516,13 @@ SCM_EXTERN ScmObj Scm_CurryProcedure(ScmObj proc, ScmObj *given,
 
 /* Closure - Scheme defined procedure */
 struct ScmClosureRec {
-    ScmProcedure common;
-    ScmObj code;                /* compiled code */
-    ScmEnvFrame *env;           /* environment */
+	ScmProcedure common;
+	ScmObj code;            /* compiled code */
+	ScmEnvFrame *env;       /* environment */
 };
 
 #define SCM_CLOSUREP(obj) \
-    (SCM_PROCEDUREP(obj)&&(SCM_PROCEDURE_TYPE(obj)==SCM_PROC_CLOSURE))
+	(SCM_PROCEDUREP(obj)&&(SCM_PROCEDURE_TYPE(obj)==SCM_PROC_CLOSURE))
 #define SCM_CLOSURE(obj)           ((ScmClosure*)(obj))
 #define SCM_CLOSURE_CODE(obj)      SCM_CLOSURE(obj)->code
 #define SCM_CLOSURE_ENV(obj)       SCM_CLOSURE(obj)->env
@@ -1531,14 +1531,14 @@ SCM_EXTERN ScmObj Scm_MakeClosure(ScmObj code, ScmEnvFrame *env);
 
 /* Subr - C defined procedure */
 struct ScmSubrRec {
-    ScmProcedure common;
-    int flags;
-    ScmSubrProc *func;
-    void *data;
+	ScmProcedure common;
+	int flags;
+	ScmSubrProc *func;
+	void *data;
 };
 
 #define SCM_SUBRP(obj) \
-    (SCM_PROCEDUREP(obj)&&(SCM_PROCEDURE_TYPE(obj)==SCM_PROC_SUBR))
+	(SCM_PROCEDUREP(obj)&&(SCM_PROCEDURE_TYPE(obj)==SCM_PROC_SUBR))
 #define SCM_SUBR(obj)              ((ScmSubr*)(obj))
 #define SCM_SUBR_FLAGS(obj)        SCM_SUBR(obj)->flags
 #define SCM_SUBR_FUNC(obj)         SCM_SUBR(obj)->func
@@ -1546,23 +1546,23 @@ struct ScmSubrRec {
 
 /* flags */
 #define SCM_SUBR_IMMEDIATE_ARG  (1L<<0) /* This subr will not retain a reference
-                                           to the flonums given to args.  VM
-                                           can safely pass the register flonums
-                                           to the subr.  This is added when
-                                           the :fast-flonum flag is given to
-                                           define-cproc. */
+	                                   to the flonums given to args.  VM
+	                                   can safely pass the register flonums
+	                                   to the subr.  This is added when
+	                                   the :fast-flonum flag is given to
+	                                   define-cproc. */
 
 #define SCM__DEFINE_SUBR_INT(cvar, req, opt, cst, inf, flags, func, inliner, data) \
-    ScmSubr cvar = {                                                        \
-        SCM__PROCEDURE_INITIALIZER(SCM_CLASS_STATIC_TAG(Scm_ProcedureClass),\
-             req, opt, SCM_PROC_SUBR, cst, 0, inf, inliner),                \
-        flags, (func), (data)                                               \
-    }
+	ScmSubr cvar = {                                                        \
+		SCM__PROCEDURE_INITIALIZER(SCM_CLASS_STATIC_TAG(Scm_ProcedureClass), \
+		                           req, opt, SCM_PROC_SUBR, cst, 0, inf, inliner),                \
+		flags, (func), (data)                                               \
+	}
 
 #define SCM_DEFINE_SUBR(cvar, req, opt, inf, func, inliner, data) \
-    SCM__DEFINE_SUBR_INT(cvar, req, opt, 0, inf, 0, func, inliner, data)
+	SCM__DEFINE_SUBR_INT(cvar, req, opt, 0, inf, 0, func, inliner, data)
 #define SCM_DEFINE_SUBRX(cvar, req, opt, cst, inf, flags, func, inliner, data) \
-    SCM__DEFINE_SUBR_INT(cvar, req, opt, cst, inf, flags, func, inliner, data)
+	SCM__DEFINE_SUBR_INT(cvar, req, opt, cst, inf, flags, func, inliner, data)
 
 SCM_EXTERN ScmObj Scm_MakeSubr(ScmSubrProc *func,
                                void *data,
@@ -1577,14 +1577,14 @@ SCM_EXTERN int    Scm_HasSetter(ScmObj proc);
 
 /* Generic - Generic function */
 struct ScmGenericRec {
-    ScmProcedure common;
-    ScmObj methods;             /* list of methods */
-    int   maxReqargs;           /* maximum # of args required to select
-                                   applicable methods */
-    ScmObj (*fallback)(ScmObj *argv, int argc, ScmGeneric *gf);
-    void *dispatcher;
-    void *data;
-    ScmInternalMutex lock;
+	ScmProcedure common;
+	ScmObj methods;         /* list of methods */
+	int maxReqargs;         /* maximum # of args required to select
+	                           applicable methods */
+	ScmObj (*fallback)(ScmObj *argv, int argc, ScmGeneric *gf);
+	void *dispatcher;
+	void *data;
+	ScmInternalMutex lock;
 };
 
 SCM_CLASS_DECL(Scm_GenericClass);
@@ -1594,13 +1594,13 @@ SCM_CLASS_DECL(Scm_GenericClass);
 #define SCM_GENERIC_DATA(obj)      (SCM_GENERIC(obj)->data)
 
 #define SCM_DEFINE_GENERIC(cvar, cfunc, data)                           \
-    ScmGeneric cvar = {                                                 \
-        SCM__PROCEDURE_INITIALIZER(SCM_CLASS_STATIC_TAG(Scm_GenericClass),\
-                                   0, 0, SCM_PROC_GENERIC, 0, 0,        \
-                                   SCM_FALSE, NULL),                    \
-        SCM_NIL, 0, cfunc, NULL, data,                                  \
-        SCM_INTERNAL_MUTEX_INITIALIZER                                  \
-    }
+	ScmGeneric cvar = {                                                 \
+		SCM__PROCEDURE_INITIALIZER(SCM_CLASS_STATIC_TAG(Scm_GenericClass), \
+		                           0, 0, SCM_PROC_GENERIC, 0, 0,        \
+		                           SCM_FALSE, NULL),                    \
+		SCM_NIL, 0, cfunc, NULL, data,                                  \
+		SCM_INTERNAL_MUTEX_INITIALIZER                                  \
+	}
 
 SCM_EXTERN void Scm_InitBuiltinGeneric(ScmGeneric *gf, const char *name,
                                        ScmModule *mod);
@@ -1616,12 +1616,12 @@ SCM_EXTERN ScmObj Scm_InvalidApply(ScmObj *argv, int argc, ScmGeneric *gf);
    have func ptr, with optional data.   Scheme-define method has NULL
    in func, code in data, and optional environment in env. */
 struct ScmMethodRec {
-    ScmProcedure common;
-    ScmGeneric *generic;
-    ScmClass **specializers;    /* array of specializers, size==required */
-    ScmObj (*func)(ScmNextMethod *nm, ScmObj *argv, int argc, void * data);
-    void *data;                 /* closure, or code */
-    ScmEnvFrame *env;           /* environment (for Scheme created method) */
+	ScmProcedure common;
+	ScmGeneric *generic;
+	ScmClass **specializers; /* array of specializers, size==required */
+	ScmObj (*func)(ScmNextMethod *nm, ScmObj *argv, int argc, void * data);
+	void *data;             /* closure, or code */
+	ScmEnvFrame *env;       /* environment (for Scheme created method) */
 };
 
 SCM_CLASS_DECL(Scm_MethodClass);
@@ -1632,12 +1632,12 @@ SCM_CLASS_DECL(Scm_MethodClass);
 #define SCM_METHOD_LEAF_P(obj)     SCM_METHOD(obj)->common.leaf
 
 #define SCM_DEFINE_METHOD(cvar, gf, req, opt, specs, func, data)        \
-    ScmMethod cvar = {                                                  \
-        SCM__PROCEDURE_INITIALIZER(SCM_CLASS_STATIC_TAG(Scm_MethodClass),\
-                                   req, opt, SCM_PROC_METHOD, 0, 0,     \
-                                   SCM_FALSE, NULL),                    \
-        gf, specs, func, data, NULL                                     \
-    }
+	ScmMethod cvar = {                                                  \
+		SCM__PROCEDURE_INITIALIZER(SCM_CLASS_STATIC_TAG(Scm_MethodClass), \
+		                           req, opt, SCM_PROC_METHOD, 0, 0,     \
+		                           SCM_FALSE, NULL),                    \
+		gf, specs, func, data, NULL                                     \
+	}
 
 SCM_EXTERN void Scm_InitBuiltinMethod(ScmMethod *m);
 
@@ -1645,12 +1645,12 @@ SCM_EXTERN void Scm_InitBuiltinMethod(ScmMethod *m);
    Next method is just another callable entity, with memoizing
    the arguments. */
 struct ScmNextMethodRec {
-    ScmProcedure common;
-    ScmGeneric *generic;
-    ScmObj methods;          /* list of applicable methods */
-    ScmObj *argv;            /* original arguments */
-    int argc;                /* # of original arguments */
-    int applyargs;           /* if TRUE, argv[argc-1] has a list of rest args */
+	ScmProcedure common;
+	ScmGeneric *generic;
+	ScmObj methods;      /* list of applicable methods */
+	ScmObj *argv;        /* original arguments */
+	int argc;            /* # of original arguments */
+	int applyargs;       /* if TRUE, argv[argc-1] has a list of rest args */
 };
 
 SCM_CLASS_DECL(Scm_NextMethodClass);
@@ -1673,18 +1673,18 @@ SCM_CLASS_DECL(Scm_NextMethodClass);
  * It is idempotent operation, so it's MT-safe.
  */
 #define SCM_BIND_PROC(var, name, module)                                \
-    do {                                                                \
-        if (SCM_UNDEFINEDP(var)) {                                      \
-            ScmObj v__ =                                                \
-                Scm_GlobalVariableRef(module,                           \
-                                      SCM_SYMBOL(SCM_INTERN(name)),     \
-                                      0);                               \
-            if (SCM_UNBOUNDP(v__)) {                                    \
-                Scm_Error("Procedure %s is unbound", name);             \
-            }                                                           \
-            var = v__;                                                  \
-        }                                                               \
-    } while (0)
+	do {                                                                \
+		if (SCM_UNDEFINEDP(var)) {                                      \
+			ScmObj v__ =                                                \
+				Scm_GlobalVariableRef(module,                           \
+				                      SCM_SYMBOL(SCM_INTERN(name)),     \
+				                      0);                               \
+			if (SCM_UNBOUNDP(v__)) {                                    \
+				Scm_Error("Procedure %s is unbound", name);             \
+			}                                                           \
+			var = v__;                                                  \
+		}                                                               \
+	} while (0)
 
 
 /* OBSOLETED - These are defined in Scheme now. */
@@ -1728,9 +1728,9 @@ SCM_EXTERN ScmObj Scm_UnwrapSyntax(ScmObj form);
  */
 
 struct ScmPromiseRec {
-    SCM_HEADER;
-    ScmObj kind;                /* promise kind */
-    struct ScmPromiseContentRec *content; /* opaque */
+	SCM_HEADER;
+	ScmObj kind;            /* promise kind */
+	struct ScmPromiseContentRec *content; /* opaque */
 };
 
 SCM_CLASS_DECL(Scm_PromiseClass);
@@ -1764,11 +1764,11 @@ SCM_EXTERN int Scm_PairP(ScmObj x);
 
 /* 'reason' flag for Scm_PortError */
 enum {
-    SCM_PORT_ERROR_INPUT,
-    SCM_PORT_ERROR_OUTPUT,
-    SCM_PORT_ERROR_CLOSED,
-    SCM_PORT_ERROR_UNIT,
-    SCM_PORT_ERROR_OTHER
+	SCM_PORT_ERROR_INPUT,
+	SCM_PORT_ERROR_OUTPUT,
+	SCM_PORT_ERROR_CLOSED,
+	SCM_PORT_ERROR_UNIT,
+	SCM_PORT_ERROR_OTHER
 };
 
 /* Throwing error */
@@ -1788,7 +1788,7 @@ SCM_EXTERN ScmObj Scm_Raise(ScmObj exception, u_long flags);
 
 /* flags for Scm_Raise */
 enum {
-    SCM_RAISE_NON_CONTINUABLE = (1L<<0)
+	SCM_RAISE_NON_CONTINUABLE = (1L<<0)
 };
 
 SCM_EXTERN ScmObj Scm_RaiseCondition(ScmObj conditionType, ...);
@@ -1802,9 +1802,9 @@ SCM_EXTERN ScmObj Scm_ConditionMessage(ScmObj c);
 SCM_EXTERN ScmObj Scm_ConditionTypeName(ScmObj c);
 
 enum {
-    /* predefined stack trace formats.  EXPERIMENTAL. */
-    SCM_STACK_TRACE_FORMAT_ORIGINAL, /* original format */
-    SCM_STACK_TRACE_FORMAT_CC        /* compiler-message-like format */
+	/* predefined stack trace formats.  EXPERIMENTAL. */
+	SCM_STACK_TRACE_FORMAT_ORIGINAL, /* original format */
+	SCM_STACK_TRACE_FORMAT_CC    /* compiler-message-like format */
 };
 
 SCM_EXTERN void Scm_ShowStackTrace(ScmPort *out, ScmObj stacklite,
@@ -1868,16 +1868,16 @@ SCM_EXTERN void Scm_RegMatchDump(ScmRegMatch *match);
 #define SCM_VOID_RETURN_VALUE(expr) ((void)(expr), SCM_UNDEFINED)
 
 #define SCM_MAYBE_P(pred, obj)      (SCM_FALSEP(obj)||(pred(obj)))
-#define SCM_MAYBE(unboxer, obj)     (SCM_FALSEP(obj)?NULL:(unboxer(obj)))
-#define SCM_MAKE_MAYBE(boxer, obj)  ((obj)?(boxer(obj)):SCM_FALSE)
+#define SCM_MAYBE(unboxer, obj)     (SCM_FALSEP(obj) ? NULL : (unboxer(obj)))
+#define SCM_MAKE_MAYBE(boxer, obj)  ((obj) ? (boxer(obj)) : SCM_FALSE)
 
 /*---------------------------------------------------
  * SIGNAL
  */
 
 typedef struct ScmSysSigsetRec {
-    SCM_HEADER;
-    sigset_t set;
+	SCM_HEADER;
+	sigset_t set;
 } ScmSysSigset;
 
 SCM_CLASS_DECL(Scm_SysSigsetClass);
@@ -1980,20 +1980,20 @@ SCM_EXTERN ScmObj Scm__RuntimeDirectory(void); /* private */
 #ifdef __GNUC__
 
 #define SCM_ASSERT(expr)                                                \
-    do {                                                                \
-        if (!(expr))                                                    \
-            Scm_Panic("\"%s\", line %d (%s): Assertion failed: %s",     \
-                      __FILE__, __LINE__, __PRETTY_FUNCTION__, #expr);  \
-    } while (0)
+	do {                                                                \
+		if (!(expr))                                                    \
+		Scm_Panic("\"%s\", line %d (%s): Assertion failed: %s",     \
+		          __FILE__, __LINE__, __PRETTY_FUNCTION__, #expr);  \
+	} while (0)
 
 #else
 
 #define SCM_ASSERT(expr)                                        \
-    do {                                                        \
-        if (!(expr))                                            \
-            Scm_Panic("\"%s\", line %d: Assertion failed: %s",  \
-                      __FILE__, __LINE__, #expr);               \
-    } while (0)
+	do {                                                        \
+		if (!(expr))                                            \
+		Scm_Panic("\"%s\", line %d: Assertion failed: %s",  \
+		          __FILE__, __LINE__, #expr);               \
+	} while (0)
 
 #endif /* !__GNUC__ */
 

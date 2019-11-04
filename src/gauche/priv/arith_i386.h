@@ -21,17 +21,17 @@
  * and to avoid both operands from being on memory.
  */
 #define UADD(r, c, x, y)                        \
-    asm("cmpl $1, %2;"                          \
-        "cmc;"                                  \
-        "movl %3, %%eax;"                       \
-        "adcl %4, %%eax;"                       \
-        "movl %%eax, %0;"                       \
-        "movl $0, %%eax;"                       \
-        "adcl $0, %%eax;"                       \
-        "movl %%eax, %1;"                       \
-        : "=&g" (r), "=&g" (c)                  \
-        : "1" (c), "g"(x), "g"(y)               \
-        : "%eax")
+	asm ("cmpl $1, %2;"                          \
+	     "cmc;"                                  \
+	     "movl %3, %%eax;"                       \
+	     "adcl %4, %%eax;"                       \
+	     "movl %%eax, %0;"                       \
+	     "movl $0, %%eax;"                       \
+	     "adcl $0, %%eax;"                       \
+	     "movl %%eax, %1;"                       \
+	     : "=&g" (r), "=&g" (c)                  \
+	     : "1" (c), "g" (x), "g" (y)               \
+	     : "%eax")
 
 /*-----------------------------------------------------------------
  * UADDOV(r, v, x, y)    unsigned word add with overflow check
@@ -41,12 +41,12 @@
  */
 
 #define UADDOV(r, v, x, y)                      \
-    asm("movl %2, %0;"                          \
-        "addl %3, %0;"                          \
-        "movl $0, %1;"                          \
-        "rcll $1, %1;"                          \
-        : "=&r" (r), "=&r" (v)                  \
-        : "g" (x), "g" (y))
+	asm ("movl %2, %0;"                          \
+	     "addl %3, %0;"                          \
+	     "movl $0, %1;"                          \
+	     "rcll $1, %1;"                          \
+	     : "=&r" (r), "=&r" (v)                  \
+	     : "g" (x), "g" (y))
 
 /*-----------------------------------------------------------------
  * SADDOV(r, v, x, y)     signed word addition with overflow check
@@ -56,16 +56,16 @@
  */
 
 #define SADDOV(r, v, x, y)                      \
-    asm("movl $0, %1;"                          \
-        "movl %2, %0;"                          \
-        "addl %3, %0;"                          \
-        "jno 0f;"                               \
-        "jns 1f;"                               \
-        "movl $1, %1; jmp 0f;"                  \
-        "1: movl $-1, %1;"                      \
-        "0:"                                    \
-        : "=&r" (r), "=&r" (v)                  \
-        : "g" (x), "g" (y))
+	asm ("movl $0, %1;"                          \
+	     "movl %2, %0;"                          \
+	     "addl %3, %0;"                          \
+	     "jno 0f;"                               \
+	     "jns 1f;"                               \
+	     "movl $1, %1; jmp 0f;"                  \
+	     "1: movl $-1, %1;"                      \
+	     "0:"                                    \
+	     : "=&r" (r), "=&r" (v)                  \
+	     : "g" (x), "g" (y))
 
 /*-----------------------------------------------------------------
  * USUB(r, c, x, y)        unsigned word subtract with borrow
@@ -75,13 +75,13 @@
  */
 
 #define USUB(r, c, x, y)                        \
-    asm("shrl $1, %2;"                          \
-        "movl %3, %0;"                          \
-        "sbbl %4, %0;"                          \
-        "movl $0, %1;"                          \
-        "rcll $1, %1;"                          \
-        : "=&r" (r), "=&r"(c)                   \
-        : "1" (c), "g" (x), "g" (y))
+	asm ("shrl $1, %2;"                          \
+	     "movl %3, %0;"                          \
+	     "sbbl %4, %0;"                          \
+	     "movl $0, %1;"                          \
+	     "rcll $1, %1;"                          \
+	     : "=&r" (r), "=&r" (c)                   \
+	     : "1" (c), "g" (x), "g" (y))
 
 /*-----------------------------------------------------------------
  * USUBOV(r, v, x, y)      unsigned word subtract with overflow check
@@ -91,12 +91,12 @@
  */
 
 #define USUBOV(r, v, x, y)                      \
-    asm("movl %2, %0;"                          \
-        "subl %3, %0;"                          \
-        "movl $0, %1;"                          \
-        "rcll $1, %1;"                          \
-        : "=&r" (r), "=&r"(v)                   \
-        : "g" (x), "g" (y))
+	asm ("movl %2, %0;"                          \
+	     "subl %3, %0;"                          \
+	     "movl $0, %1;"                          \
+	     "rcll $1, %1;"                          \
+	     : "=&r" (r), "=&r" (v)                   \
+	     : "g" (x), "g" (y))
 
 /*-----------------------------------------------------------------
  * SSUBOV(r, v, x, y)     signed word subtract without borrow
@@ -106,16 +106,16 @@
  */
 
 #define SSUBOV(r, v, x, y)                      \
-    asm("movl $0, %1;"                          \
-        "movl %2, %0;"                          \
-        "subl %3, %0;"                          \
-        "jno 0f;"                               \
-        "jns 1f;"                               \
-        "movl $1, %1; jmp 0f;"                  \
-        "1: movl $-1, %1;"                      \
-        "0:"                                    \
-        : "=&r" (r), "=&r" (v)                  \
-        : "g" (x), "g" (y))
+	asm ("movl $0, %1;"                          \
+	     "movl %2, %0;"                          \
+	     "subl %3, %0;"                          \
+	     "jno 0f;"                               \
+	     "jns 1f;"                               \
+	     "movl $1, %1; jmp 0f;"                  \
+	     "1: movl $-1, %1;"                      \
+	     "0:"                                    \
+	     : "=&r" (r), "=&r" (v)                  \
+	     : "g" (x), "g" (y))
 
 /*-----------------------------------------------------------------
  * UMUL(hi, lo, x, y)       unsigned word multiply
@@ -124,13 +124,13 @@
  */
 
 #define UMUL(hi, lo, x, y)                      \
-    asm("movl %2, %%eax;"                       \
-        "mull %3;"                              \
-        "movl %%eax, %1;"                       \
-        "movl %%edx, %0;"                       \
-        : "=r" (hi), "=r" (lo)                  \
-        : "g" (x), "r" (y)                      \
-        : "%eax", "%edx")
+	asm ("movl %2, %%eax;"                       \
+	     "mull %3;"                              \
+	     "movl %%eax, %1;"                       \
+	     "movl %%edx, %0;"                       \
+	     : "=r" (hi), "=r" (lo)                  \
+	     : "g" (x), "r" (y)                      \
+	     : "%eax", "%edx")
 
 /*-----------------------------------------------------------------
  * UMULOV(r, v, x, y)      unsigned word multiply with overflow check
@@ -144,11 +144,11 @@
    gcc fail to allocate registers.  Thus we use "g" constraint. */
 
 #define UMULOV(r, v, x, y)                      \
-    asm("mull %2;"                              \
-        "rcll $1, %1;"                          \
-        : "=a" (r), "=r" (v)                    \
-        : "r" (y), "0" (x), "1" (0)             \
-        : "%edx")
+	asm ("mull %2;"                              \
+	     "rcll $1, %1;"                          \
+	     : "=a" (r), "=r" (v)                    \
+	     : "r" (y), "0" (x), "1" (0)             \
+	     : "%edx")
 
 /*-----------------------------------------------------------------
  * SMULOV(r, v, x, y)      signed word multiply with overflow check
@@ -159,15 +159,15 @@
  */
 
 #define SMULOV(r, v, x, y)                      \
-    asm("imull %2;"                             \
-        "jno 0f;"                               \
-        "cmp $0, %%edx;"                        \
-        "jl 1f;"                                \
-        "movl $1, %1; jmp 0f;"                  \
-        "1: movl $-1, %1;"                      \
-        "0:"                                    \
-        : "=a" (r), "=r" (v)                    \
-        : "r" (y), "0" (x), "1" (0)             \
-        : "%edx")
+	asm ("imull %2;"                             \
+	     "jno 0f;"                               \
+	     "cmp $0, %%edx;"                        \
+	     "jl 1f;"                                \
+	     "movl $1, %1; jmp 0f;"                  \
+	     "1: movl $-1, %1;"                      \
+	     "0:"                                    \
+	     : "=a" (r), "=r" (v)                    \
+	     : "r" (y), "0" (x), "1" (0)             \
+	     : "%edx")
 
 #endif /*__GNUC__*/

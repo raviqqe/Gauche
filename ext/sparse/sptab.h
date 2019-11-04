@@ -45,12 +45,12 @@
 #include "ctrie.h"
 
 typedef struct SparseTableRec {
-    SCM_HEADER;
-    CompactTrie trie;
-    u_long      numEntries;
-    u_long      (*hashfn)(ScmObj key);
-    int         (*cmpfn)(ScmObj a, ScmObj b);
-    ScmComparator *comparator;  /* only used for generic table */
+	SCM_HEADER;
+	CompactTrie trie;
+	u_long numEntries;
+	u_long (*hashfn)(ScmObj key);
+	int (*cmpfn)(ScmObj a, ScmObj b);
+	ScmComparator *comparator; /* only used for generic table */
 } SparseTable;
 
 SCM_CLASS_DECL(Scm_SparseTableClass);
@@ -72,10 +72,10 @@ extern void   SparseTableCheck(SparseTable *sv);
 
 /* Iterator */
 typedef struct SparseTableIterRec {
-    SparseTable *st;
-    CompactTrieIter ctit;
-    ScmObj chain;
-    int end;
+	SparseTable *st;
+	CompactTrieIter ctit;
+	ScmObj chain;
+	int end;
 } SparseTableIter;
 
 extern void   SparseTableIterInit(SparseTableIter *it, SparseTable *st);

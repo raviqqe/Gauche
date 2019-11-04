@@ -37,15 +37,15 @@
 #define GAUCHE_GLOC_H
 
 struct ScmGlocRec {
-    SCM_HEADER;
-    ScmSymbol *name;
-    ScmModule *module;
-    ScmObj value;               /* The actual value.  Have to be accessed
-                                   via SCM_GLOC_{GET|SET} macros. */
-    char hidden;                /* TRUE if this is a "negative binding",
-                                   see below. */
-    ScmObj (*getter)(ScmGloc *);         /* see 'hooks' below */
-    ScmObj (*setter)(ScmGloc *, ScmObj); /* see 'hooks' below */
+	SCM_HEADER;
+	ScmSymbol *name;
+	ScmModule *module;
+	ScmObj value;           /* The actual value.  Have to be accessed
+	                           via SCM_GLOC_{GET|SET} macros. */
+	char hidden;            /* TRUE if this is a "negative binding",
+	                           see below. */
+	ScmObj (*getter)(ScmGloc *);     /* see 'hooks' below */
+	ScmObj (*setter)(ScmGloc *, ScmObj); /* see 'hooks' below */
 };
 
 /* About negative binding:
@@ -99,9 +99,9 @@ SCM_CLASS_DECL(Scm_GlocClass);
 #define SCM_GLOCP(obj)           SCM_XTYPEP(obj, SCM_CLASS_GLOC)
 
 #define SCM_GLOC_GET(gloc) \
-    ((gloc)->getter? (gloc)->getter(gloc) : (gloc)->value)
+	((gloc)->getter ? (gloc)->getter(gloc) : (gloc)->value)
 #define SCM_GLOC_SET(gloc, val) \
-    ((gloc)->setter? (gloc)->setter((gloc), (val)) : ((gloc)->value = (val)))
+	((gloc)->setter ? (gloc)->setter((gloc), (val)) : ((gloc)->value = (val)))
 
 #define SCM_GLOC_PHANTOM_BINDING_P(gloc) SCM_UNBOUNDP((gloc)->value)
 

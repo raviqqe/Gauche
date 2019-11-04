@@ -76,48 +76,48 @@ SCM_DECL_BEGIN
  *  and an error is signalled in its body.
  */
 typedef struct ScmEscapePointRec {
-    struct ScmEscapePointRec *prev;
-    struct ScmEscapePointRec *floating;
-    ScmObj ehandler;            /* handler closure */
-    ScmContFrame *cont;         /* saved continuation */
-    ScmObj handlers;            /* saved dynamic handler chain */
-    ScmCStack *cstack;          /* vm->cstack when escape point is created.
-                                   this will be used to rewind cstack.
-                                   this is NULL for partial continuations,
-                                   for they can be executed on anywhere
-                                   w.r.t. cstack. */
-    ScmObj xhandler;            /* saved exception handler */
-    ScmObj resetChain;          /* for reset/shift */
-    ScmObj partHandlers;        /* for reset/shift */
-    int errorReporting;         /* state of SCM_VM_ERROR_REPORTING flag
-                                   when this ep is captured.  The flag status
-                                   should be restored when the control
-                                   transferred to this escape point. */
-    int rewindBefore;           /* EXPERIMENTAL: if TRUE, dynamic handlers
-                                   are rewound after an exception is raised
-                                   and before the exception handler is called.
-                                   If FALSE, the exception handler is called
-                                   first, then the dynamic handlers are
-                                   rewound.   SRFI-18 model and legacy
-                                   with-error-handler uses the latter model,
-                                   but SRFI-34's guard needs the former model.
-                                */
-    int reraised;               /* EXPERIMENTAL: if exception is reraised,
-                                   this flag is set to TRUE and the exception
-                                   handler can return to the caller. */
+	struct ScmEscapePointRec *prev;
+	struct ScmEscapePointRec *floating;
+	ScmObj ehandler;        /* handler closure */
+	ScmContFrame *cont;     /* saved continuation */
+	ScmObj handlers;        /* saved dynamic handler chain */
+	ScmCStack *cstack;      /* vm->cstack when escape point is created.
+	                           this will be used to rewind cstack.
+	                           this is NULL for partial continuations,
+	                           for they can be executed on anywhere
+	                           w.r.t. cstack. */
+	ScmObj xhandler;        /* saved exception handler */
+	ScmObj resetChain;      /* for reset/shift */
+	ScmObj partHandlers;    /* for reset/shift */
+	int errorReporting;     /* state of SCM_VM_ERROR_REPORTING flag
+	                           when this ep is captured.  The flag status
+	                           should be restored when the control
+	                           transferred to this escape point. */
+	int rewindBefore;       /* EXPERIMENTAL: if TRUE, dynamic handlers
+	                           are rewound after an exception is raised
+	                           and before the exception handler is called.
+	                           If FALSE, the exception handler is called
+	                           first, then the dynamic handlers are
+	                           rewound.   SRFI-18 model and legacy
+	                           with-error-handler uses the latter model,
+	                           but SRFI-34's guard needs the former model.
+	                         */
+	int reraised;           /* EXPERIMENTAL: if exception is reraised,
+	                           this flag is set to TRUE and the exception
+	                           handler can return to the caller. */
 } ScmEscapePoint;
 
 /* Link management */
 #define SCM_VM_FLOATING_EP(vm) \
-    ((vm)->escapePoint? (vm)->escapePoint->floating : vm->escapePointFloating)
+	((vm)->escapePoint ? (vm)->escapePoint->floating : vm->escapePointFloating)
 #define SCM_VM_FLOATING_EP_SET(vm, ep)          \
-    do {                                        \
-        if ((vm)->escapePoint) {                \
-            (vm)->escapePoint->floating = (ep); \
-        } else {                                \
-            (vm)->escapePointFloating = (ep);   \
-        }                                       \
-    } while (0)
+	do {                                        \
+		if ((vm)->escapePoint) {                \
+			(vm)->escapePoint->floating = (ep); \
+		} else {                                \
+			(vm)->escapePointFloating = (ep);   \
+		}                                       \
+	} while (0)
 
 /* Escape types */
 #define SCM_VM_ESCAPE_NONE   0
@@ -130,24 +130,24 @@ typedef struct ScmEscapePointRec {
  */
 
 typedef struct ScmCallTraceEntryRec {
-    ScmCompiledCode *base;
-    SCM_PCTYPE pc;
+	ScmCompiledCode *base;
+	SCM_PCTYPE pc;
 } ScmCallTraceEntry;
 
 struct ScmCallTraceRec {
-    u_long size;                  /* size of the array, must be 2^n */
-    u_long top;                   /* index to the next entry */
-    ScmCallTraceEntry entries[1]; /* variable length */
+	u_long size;              /* size of the array, must be 2^n */
+	u_long top;               /* index to the next entry */
+	ScmCallTraceEntry entries[1]; /* variable length */
 };
 
 ScmCallTrace *Scm__MakeCallTraceQueue(u_long size);
 
 
-/* For BF and BT instructions, we check for #<undef>. 
+/* For BF and BT instructions, we check for #<undef>.
    This macro assumes to the local variable VM holding ScmVM*.
  */
 #define SCM_CHECKED_FALSEP(obj) \
-    (SCM_FALSEP(obj) || (SCM_UNDEFINEDP(obj)&&Scm_VMUndefinedBool(vm)))
+	(SCM_FALSEP(obj) || (SCM_UNDEFINEDP(obj)&&Scm_VMUndefinedBool(vm)))
 SCM_EXTERN int Scm_VMUndefinedBool(ScmVM*); /* in boolean.c */
 
 

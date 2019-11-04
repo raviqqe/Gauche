@@ -45,8 +45,8 @@ ScmObj Scm_VMRepl(ScmObj reader SCM_UNUSED,
                   ScmObj printer SCM_UNUSED,
                   ScmObj prompter SCM_UNUSED)
 {
-    Scm_Panic("Scm_VMRepl is obsoleted.");
-    return SCM_UNDEFINED;
+	Scm_Panic("Scm_VMRepl is obsoleted.");
+	return SCM_UNDEFINED;
 }
 
 /* C API - deprecated
@@ -61,7 +61,7 @@ ScmObj Scm_VMRepl(ScmObj reader SCM_UNUSED,
 void Scm_Repl(ScmObj reader, ScmObj evaluator, ScmObj printer,
               ScmObj prompter)
 {
-    static ScmObj repl = SCM_UNDEFINED;
-    SCM_BIND_PROC(repl, "read-eval-print-loop", Scm_GaucheModule());
-    Scm_ApplyRec(repl, SCM_LIST4(reader, evaluator, printer, prompter));
+	static ScmObj repl = SCM_UNDEFINED;
+	SCM_BIND_PROC(repl, "read-eval-print-loop", Scm_GaucheModule());
+	Scm_ApplyRec(repl, SCM_LIST4(reader, evaluator, printer, prompter));
 }

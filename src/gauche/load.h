@@ -46,26 +46,26 @@
  * unnecessary.
  */
 typedef enum {
-    SCM_LOAD_QUIET_NOFILE = (1L<<0),
-    /* [L,V,F] do not signal an error if the file does not exist;
-       just return #f. */
+	SCM_LOAD_QUIET_NOFILE = (1L<<0),
+	/* [L,V,F] do not signal an error if the file does not exist;
+	   just return #f. */
 
-    SCM_LOAD_IGNORE_CODING = (1L<<1),
-    /* [L,V] do not use coding-aware port to honor 'coding' magic comment */
+	SCM_LOAD_IGNORE_CODING = (1L<<1),
+	/* [L,V] do not use coding-aware port to honor 'coding' magic comment */
 
-    SCM_LOAD_PROPAGATE_ERROR = (1L<<2),
-    /* [L,R] do not capture an error; let the caller handle it.  */
+	SCM_LOAD_PROPAGATE_ERROR = (1L<<2),
+	/* [L,R] do not capture an error; let the caller handle it.  */
 
-    SCM_LOAD_SEARCH_ARCHIVE = (1L<<4)
-    /* [F] Search a file to load from archive file, using the hook of
-       Scm_FindFile.  This is mainly for internal use---Scm_VMLoad etc calls
-       Scm_FindFile with this flag on. */
+	SCM_LOAD_SEARCH_ARCHIVE = (1L<<4)
+	                          /* [F] Search a file to load from archive file, using the hook of
+	                             Scm_FindFile.  This is mainly for internal use---Scm_VMLoad etc calls
+	                             Scm_FindFile with this flag on. */
 } ScmLoadFlags;
 
 /* A structure to obtain a detailed result of loading. */
 typedef struct ScmLoadPacketRec {
-    ScmObj exception; /* OUT: exception object in case of LOAD_EVAL_ERROR */
-    int    loaded;    /* OUT: TRUE iff file is successfully loaded.  */
+	ScmObj exception; /* OUT: exception object in case of LOAD_EVAL_ERROR */
+	int loaded;   /* OUT: TRUE iff file is successfully loaded.  */
 } ScmLoadPacket;
 
 SCM_EXTERN ScmObj Scm_VMLoadFromPort(ScmPort *port, ScmObj next_paths,
@@ -122,27 +122,27 @@ SCM_EXTERN int    Scm_ProvidedP(ScmObj feature);
  * Autoloads
  */
 struct ScmAutoloadRec {
-    SCM_HEADER;
-    ScmSymbol *name;            /* variable to be autoloaded */
-    ScmModule *module;          /* where the binding should be inserted.
-                                   this is where autoload is defined. */
-    ScmString *path;            /* file to load */
-    ScmSymbol *import_from;     /* module to be imported after loading */
-    ScmModule *import_to;       /* module to where import_from should be
-                                   imported */
-                                /* The fields above will be set up when
-                                   the autoload object is created, and never
-                                   be modified. */
+	SCM_HEADER;
+	ScmSymbol *name;        /* variable to be autoloaded */
+	ScmModule *module;      /* where the binding should be inserted.
+	                           this is where autoload is defined. */
+	ScmString *path;        /* file to load */
+	ScmSymbol *import_from; /* module to be imported after loading */
+	ScmModule *import_to;   /* module to where import_from should be
+	                           imported */
+	                        /* The fields above will be set up when
+	                           the autoload object is created, and never
+	                           be modified. */
 
-    int loaded;                 /* The flag that indicates this autoload
-                                   is resolved, and value field contains
-                                   the resolved value.  Once the autoload
-                                   goes into "loaded" status, no field
-                                   should be changed. */
-    ScmObj value;               /* The resolved value */
-    ScmInternalMutex mutex;     /* mutex to resolve this autoload */
-    ScmInternalCond cv;         /* ... and condition variable. */
-    ScmVM *locker;              /* The thread that is resolving the autoload.*/
+	int loaded;             /* The flag that indicates this autoload
+	                           is resolved, and value field contains
+	                           the resolved value.  Once the autoload
+	                           goes into "loaded" status, no field
+	                           should be changed. */
+	ScmObj value;           /* The resolved value */
+	ScmInternalMutex mutex; /* mutex to resolve this autoload */
+	ScmInternalCond cv;     /* ... and condition variable. */
+	ScmVM *locker;          /* The thread that is resolving the autoload.*/
 };
 
 SCM_CLASS_DECL(Scm_AutoloadClass);

@@ -46,24 +46,24 @@
  */
 
 #define SCM_SYSCALL3(result, expr, check)                       \
-  do {                                                          \
-    (result) = (expr);                                          \
-    if ((check) && (errno == EINTR || errno == EPIPE)) {        \
-      ScmVM *vm__ = Scm_VM();                                   \
-      int epipe__ = (errno == EPIPE);                           \
-      errno = 0;                                                \
-      SCM_SIGCHECK(vm__);                                       \
-      if (epipe__) {                                            \
-        errno = EPIPE;                                          \
-        break;                                                  \
-      }                                                         \
-    } else {                                                    \
-      break;                                                    \
-    }                                                           \
-  } while (1)
+	do {                                                          \
+		(result) = (expr);                                          \
+		if ((check) && (errno == EINTR || errno == EPIPE)) {        \
+			ScmVM *vm__ = Scm_VM();                                   \
+			int epipe__ = (errno == EPIPE);                           \
+			errno = 0;                                                \
+			SCM_SIGCHECK(vm__);                                       \
+			if (epipe__) {                                            \
+				errno = EPIPE;                                          \
+				break;                                                  \
+			}                                                         \
+		} else {                                                    \
+			break;                                                    \
+		}                                                           \
+	} while (1)
 
 #define SCM_SYSCALL(result, expr) \
-  SCM_SYSCALL3(result, expr, (result < 0))
+	SCM_SYSCALL3(result, expr, (result < 0))
 
 /*==============================================================
  * Utility functions
@@ -100,8 +100,8 @@ typedef struct stat ScmStat;
 #endif /*!GAUCHE_WINDOWS*/
 
 typedef struct ScmSysStatRec {
-    SCM_HEADER;
-    ScmStat statrec;
+	SCM_HEADER;
+	ScmStat statrec;
 } ScmSysStat;
 
 SCM_CLASS_DECL(Scm_SysStatClass);
@@ -134,10 +134,10 @@ SCM_EXTERN int  Scm_ClockGetResMonotonic(u_long *sec, u_long *nsec);
  * such as sys-time or sys-gettimeofday.
  */
 typedef struct ScmTimeRec {
-    SCM_HEADER;
-    ScmObj type;       /* 'time-utc by default.  see SRFI-19 */
-    int64_t sec;       /* seconds */
-    long nsec;         /* nanoseconds */
+	SCM_HEADER;
+	ScmObj type;   /* 'time-utc by default.  see SRFI-19 */
+	int64_t sec;   /* seconds */
+	long nsec;     /* nanoseconds */
 } ScmTime;
 
 SCM_CLASS_DECL(Scm_TimeClass);
@@ -159,8 +159,8 @@ SCM_EXTERN ScmObj Scm_TimeToSeconds(ScmTime *t);
 typedef struct timespec ScmTimeSpec;
 #else  /*!(defined(HAVE_STRUCT_TIMESPEC) && (!defined(GAUCHE_WINDOWS) || defined(__MINGW64_VERSION_MAJOR)))*/
 typedef struct ScmTimeSpecRec {
-    time_t tv_sec;
-    long   tv_nsec;
+	time_t tv_sec;
+	long tv_nsec;
 } ScmTimeSpec;
 #endif /*!(defined(HAVE_STRUCT_TIMESPEC) && (!defined(GAUCHE_WINDOWS) || defined(__MINGW64_VERSION_MAJOR)))*/
 
@@ -171,8 +171,8 @@ SCM_EXTERN void   Scm_YieldCPU(void);
 
 /* struct tm */
 typedef struct ScmSysTmRec {
-    SCM_HEADER;
-    struct tm tm;
+	SCM_HEADER;
+	struct tm tm;
 } ScmSysTm;
 
 SCM_CLASS_DECL(Scm_SysTmClass);
@@ -192,11 +192,11 @@ SCM_EXTERN int    Scm_NanoSleep(const ScmTimeSpec *req,
 
 /* struct group */
 typedef struct ScmSysGroupRec {
-    SCM_HEADER;
-    ScmObj name;
-    ScmObj gid;
-    ScmObj passwd;
-    ScmObj mem;
+	SCM_HEADER;
+	ScmObj name;
+	ScmObj gid;
+	ScmObj passwd;
+	ScmObj mem;
 } ScmSysGroup;
 
 SCM_CLASS_DECL(Scm_SysGroupClass);
@@ -209,15 +209,15 @@ SCM_EXTERN ScmObj Scm_GetGroupByName(ScmString *name);
 
 /* struct passwd */
 typedef struct ScmSysPasswdRec {
-    SCM_HEADER;
-    ScmObj name;
-    ScmObj passwd;
-    ScmObj uid;
-    ScmObj gid;
-    ScmObj gecos;
-    ScmObj dir;
-    ScmObj shell;
-    ScmObj pwclass;
+	SCM_HEADER;
+	ScmObj name;
+	ScmObj passwd;
+	ScmObj uid;
+	ScmObj gid;
+	ScmObj gecos;
+	ScmObj dir;
+	ScmObj shell;
+	ScmObj pwclass;
 } ScmSysPasswd;
 
 SCM_CLASS_DECL(Scm_SysPasswdClass);
@@ -236,9 +236,9 @@ SCM_EXTERN int    Scm_IsSugid(void);
 
 /* flags for Scm_SysExec */
 enum {
-    SCM_EXEC_WITH_FORK = (1L<<0), /* fork() before exec(), i.e. spawn(). */
-    SCM_EXEC_DETACHED = (1L<<1)   /* try to detach from process group.
-                                     good for daemoninzing. */
+	SCM_EXEC_WITH_FORK = (1L<<0), /* fork() before exec(), i.e. spawn(). */
+	SCM_EXEC_DETACHED = (1L<<1) /* try to detach from process group.
+	                               good for daemoninzing. */
 };
 
 SCM_EXTERN ScmObj Scm_SysExec(ScmString *file, ScmObj args,
@@ -257,9 +257,9 @@ SCM_EXTERN ScmObj Scm_SysWait(ScmObj process, int options);
 /* select */
 #ifdef HAVE_SELECT
 typedef struct ScmSysFdsetRec {
-    SCM_HEADER;
-    int maxfd;
-    fd_set fdset;
+	SCM_HEADER;
+	int maxfd;
+	fd_set fdset;
 } ScmSysFdset;
 
 SCM_CLASS_DECL(Scm_SysFdsetClass);

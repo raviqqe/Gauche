@@ -43,8 +43,8 @@
 #include <gauche/extern.h>      /* redefine SCM_EXTERN */
 
 typedef struct ScmSysFlockRec {
-    SCM_HEADER;
-    struct flock lock;
+	SCM_HEADER;
+	struct flock lock;
 } ScmSysFlock;
 
 SCM_CLASS_DECL(Scm_SysFlockClass);

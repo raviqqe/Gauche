@@ -41,25 +41,25 @@ SCM_DECL_BEGIN
  *  - Packages slot initialization and accessing methods.
  */
 typedef struct ScmSlotAccessorRec {
-    SCM_HEADER;
-    ScmClass *klass;            /* the class this accessor belongs to.
-                                   need to be checked before used, for the
-                                   class may be changed. */
-    ScmObj name;                /* slot name (symbol) */
-    ScmObj (*getter)(ScmObj instance); /* getter for C accessor */
-    void (*setter)(ScmObj instance, ScmObj value); /* setter for C accessor */
-    ScmObj initValue;           /* :init-value */
-    ScmObj initKeyword;         /* :init-keyword */
-    ScmObj initThunk;           /* :initform or :init-thunk */
-    int initializable;          /* is this slot initializable? */
-    int slotNumber;             /* for :instance slot access */
-    ScmObj schemeGetter;        /* for :virtual slot getter; #f if N/A */
-    ScmObj schemeSetter;        /* for :virtual slot setter; #f if N/A */
-    ScmObj schemeBoundp;        /* for :virtual slot bound?; #f if N/A */
+	SCM_HEADER;
+	ScmClass *klass;        /* the class this accessor belongs to.
+	                           need to be checked before used, for the
+	                           class may be changed. */
+	ScmObj name;            /* slot name (symbol) */
+	ScmObj (*getter)(ScmObj instance); /* getter for C accessor */
+	void (*setter)(ScmObj instance, ScmObj value); /* setter for C accessor */
+	ScmObj initValue;       /* :init-value */
+	ScmObj initKeyword;     /* :init-keyword */
+	ScmObj initThunk;       /* :initform or :init-thunk */
+	int initializable;      /* is this slot initializable? */
+	int slotNumber;         /* for :instance slot access */
+	ScmObj schemeGetter;    /* for :virtual slot getter; #f if N/A */
+	ScmObj schemeSetter;    /* for :virtual slot setter; #f if N/A */
+	ScmObj schemeBoundp;    /* for :virtual slot bound?; #f if N/A */
 } ScmSlotAccessor;
 
 typedef ScmObj (*ScmNativeGetterProc)(ScmObj);
-typedef void   (*ScmNativeSetterProc)(ScmObj, ScmObj);
+typedef void (*ScmNativeSetterProc)(ScmObj, ScmObj);
 
 SCM_CLASS_DECL(Scm_SlotAccessorClass);
 #define SCM_CLASS_SLOT_ACCESSOR    (&Scm_SlotAccessorClass)
@@ -68,21 +68,21 @@ SCM_CLASS_DECL(Scm_SlotAccessorClass);
 
 /* for static declaration of fields */
 struct ScmClassStaticSlotSpecRec {
-    const char *name;
-    ScmSlotAccessor accessor;
+	const char *name;
+	ScmSlotAccessor accessor;
 };
 
 #define SCM_CLASS_SLOT_SPEC(name, getter, setter)               \
-    { name, { {SCM_CLASS_STATIC_TAG(Scm_SlotAccessorClass)},    \
-              NULL, NULL,                                       \
-              (ScmNativeGetterProc)getter,                      \
-              (ScmNativeSetterProc)setter,                      \
-              SCM_UNBOUND,                                      \
-              SCM_FALSE,                                        \
-              SCM_FALSE,                                        \
-              TRUE, -1,                                         \
-              SCM_FALSE, SCM_FALSE, SCM_FALSE,                  \
-             } }
+	{ name, { {SCM_CLASS_STATIC_TAG(Scm_SlotAccessorClass)},    \
+		  NULL, NULL,                                       \
+		  (ScmNativeGetterProc)getter,                      \
+		  (ScmNativeSetterProc)setter,                      \
+		  SCM_UNBOUND,                                      \
+		  SCM_FALSE,                                        \
+		  SCM_FALSE,                                        \
+		  TRUE, -1,                                         \
+		  SCM_FALSE, SCM_FALSE, SCM_FALSE,                  \
+	  } }
 
 #define SCM_CLASS_SLOT_SPEC_END()   SCM_CLASS_SLOT_SPEC(NULL, NULL, NULL)
 
@@ -125,7 +125,7 @@ SCM_CLASS_DECL(Scm_AccessorMethodClass);
 
 /* cliche in allocate method */
 #define SCM_NEW_INSTANCE(klassname, klass) \
-    ((klassname*)Scm_NewInstance(klass, sizeof(klassname)))
+	((klassname*)Scm_NewInstance(klass, sizeof(klassname)))
 
 /* some internal methods */
 

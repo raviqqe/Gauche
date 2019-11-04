@@ -42,18 +42,18 @@
    SCM_WRITE_SIMPLE makes write use one-pass mode.  Settings
    SCM_WRITE_SHARED makes write write-shared (srfi-38 write/ss) mode. */
 enum ScmWriteModeFlags {
-    SCM_WRITE_WRITE = 0,        /* write mode   */
-    SCM_WRITE_DISPLAY = 1,      /* display mode */
-    SCM_WRITE_SHARED = 2,       /* write/ss mode */
-    SCM_WRITE_SIMPLE = 3        /* write-simple mode */
+	SCM_WRITE_WRITE = 0,    /* write mode   */
+	SCM_WRITE_DISPLAY = 1,  /* display mode */
+	SCM_WRITE_SHARED = 2,   /* write/ss mode */
+	SCM_WRITE_SIMPLE = 3    /* write-simple mode */
 };
 
 /* Case folding mode flags */
 enum ScmWriteCaseFlags {
-    SCM_WRITE_CASE_FOLD = 4,    /* case-fold mode.  need to escape capital
-                                   letters. */
-    SCM_WRITE_CASE_NOFOLD = 8,  /* case-sensitive mode.  no need to escape
-                                   capital letters */
+	SCM_WRITE_CASE_FOLD = 4, /* case-fold mode.  need to escape capital
+	                            letters. */
+	SCM_WRITE_CASE_NOFOLD = 8, /* case-sensitive mode.  no need to escape
+	                              capital letters */
 };
 
 SCM_EXTERN ScmWriteControls *Scm_MakeWriteControls(const ScmWriteControls *proto);

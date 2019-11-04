@@ -16,7 +16,7 @@
 #if GC_BUILTIN_ATOMIC
 
 #  if HAVE_STDATOMIC_H
-/* 
+/*
  * C11 atomics
  */
 #include <stdatomic.h>
@@ -29,7 +29,7 @@ typedef volatile _Atomic ScmAtomicWord ScmAtomicVar;
 #define AO_store(loc, val)       atomic_store(loc, val)
 #define AO_load(loc)             atomic_load(loc)
 #define AO_compare_and_swap_full(loc, oldval, newval) \
-    atomic_compare_exchange_strong(loc, &oldval, newval)
+	atomic_compare_exchange_strong(loc, &oldval, newval)
 #define AO_nop_full()            atomic_thread_fence(__ATOMIC_SEQ_CST)
 
 #  else /* GC_BUILTIN_ATOMIC && !HAVE_STDATOMIC_H */
@@ -44,14 +44,14 @@ typedef volatile ScmAtomicWord ScmAtomicVar;
 #define AO_store(loc, val)       __atomic_store_n(loc, val, __ATOMIC_SEQ_CST)
 #define AO_load(loc)             __atomic_load_n(loc, __ATOMIC_SEQ_CST)
 #define AO_compare_and_swap_full(loc, oldval, newval) \
-    __atomic_compare_exchange_n(loc, &oldval, newval, 0, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+	__atomic_compare_exchange_n(loc, &oldval, newval, 0, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #define AO_nop_full()            __atomic_thread_fence(__ATOMIC_SEQ_CST)
 
 
 #  endif /* GC_BUILTIN_ATOMIC && !HAVE_STDATOMIC_H */
 
 #else /* !GC_BUILTIN_ATOMIC */
-/* 
+/*
  * Use libatomic_ops
  */
 
@@ -66,14 +66,14 @@ typedef volatile ScmAtomicWord ScmAtomicVar;
  * are incompatible to SH-4A, SMP machines.
  *
  * I believe that SH-4A, architecture wise, breaks SH-4 ABI already.
- * 
+ *
  * If SH-4A machine insists as if it were SH4 (ABI), we can't use
  * gUSA, nor ll/sc equivalents (movli.l/movco.l, IIRC), either.
  * That's totally a mess.
  *
  * Only workaround for both of SH-4 and SH-4A is to downgrade to
  * pthread implementation, so that it will work reliably.
- * 
+ *
  * -- gniibe  2012-11-27
  *
  */
@@ -86,7 +86,7 @@ typedef volatile ScmAtomicWord ScmAtomicVar;
  * for ARM architectures.  It could be understandable as there
  * are so many variants in "ARM".
  *
- * For __ARMEL__ (which means ARM_ARCH_4T, in Debian), there is no 
+ * For __ARMEL__ (which means ARM_ARCH_4T, in Debian), there is no
  * hardware support for atomic operations, unfortunately.
  *
  * NOTE:

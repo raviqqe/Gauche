@@ -86,18 +86,18 @@ SCM_DECL_BEGIN
 typedef struct ScmTLSRec ScmTLS;
 
 struct ScmTLSRec {
-    SCM_HEADER;
-    ScmObj sock;                /* <socket> */
-    ScmObj in_port;
-    ScmObj out_port;
+	SCM_HEADER;
+	ScmObj sock;            /* <socket> */
+	ScmObj in_port;
+	ScmObj out_port;
 
-    ScmObj (*connect)(ScmTLS*, int);
-    ScmObj (*accept)(ScmTLS*, int);
-    ScmObj (*read)(ScmTLS*);
-    ScmObj (*write)(ScmTLS*, ScmObj);
-    ScmObj (*close)(ScmTLS*);
-    ScmObj (*loadObject)(ScmTLS*, ScmObj, const char*, const char*);
-    void   (*finalize)(ScmObj, void*);
+	ScmObj (*connect)(ScmTLS*, int);
+	ScmObj (*accept)(ScmTLS*, int);
+	ScmObj (*read)(ScmTLS*);
+	ScmObj (*write)(ScmTLS*, ScmObj);
+	ScmObj (*close)(ScmTLS*);
+	ScmObj (*loadObject)(ScmTLS*, ScmObj, const char*, const char*);
+	void (*finalize)(ScmObj, void*);
 };
 
 SCM_CLASS_DECL(Scm_TLSClass);

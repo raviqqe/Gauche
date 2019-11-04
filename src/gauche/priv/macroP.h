@@ -39,18 +39,18 @@ SCM_DECL_BEGIN
 
 /* Syntax is a built-in procedure to compile given form. */
 struct ScmSyntaxRec {
-    SCM_HEADER;
-    ScmSymbol *name;         /* for debugging.  can be NULL */
-    ScmObj     handler;      /* syntax handler.  (Sexpr, Env) -> IForm */
+	SCM_HEADER;
+	ScmSymbol *name;     /* for debugging.  can be NULL */
+	ScmObj handler;      /* syntax handler.  (Sexpr, Env) -> IForm */
 };
 
 /* Macro */
 struct ScmMacroRec {
-    SCM_HEADER;
-    ScmObj name;             /* for debugging.  */
-    ScmObj transformer;      /* (Sexpr, CEnv) -> Sexpr */
-    ScmObj src;              /* for debugging.  #f if n/a */
-    ScmObj describer;        /* for debugging.  Maybe ((Macro, Port) -> ()) */
+	SCM_HEADER;
+	ScmObj name;         /* for debugging.  */
+	ScmObj transformer;  /* (Sexpr, CEnv) -> Sexpr */
+	ScmObj src;          /* for debugging.  #f if n/a */
+	ScmObj describer;    /* for debugging.  Maybe ((Macro, Port) -> ()) */
 };
 
 /*
@@ -58,23 +58,23 @@ struct ScmMacroRec {
  */
 
 typedef struct ScmSyntaxRuleBranchRec {
-    ScmObj pattern;             /* pattern to match */
-    ScmObj templat;             /* template to be expanded */
-    int numPvars;               /* # of pattern variables */
-    int maxLevel;               /* maximum # of nested subpatterns */
+	ScmObj pattern;         /* pattern to match */
+	ScmObj templat;         /* template to be expanded */
+	int numPvars;           /* # of pattern variables */
+	int maxLevel;           /* maximum # of nested subpatterns */
 } ScmSyntaxRuleBranch;
 
 typedef struct ScmSyntaxRules {
-    SCM_HEADER;
-    ScmObj name;                  /* name of the macro (for debug) */
-    int numRules;                 /* # of rules */
-    int maxNumPvars;              /* max # of pattern variables */
-    ScmModule *mod;               /* macro definition module */
-    ScmObj env;                   /* macro definition env (in fact, it is
-                                     list of frames passed to Scm_MakeIdentifier,
-                                     but the macro system should treat it
-                                     as an opaque object. */
-    ScmSyntaxRuleBranch rules[1]; /* variable length */
+	SCM_HEADER;
+	ScmObj name;              /* name of the macro (for debug) */
+	int numRules;             /* # of rules */
+	int maxNumPvars;          /* max # of pattern variables */
+	ScmModule *mod;           /* macro definition module */
+	ScmObj env;               /* macro definition env (in fact, it is
+	                             list of frames passed to Scm_MakeIdentifier,
+	                             but the macro system should treat it
+	                             as an opaque object. */
+	ScmSyntaxRuleBranch rules[1]; /* variable length */
 } ScmSyntaxRules;
 
 SCM_CLASS_DECL(Scm_SyntaxRulesClass);
@@ -97,7 +97,7 @@ SCM_EXTERN ScmObj Scm_CompileSyntaxRules(ScmObj name, ScmObj src,
 #define SCM_PVREF_COUNT(obj)       ((SCM_WORD(obj)>>16) & 0xff)
 
 #define SCM_MAKE_PVREF(level, count)  \
-    SCM_OBJ((SCM_WORD(level)<<24) | (SCM_WORD(count)<<16) | SCM_PVREF_TAG)
+	SCM_OBJ((SCM_WORD(level)<<24) | (SCM_WORD(count)<<16) | SCM_PVREF_TAG)
 
 
 /*
@@ -107,7 +107,7 @@ SCM_EXTERN ScmObj Scm_CompileSyntaxRules(ScmObj name, ScmObj src,
 /* 'compare' function used in er macro.
    The definition is in compile.scm, for it needs to access internal
    variable lookup routine. */
-SCM_EXTERN int     Scm__ERCompare(ScmObj, ScmObj, ScmModule*, ScmObj);
+SCM_EXTERN int Scm__ERCompare(ScmObj, ScmObj, ScmModule*, ScmObj);
 
 
 SCM_DECL_END

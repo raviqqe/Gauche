@@ -76,45 +76,45 @@
    See port.c for the details of function pointers. */
 
 typedef struct ScmPortBufferRec {
-    char *buffer;       /* ptr to the buffer area */
-    char *current;      /* current buffer position */
-    char *end;          /* the end of the current valid data */
-    ScmSize size;       /* buffer size */
-    int  mode;          /* buffering mode (ScmPortBufferMode) & SIGPIPE flag */
-    ScmSize (*filler)(ScmPort *p, ScmSize min);
-    ScmSize (*flusher)(ScmPort *p, ScmSize cnt, int forcep);
-    void (*closer)(ScmPort *p);
-    int  (*ready)(ScmPort *p);
-    int  (*filenum)(ScmPort *p);
-    off_t (*seeker)(ScmPort *p, off_t offset, int whence);
-    void *data;
+	char *buffer;   /* ptr to the buffer area */
+	char *current;  /* current buffer position */
+	char *end;      /* the end of the current valid data */
+	ScmSize size;   /* buffer size */
+	int mode;       /* buffering mode (ScmPortBufferMode) & SIGPIPE flag */
+	ScmSize (*filler)(ScmPort *p, ScmSize min);
+	ScmSize (*flusher)(ScmPort *p, ScmSize cnt, int forcep);
+	void (*closer)(ScmPort *p);
+	int (*ready)(ScmPort *p);
+	int (*filenum)(ScmPort *p);
+	off_t (*seeker)(ScmPort *p, off_t offset, int whence);
+	void *data;
 } ScmPortBuffer;
 
 /* For input buffered port, returns the size of room that can be filled
    by the filler */
 #define SCM_PORT_BUFFER_ROOM(p) \
-    (int)((p)->src.buf.buffer+(p)->src.buf.size-(p)->src.buf.end)
+	(int)((p)->src.buf.buffer+(p)->src.buf.size-(p)->src.buf.end)
 
 /* For output buffered port, returns the size of available data that can
    be flushed by the flusher */
 #define SCM_PORT_BUFFER_AVAIL(p) \
-    (int)((p)->src.buf.current-(p)->src.buf.buffer)
+	(int)((p)->src.buf.current-(p)->src.buf.buffer)
 
 /* The function table of procedural port. */
 
 typedef struct ScmPortVTableRec {
-    int     (*Getb)(ScmPort *p);
-    int     (*Getc)(ScmPort *p);
-    ScmSize (*Getz)(char *buf, ScmSize buflen, ScmPort *p);
-    int     (*Ready)(ScmPort *p, int charp);
-    void    (*Putb)(ScmByte b, ScmPort *p);
-    void    (*Putc)(ScmChar c, ScmPort *p);
-    void    (*Putz)(const char *buf, ScmSize size, ScmPort *p);
-    void    (*Puts)(ScmString *s, ScmPort *p);
-    void    (*Flush)(ScmPort *p);
-    void    (*Close)(ScmPort *p);
-    off_t   (*Seek)(ScmPort *p, off_t off, int whence);
-    void    *data;
+	int (*Getb)(ScmPort *p);
+	int (*Getc)(ScmPort *p);
+	ScmSize (*Getz)(char *buf, ScmSize buflen, ScmPort *p);
+	int (*Ready)(ScmPort *p, int charp);
+	void (*Putb)(ScmByte b, ScmPort *p);
+	void (*Putc)(ScmChar c, ScmPort *p);
+	void (*Putz)(const char *buf, ScmSize size, ScmPort *p);
+	void (*Puts)(ScmString *s, ScmPort *p);
+	void (*Flush)(ScmPort *p);
+	void (*Close)(ScmPort *p);
+	off_t (*Seek)(ScmPort *p, off_t off, int whence);
+	void    *data;
 } ScmPortVTable;
 
 /* The main port structure.
@@ -126,60 +126,60 @@ typedef struct ScmPortVTableRec {
  */
 
 struct ScmPortRec {
-    SCM_INSTANCE_HEADER;
-    u_int direction : 2;        /* SCM_PORT_INPUT or SCM_PORT_OUTPUT.
-                                   There may be I/O port in future. */
-    u_int type      : 2;        /* SCM_PORT_{FILE|ISTR|OSTR|PROC} */
-    u_int scrcnt    : 3;        /* # of bytes in the scratch buffer */
+	SCM_INSTANCE_HEADER;
+	u_int direction : 2;    /* SCM_PORT_INPUT or SCM_PORT_OUTPUT.
+	                           There may be I/O port in future. */
+	u_int type      : 2;    /* SCM_PORT_{FILE|ISTR|OSTR|PROC} */
+	u_int scrcnt    : 3;    /* # of bytes in the scratch buffer */
 
-    u_int ownerp    : 1;        /* TRUE if this port owns underlying
-                                   file pointer */
-    u_int closed    : 1;        /* TRUE if this port is closed */
-    u_int error     : 1;        /* Error has been occurred */
+	u_int ownerp    : 1;    /* TRUE if this port owns underlying
+	                           file pointer */
+	u_int closed    : 1;    /* TRUE if this port is closed */
+	u_int error     : 1;    /* Error has been occurred */
 
-    u_int flags     : 5;        /* see ScmPortFlags below */
+	u_int flags     : 5;    /* see ScmPortFlags below */
 
-    char scratch[SCM_CHAR_MAX_BYTES]; /* incomplete buffer */
+	char scratch[SCM_CHAR_MAX_BYTES]; /* incomplete buffer */
 
-    ScmChar ungotten;           /* ungotten character.
-                                   SCM_CHAR_INVALID if empty. */
-    ScmObj name;                /* port's name.  Can be any Scheme object. */
+	ScmChar ungotten;       /* ungotten character.
+	                           SCM_CHAR_INVALID if empty. */
+	ScmObj name;            /* port's name.  Can be any Scheme object. */
 
-    ScmInternalFastlock lock;   /* for port mutex */
-    ScmVM *lockOwner;           /* for port mutex; owner of the lock */
-    int lockCount;              /* for port mutex; # of recursive locks */
+	ScmInternalFastlock lock; /* for port mutex */
+	ScmVM *lockOwner;       /* for port mutex; owner of the lock */
+	int lockCount;          /* for port mutex; # of recursive locks */
 
-    ScmWriteState *writeState;  /* used internally */
+	ScmWriteState *writeState; /* used internally */
 
-    /* Input counters.  these doesn't take account of ungetting and
-       seeking: Ungetting doesn't affect those counters (you can think
-       that ungetting are handled above the counting layer).
-       Seeking invalidates counters; if you seek, the values of the counters
-       become bogus.
-       We don't have character counter, since it is difficult to track
-       (read-line uses byte read; see Scm_ReadLine in portapi.c).
-     */
-    u_long line;                /* line counter */
-    u_long bytes;               /* byte counter */
+	/* Input counters.  these doesn't take account of ungetting and
+	   seeking: Ungetting doesn't affect those counters (you can think
+	   that ungetting are handled above the counting layer).
+	   Seeking invalidates counters; if you seek, the values of the counters
+	   become bogus.
+	   We don't have character counter, since it is difficult to track
+	   (read-line uses byte read; see Scm_ReadLine in portapi.c).
+	 */
+	u_long line;            /* line counter */
+	u_long bytes;           /* byte counter */
 
-    /* The source or the sink of the port. */
-    union {
-        ScmPortBuffer buf;      /* buffered port */
-        struct {
-            const char *start;
-            const char *current;
-            const char *end;
-        } istr;                 /* input string port */
-        ScmDString ostr;        /* output string port */
-        ScmPortVTable vt;       /* virtual port */
-    } src;
+	/* The source or the sink of the port. */
+	union {
+		ScmPortBuffer buf; /* buffered port */
+		struct {
+			const char *start;
+			const char *current;
+			const char *end;
+		} istr;         /* input string port */
+		ScmDString ostr; /* output string port */
+		ScmPortVTable vt; /* virtual port */
+	} src;
 
-    /* Port attibutes.
-     * NB: Before we release 0.9.4, we might merge this into port->data and/or
-     * port->name.
-     */
-    ScmObj attrs;               /* port attibutes.  use Scm_PortAttr* API to
-                                   access. */
+	/* Port attibutes.
+	 * NB: Before we release 0.9.4, we might merge this into port->data and/or
+	 * port->name.
+	 */
+	ScmObj attrs;           /* port attibutes.  use Scm_PortAttr* API to
+	                           access. */
 };
 
 /* Port direction.  Bidirectional port is not supported yet.
@@ -189,19 +189,19 @@ struct ScmPortRec {
    Only the lower two bits are stored in port->direction.
  */
 enum ScmPortDirection {
-    SCM_PORT_INPUT = 1,
-    SCM_PORT_OUTPUT = 2,
-    SCM_PORT_IOMASK = 3,
-    SCM_PORT_OUTPUT_TRANSIENT = 4+SCM_PORT_OUTPUT
+	SCM_PORT_INPUT = 1,
+	SCM_PORT_OUTPUT = 2,
+	SCM_PORT_IOMASK = 3,
+	SCM_PORT_OUTPUT_TRANSIENT = 4+SCM_PORT_OUTPUT
 };
 
 /* Port buffering mode */
 enum ScmPortBufferMode {
-    SCM_PORT_BUFFER_FULL = 0,       /* full buffering */
-    SCM_PORT_BUFFER_LINE = 1,       /* flush the buffer for each line */
-    SCM_PORT_BUFFER_NONE = 2,       /* flush the buffer for every output */
+	SCM_PORT_BUFFER_FULL = 0,   /* full buffering */
+	SCM_PORT_BUFFER_LINE = 1,   /* flush the buffer for each line */
+	SCM_PORT_BUFFER_NONE = 2,   /* flush the buffer for every output */
 
-    SCM_PORT_BUFFER_MODE_MASK = 0x07 /* for future extension */
+	SCM_PORT_BUFFER_MODE_MASK = 0x07 /* for future extension */
 };
 
 /* If this flag is set in `mode' member of ScmPortBuffer, SIGPIPE causes
@@ -214,33 +214,33 @@ enum ScmPortBufferMode {
    C routine can dispatch quicker using these flags.  User code
    doesn't need to care about these. */
 enum ScmPortType {
-    SCM_PORT_FILE,              /* file (buffered) port */
-    SCM_PORT_ISTR,              /* input string port */
-    SCM_PORT_OSTR,              /* output string port */
-    SCM_PORT_PROC               /* virtual port */
+	SCM_PORT_FILE,          /* file (buffered) port */
+	SCM_PORT_ISTR,          /* input string port */
+	SCM_PORT_OSTR,          /* output string port */
+	SCM_PORT_PROC           /* virtual port */
 };
 
 /* Return value from Scm_FdReady */
 enum ScmFdReadyResult {
-    SCM_FD_WOULDBLOCK,
-    SCM_FD_READY,
-    SCM_FD_UNKNOWN
+	SCM_FD_WOULDBLOCK,
+	SCM_FD_READY,
+	SCM_FD_UNKNOWN
 };
 
 /* Other flags used internally */
 /* NB: The first two flags only matter when port->recursiveContext is set,
    and they're transient by nature.  See write.c for the details. */
 enum ScmPortFlags {
-    SCM_PORT_WRITESS = (1L<<0), /* we're write/ss mode.  */
-    SCM_PORT_WALKING = (1L<<1), /* indicates we're currently in 'walk' pass
-                                   of two-pass writing. */
-    SCM_PORT_PRIVATE = (1L<<2), /* this port is for 'private' use within
-                                   a thread, so never need to be locked. */
-    SCM_PORT_CASE_FOLD = (1L<<3),/* read from or write to this port should
-                                    be case folding. */
-    SCM_PORT_TRANSIENT = (1L<<4) /* a buffered output port that's used
-                                    transiently and doesn't need to be
-                                    registered for flushing. */
+	SCM_PORT_WRITESS = (1L<<0), /* we're write/ss mode.  */
+	SCM_PORT_WALKING = (1L<<1), /* indicates we're currently in 'walk' pass
+	                               of two-pass writing. */
+	SCM_PORT_PRIVATE = (1L<<2), /* this port is for 'private' use within
+	                               a thread, so never need to be locked. */
+	SCM_PORT_CASE_FOLD = (1L<<3),/* read from or write to this port should
+	                                be case folding. */
+	SCM_PORT_TRANSIENT = (1L<<4) /* a buffered output port that's used
+	                                transiently and doesn't need to be
+	                                registered for flushing. */
 };
 
 #if 0 /* not implemented */
@@ -249,11 +249,11 @@ enum ScmPortFlags {
    multibyte character, it may take one of the following actions,
    according to the port's icpolicy field. */
 enum ScmPortICPolicy {
-    SCM_PORT_IC_ERROR,          /* signal an error */
-    SCM_PORT_IC_IGNORE,         /* ignore bytes until Getc finds a
-                                   valid multibyte character */
-    SCM_PORT_IC_REPLACE,        /* replace invalid byte to a designated
-                                   character. */
+	SCM_PORT_IC_ERROR,      /* signal an error */
+	SCM_PORT_IC_IGNORE,     /* ignore bytes until Getc finds a
+	                           valid multibyte character */
+	SCM_PORT_IC_REPLACE,    /* replace invalid byte to a designated
+	                           character. */
 };
 #endif
 

@@ -71,8 +71,8 @@ SCM_EXTERN ScmObj Scm_SetReaderLexicalMode(ScmObj);
  * code that handles it explicitly (like read-time constructor).
  */
 typedef struct ScmReadReferenceRec {
-    SCM_HEADER;
-    ScmObj value;               /* realized reference.  initially UNBOUND */
+	SCM_HEADER;
+	ScmObj value;           /* realized reference.  initially UNBOUND */
 } ScmReadReference;
 
 SCM_CLASS_DECL(Scm_ReadReferenceClass);
@@ -80,7 +80,7 @@ SCM_CLASS_DECL(Scm_ReadReferenceClass);
 #define SCM_READ_REFERENCE(obj)   ((ScmReadReference*)(obj))
 #define SCM_READ_REFERENCE_P(obj) SCM_XTYPEP(obj, SCM_CLASS_READ_REFERENCE)
 #define SCM_READ_REFERENCE_REALIZED(obj) \
-   (!SCM_EQ(SCM_READ_REFERENCE(obj)->value, SCM_UNBOUND))
+	(!SCM_EQ(SCM_READ_REFERENCE(obj)->value, SCM_UNBOUND))
 
 /*
  * Standard Read entries

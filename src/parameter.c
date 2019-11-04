@@ -91,78 +91,78 @@ SCM_DEFINE_BASE_CLASS(Scm_PrimitiveParameterClass, ScmPrimitiveParameter,
  */
 ScmVMParameterTable *Scm__MakeVMParameterTable(ScmVM *base)
 {
-    ScmVMParameterTable *table = SCM_NEW(ScmVMParameterTable);
+	ScmVMParameterTable *table = SCM_NEW(ScmVMParameterTable);
 
-    if (base) {
-        /* NB: In this case, the caller is the owner thread of BASE,
-           so we don't need to worry about base->parameters being
-           modified during copying. */
-        table->vector = SCM_NEW_ARRAY(ScmObj, base->parameters->size);
-        table->size = base->parameters->size;
-        for (ScmSize i=0; i<table->size; i++) {
-            table->vector[i] = base->parameters->vector[i];
-        }
-    } else {
-        table->vector = SCM_NEW_ARRAY(ScmObj, PARAMETER_INIT_SIZE);
-        table->size = PARAMETER_INIT_SIZE;
-        for (ScmSize i=0; i<table->size; i++) {
-            table->vector[i] = SCM_UNBOUND;
-        }
-    }
-    return table;
+	if (base) {
+		/* NB: In this case, the caller is the owner thread of BASE,
+		   so we don't need to worry about base->parameters being
+		   modified during copying. */
+		table->vector = SCM_NEW_ARRAY(ScmObj, base->parameters->size);
+		table->size = base->parameters->size;
+		for (ScmSize i=0; i<table->size; i++) {
+			table->vector[i] = base->parameters->vector[i];
+		}
+	} else {
+		table->vector = SCM_NEW_ARRAY(ScmObj, PARAMETER_INIT_SIZE);
+		table->size = PARAMETER_INIT_SIZE;
+		for (ScmSize i=0; i<table->size; i++) {
+			table->vector[i] = SCM_UNBOUND;
+		}
+	}
+	return table;
 }
 
-static void pparam_print(ScmObj obj, 
+static void pparam_print(ScmObj obj,
                          ScmPort *out,
                          ScmWriteContext *ctx SCM_UNUSED)
 {
-    Scm_Printf(out, "#<%A %S @%p>",
-               Scm_ShortClassName(Scm_ClassOf(obj)),
-               SCM_PRIMITIVE_PARAMETER(obj)->name,
-               obj);
+	Scm_Printf(out, "#<%A %S @%p>",
+	           Scm_ShortClassName(Scm_ClassOf(obj)),
+	           SCM_PRIMITIVE_PARAMETER(obj)->name,
+	           obj);
 }
 
 static void ensure_parameter_slot(ScmVMParameterTable *p, ScmSize index)
 {
-    if (index >= p->size) {
-        ScmSize newsiz = ((index+PARAMETER_GROW)/PARAMETER_GROW)*PARAMETER_GROW;
-        ScmObj *newvec = SCM_NEW_ARRAY(ScmObj, newsiz);
+	if (index >= p->size) {
+		ScmSize newsiz = ((index+PARAMETER_GROW)/PARAMETER_GROW)*PARAMETER_GROW;
+		ScmObj *newvec = SCM_NEW_ARRAY(ScmObj, newsiz);
 
-        ScmSize i;
-        for (i=0; i < p->size; i++) {
-            newvec[i] = p->vector[i];
-            p->vector[i] = SCM_FALSE; /*be friendly to GC*/
-        }
-        for (; i < newsiz; i++) {
-            newvec[i] = SCM_UNBOUND;
-        }
-        p->vector = newvec;
-        p->size = newsiz;
-    }
+		ScmSize i;
+		for (i=0; i < p->size; i++) {
+			newvec[i] = p->vector[i];
+			p->vector[i] = SCM_FALSE; /*be friendly to GC*/
+		}
+		for (; i < newsiz; i++) {
+			newvec[i] = SCM_UNBOUND;
+		}
+		p->vector = newvec;
+		p->size = newsiz;
+	}
 }
 
 static void ensure_parameter_init_keywords()
 {
-    /* idempotency is ensured in SCM_MAKE_KEYWORD. */
-    if (SCM_FALSEP(key_name)) {
-        key_name = SCM_MAKE_KEYWORD("name");
-    }
-    if (SCM_FALSEP(key_initial_value)) {
-        key_initial_value = SCM_MAKE_KEYWORD("initial-value");
-    }
+	/* idempotency is ensured in SCM_MAKE_KEYWORD. */
+	if (SCM_FALSEP(key_name)) {
+		key_name = SCM_MAKE_KEYWORD("name");
+	}
+	if (SCM_FALSEP(key_initial_value)) {
+		key_initial_value = SCM_MAKE_KEYWORD("initial-value");
+	}
 }
 
 static ScmObj pparam_allocate(ScmClass *klass, ScmObj initargs)
 {
-    ensure_parameter_init_keywords();
-    ScmObj name = Scm_GetKeyword(key_name, initargs, SCM_FALSE);
-    ScmObj initval = Scm_GetKeyword(key_initial_value, initargs, SCM_FALSE);
-    ScmPrimitiveParameter *p =
-        Scm_MakePrimitiveParameter(klass, name, initval, 0);
-    return SCM_OBJ(p);
+	ensure_parameter_init_keywords();
+	ScmObj name = Scm_GetKeyword(key_name, initargs, SCM_FALSE);
+	ScmObj initval = Scm_GetKeyword(key_initial_value, initargs, SCM_FALSE);
+	ScmPrimitiveParameter *p =
+		Scm_MakePrimitiveParameter(klass, name, initval, 0);
+	return SCM_OBJ(p);
 }
 
-/* 
+/*
  * Create primitive parameter, which is a SUBR
  */
 ScmPrimitiveParameter *Scm_MakePrimitiveParameter(ScmClass *klass,
@@ -170,30 +170,30 @@ ScmPrimitiveParameter *Scm_MakePrimitiveParameter(ScmClass *klass,
                                                   ScmObj initval,
                                                   u_long flags)
 {
-    SCM_INTERNAL_MUTEX_LOCK(parameter_mutex);
-    ScmSize index = next_parameter_index++;
-    SCM_INTERNAL_MUTEX_UNLOCK(parameter_mutex);
-    ensure_parameter_slot(Scm_VM()->parameters, index);
+	SCM_INTERNAL_MUTEX_LOCK(parameter_mutex);
+	ScmSize index = next_parameter_index++;
+	SCM_INTERNAL_MUTEX_UNLOCK(parameter_mutex);
+	ensure_parameter_slot(Scm_VM()->parameters, index);
 
-    /* This is called _before_ class stuff is initialized, in which case
-       we can't call SCM_NEW_INSTANCE.  We know such cases only happens
-       with klass == SCM_CLASS_PRIMITIVE_PARAMETER, so we hard-wire the
-       case.
-     */
-    
-    ScmPrimitiveParameter *p;
-    if (SCM_EQ(klass, SCM_CLASS_PRIMITIVE_PARAMETER)) {
-        p = SCM_NEW(ScmPrimitiveParameter);
-        SCM_SET_CLASS(p, SCM_CLASS_PRIMITIVE_PARAMETER);
-        SCM_INSTANCE(p)->slots = NULL;        /* no extra slots */
-    } else {
-        p = SCM_NEW_INSTANCE(ScmPrimitiveParameter, klass);
-    }
-    p->name = name;
-    p->index = index;
-    p->initialValue = initval;
-    p->flags = flags;
-    return p;
+	/* This is called _before_ class stuff is initialized, in which case
+	   we can't call SCM_NEW_INSTANCE.  We know such cases only happens
+	   with klass == SCM_CLASS_PRIMITIVE_PARAMETER, so we hard-wire the
+	   case.
+	 */
+
+	ScmPrimitiveParameter *p;
+	if (SCM_EQ(klass, SCM_CLASS_PRIMITIVE_PARAMETER)) {
+		p = SCM_NEW(ScmPrimitiveParameter);
+		SCM_SET_CLASS(p, SCM_CLASS_PRIMITIVE_PARAMETER);
+		SCM_INSTANCE(p)->slots = NULL; /* no extra slots */
+	} else {
+		p = SCM_NEW_INSTANCE(ScmPrimitiveParameter, klass);
+	}
+	p->name = name;
+	p->index = index;
+	p->initialValue = initval;
+	p->flags = flags;
+	return p;
 }
 
 /*
@@ -201,36 +201,36 @@ ScmPrimitiveParameter *Scm_MakePrimitiveParameter(ScmClass *klass,
  */
 ScmObj Scm_PrimitiveParameterRef(ScmVM *vm, const ScmPrimitiveParameter *p)
 {
-    ScmVMParameterTable *t = vm->parameters;
-    ScmObj result;
-    if (p->index >= t->size) {
-        result = p->initialValue;
-    } else {
-        result = t->vector[p->index];
-        if (SCM_UNBOUNDP(result)) {
-            result = t->vector[p->index] = p->initialValue;
-        }
-    }
-    if (p->flags & SCM_PARAMETER_LAZY) return Scm_Force(result);
-    else return result;
+	ScmVMParameterTable *t = vm->parameters;
+	ScmObj result;
+	if (p->index >= t->size) {
+		result = p->initialValue;
+	} else {
+		result = t->vector[p->index];
+		if (SCM_UNBOUNDP(result)) {
+			result = t->vector[p->index] = p->initialValue;
+		}
+	}
+	if (p->flags & SCM_PARAMETER_LAZY) return Scm_Force(result);
+	else return result;
 }
 
 ScmObj Scm_PrimitiveParameterSet(ScmVM *vm, const ScmPrimitiveParameter *p,
                                  ScmObj val)
 {
-    ScmObj oldval;
-    ScmVMParameterTable *t = vm->parameters;
-    if (p->index >= t->size) {
-        ensure_parameter_slot(t, p->index);
-        oldval = p->initialValue;
-    } else {
-        oldval = t->vector[p->index];
-        if (SCM_UNBOUNDP(oldval)) {
-            oldval = p->initialValue;
-        }
-    }
-    t->vector[p->index] = val;
-    return oldval;
+	ScmObj oldval;
+	ScmVMParameterTable *t = vm->parameters;
+	if (p->index >= t->size) {
+		ensure_parameter_slot(t, p->index);
+		oldval = p->initialValue;
+	} else {
+		oldval = t->vector[p->index];
+		if (SCM_UNBOUNDP(oldval)) {
+			oldval = p->initialValue;
+		}
+	}
+	t->vector[p->index] = val;
+	return oldval;
 }
 
 /* Convenience function.  Create a primitive parameter and bind
@@ -240,19 +240,19 @@ ScmPrimitiveParameter *Scm_BindPrimitiveParameter(ScmModule *mod,
                                                   ScmObj initval,
                                                   u_long flags)
 {
-    ScmPrimitiveParameter *p = 
-        Scm_MakePrimitiveParameter(SCM_CLASS_PRIMITIVE_PARAMETER,
-                                   SCM_INTERN(name), initval, flags);
-    Scm_Define(mod, SCM_SYMBOL(p->name), SCM_OBJ(p));
-    return p;
+	ScmPrimitiveParameter *p =
+		Scm_MakePrimitiveParameter(SCM_CLASS_PRIMITIVE_PARAMETER,
+		                           SCM_INTERN(name), initval, flags);
+	Scm_Define(mod, SCM_SYMBOL(p->name), SCM_OBJ(p));
+	return p;
 }
 
 void Scm__InitParameter(void)
 {
-    SCM_INTERNAL_MUTEX_INIT(parameter_mutex);
-    /* We don't initialize Scm_PrimitiveParameterClass yet, since class
-       stuff is not initialized yet.  The class is initialized in
-       class.c. */
+	SCM_INTERNAL_MUTEX_INIT(parameter_mutex);
+	/* We don't initialize Scm_PrimitiveParameterClass yet, since class
+	   stuff is not initialized yet.  The class is initialized in
+	   class.c. */
 }
 
 /* TRANSIENT: For the backward compatibility.  Remove by 1.0 */
@@ -261,41 +261,41 @@ void Scm_DefinePrimitiveParameter(ScmModule *mod,
                                   ScmObj initval,
                                   ScmParameterLoc *location /*out*/)
 {
-    location->p = Scm_BindPrimitiveParameter(mod, name, initval, 0);
+	location->p = Scm_BindPrimitiveParameter(mod, name, initval, 0);
 }
 
 ScmObj Scm_ParameterRef(ScmVM *vm, const ScmParameterLoc *loc)
 {
-    Scm_Warn("Scm_ParameterRef is deprecated.");
-    return Scm_PrimitiveParameterRef(vm, loc->p);
+	Scm_Warn("Scm_ParameterRef is deprecated.");
+	return Scm_PrimitiveParameterRef(vm, loc->p);
 }
 
 ScmObj Scm_ParameterSet(ScmVM *vm, const ScmParameterLoc *loc, ScmObj value)
 {
-    Scm_Warn("Scm_ParameterSet is deprecated.");
-    return Scm_PrimitiveParameterSet(vm, loc->p, value);
+	Scm_Warn("Scm_ParameterSet is deprecated.");
+	return Scm_PrimitiveParameterSet(vm, loc->p, value);
 }
 
 void Scm_InitParameterLoc(ScmVM *vm SCM_UNUSED,
                           ScmParameterLoc *location,
                           ScmObj initval)
 {
-    Scm_Warn("Scm_InitParameterLoc is deprecated.  Use Scm_MakePrimitiveParameter");
-    ScmPrimitiveParameter *p =
-        Scm_MakePrimitiveParameter(SCM_CLASS_PRIMITIVE_PARAMETER, 
-                                   SCM_FALSE, initval, 0);
-    location->p = p;
+	Scm_Warn("Scm_InitParameterLoc is deprecated.  Use Scm_MakePrimitiveParameter");
+	ScmPrimitiveParameter *p =
+		Scm_MakePrimitiveParameter(SCM_CLASS_PRIMITIVE_PARAMETER,
+		                           SCM_FALSE, initval, 0);
+	location->p = p;
 }
 
 void Scm_MakeParameterSlot(ScmVM *vm, ScmParameterLoc *location)
 {
-    Scm_Warn("Scm_MakeParameterSlot is deprecated.  Use Scm_MakePrimitiveParameter.");
-    Scm_InitParameterLoc(vm, location, SCM_FALSE);
+	Scm_Warn("Scm_MakeParameterSlot is deprecated.  Use Scm_MakePrimitiveParameter.");
+	Scm_InitParameterLoc(vm, location, SCM_FALSE);
 }
 
 void Scm__VMParameterTableInit(void *dummy SCM_UNUSED,
                                ScmVM *dummy2 SCM_UNUSED)
 {
-    Scm_Panic("Scm__VMParameterTableInit is obsoleted.  Shouldn't be called.");
+	Scm_Panic("Scm__VMParameterTableInit is obsoleted.  Shouldn't be called.");
 }
 

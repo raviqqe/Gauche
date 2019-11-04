@@ -63,10 +63,10 @@ extern ScmObj Scm_ThreadTerminate(ScmVM *vm);
  * Scheme condition variable.
  */
 typedef struct ScmConditionVariableRec {
-    SCM_INSTANCE_HEADER;
-    ScmInternalCond cv;
-    ScmObj name;
-    ScmObj specific;
+	SCM_INSTANCE_HEADER;
+	ScmInternalCond cv;
+	ScmObj name;
+	ScmObj specific;
 } ScmConditionVariable;
 
 SCM_CLASS_DECL(Scm_ConditionVariableClass);
@@ -86,15 +86,15 @@ ScmObj Scm_ConditionVariableBroadcast(ScmConditionVariable *cond);
  *    locked=TRUE   owner=terminated vm  unlocked/abandoned
  */
 typedef struct ScmMutexRec {
-    SCM_INSTANCE_HEADER;
-    ScmInternalMutex mutex;
-    ScmInternalCond  cv;
-    ScmObj name;
-    ScmObj specific;
-    int   locked;
-    ScmVM *owner;              /* the thread who owns this lock; may be NULL */
-    ScmObj locker_proc;        /* subr thunk to lock this mutex */
-    ScmObj unlocker_proc;      /* subr thunk to unlock this mutex */
+	SCM_INSTANCE_HEADER;
+	ScmInternalMutex mutex;
+	ScmInternalCond cv;
+	ScmObj name;
+	ScmObj specific;
+	int locked;
+	ScmVM *owner;          /* the thread who owns this lock; may be NULL */
+	ScmObj locker_proc;    /* subr thunk to lock this mutex */
+	ScmObj unlocker_proc;  /* subr thunk to unlock this mutex */
 } ScmMutex;
 
 SCM_CLASS_DECL(Scm_MutexClass);

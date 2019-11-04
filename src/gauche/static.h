@@ -64,13 +64,13 @@
 #endif
 
 #define SCM_INIT_STATIC()                       \
-    do {                                        \
-        GC_INIT();                              \
-        Scm_Init(GAUCHE_SIGNATURE);             \
-        Scm_InitPrelinked();                    \
-        GAUCHE__STATIC_INIT_GDBM;               \
-        GAUCHE__STATIC_INIT_MBED;               \
-    } while (0)
+	do {                                        \
+		GC_INIT();                              \
+		Scm_Init(GAUCHE_SIGNATURE);             \
+		Scm_InitPrelinked();                    \
+		GAUCHE__STATIC_INIT_GDBM;               \
+		GAUCHE__STATIC_INIT_MBED;               \
+	} while (0)
 
 /* These functions are directly linked, so do not use SCM_EXTERN. */
 #ifdef __cplusplus

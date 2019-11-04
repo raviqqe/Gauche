@@ -72,13 +72,13 @@ static DwSH_WORD DwSip_hash(uint8_t *str, uint32_t len,
 uint32_t Scm__DwSipDefaultHash(uint8_t *str, uint32_t len,
                                uint32_t k1, uint32_t k2)
 {
-    return Scm__DwSip32_hash(str, len, k1, k2);
+	return Scm__DwSip32_hash(str, len, k1, k2);
 }
 
 uint32_t Scm__DwSipPortableHash(uint8_t *str, uint32_t len,
                                 uint32_t k1, uint32_t k2)
 {
-    return Scm__DwSip32_hash(str, len, k1, k2);
+	return Scm__DwSip32_hash(str, len, k1, k2);
 }
 #else    /*DwSH_BWIDTH == 64*/
 /* nothing */
@@ -90,13 +90,13 @@ uint32_t Scm__DwSipPortableHash(uint8_t *str, uint32_t len,
 uint32_t Scm__DwSipPortableHash(uint8_t *str, uint32_t len,
                                 uint32_t k1, uint32_t k2)
 {
-    return Scm__DwSip32_hash(str, len, k1, k2);
+	return Scm__DwSip32_hash(str, len, k1, k2);
 }
 #else    /*DwSH_BWIDTH == 64*/
 uint64_t Scm__DwSipDefaultHash(uint8_t *str, uint32_t len,
                                uint64_t k1, uint64_t k2)
 {
-    return Scm__DwSip64_hash(str, len, k1, k2);
+	return Scm__DwSip64_hash(str, len, k1, k2);
 }
 #endif   /*DwSH_BWIDTH == 64*/
 

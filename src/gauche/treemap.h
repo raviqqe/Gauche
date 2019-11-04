@@ -47,15 +47,15 @@
 
 typedef struct ScmTreeCoreRec ScmTreeCore;
 
-typedef int ScmTreeCoreCompareProc(ScmTreeCore*, intptr_t, intptr_t);
+typedef int ScmTreeCoreCompareProc (ScmTreeCore*, intptr_t, intptr_t);
 
 /* A general tree map for internal use.  This is NOT a Scheme object. */
 
 struct ScmTreeCoreRec {
-    ScmDictEntry *root;
-    ScmTreeCoreCompareProc *cmp;
-    int   num_entries;
-    void  *data;
+	ScmDictEntry *root;
+	ScmTreeCoreCompareProc *cmp;
+	int num_entries;
+	void  *data;
 };
 
 #define SCM_TREE_CORE_DATA(core)  ((core)->data)
@@ -67,7 +67,7 @@ struct ScmTreeCoreRec {
    cursor would go.  So 'prev' pointer points to the max node (hence
    going backwards start from max node) and 'next' pointer points to the
    min node (so going fowards start from min node).
-   
+
    p      c      n
    cur-1  cur    cur+1          normal state
    NULL   min    min+1          cursor at the lowest end
@@ -78,12 +78,12 @@ struct ScmTreeCoreRec {
 
    NULL   cur    NULL           edge case: map only has one entry
    NULL   NULL   NULL           edge case: map has no entries
-*/
+ */
 typedef struct ScmTreeIterRec {
-    ScmTreeCore  *t;
-    ScmDictEntry *c;            /* current */
-    ScmDictEntry *n;            /* next */
-    ScmDictEntry *p;            /* prev */
+	ScmTreeCore  *t;
+	ScmDictEntry *c;        /* current */
+	ScmDictEntry *n;        /* next */
+	ScmDictEntry *p;        /* prev */
 } ScmTreeIter;
 
 /*
@@ -112,8 +112,8 @@ SCM_EXTERN ScmDictEntry *Scm_TreeCoreNextEntry(ScmTreeCore *tc, intptr_t key);
 SCM_EXTERN ScmDictEntry *Scm_TreeCorePrevEntry(ScmTreeCore *tc, intptr_t key);
 
 typedef enum ScmTreeCoreBoundOp {
-    SCM_TREE_CORE_MIN,
-    SCM_TREE_CORE_MAX
+	SCM_TREE_CORE_MIN,
+	SCM_TREE_CORE_MAX
 } ScmTreeCoreBoundOp;
 
 SCM_EXTERN ScmDictEntry *Scm_TreeCoreGetBound(ScmTreeCore *tc,
@@ -147,8 +147,8 @@ SCM_EXTERN void          Scm_TreeCoreDump(ScmTreeCore *tc, ScmPort *out);
 /* We store ScmComparator in core.data if the treemap is created
    in the Scheme world.  See make-tree-map in lib/gauche/treeutil.scm */
 struct ScmTreeMapRec {
-    SCM_HEADER;
-    ScmTreeCore core;
+	SCM_HEADER;
+	ScmTreeCore core;
 };
 
 SCM_CLASS_DECL(Scm_TreeMapClass);
